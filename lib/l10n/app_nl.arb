@@ -1,0 +1,25 @@
+{
+  "@@locale": "nl",
+  "appTitle": "Cherrytree Flutter",
+  "loading": "Laden…",
+  "saveFailed": "Notities konden niet worden opgeslagen. Controleer opslag en vrije ruimte.",
+  "errorWithMessage": "Fout: {error}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addRootNoteTooltip": "Hoofdnotitie toevoegen",
+  "drawerNotesTitle": "Notities",
+  "menuAddChild": "Kind toevoegen",
+  "menuDeleteSubtree": "Subboom verwijderen",
+  "untitledNote": "Naamloos",
+  "emptyEditorHint": "Selecteer een notitie of voeg er een toe.",
+  "fieldTitle": "Titel",
+  "fieldBody": "Tekst",
+  "newNoteTitle": "Nieuwe notitie",
+  "seedWelcomeTitle": "Welkom",
+  "seedWelcomeBody": "Dit is Spike A: een lokale boom van notities. Bewerk titels en tekst; voeg notities toe via het +-menu. Gegevens worden alleen op dit apparaat opgeslagen — import van CherryTree-bestanden volgt later."
+}

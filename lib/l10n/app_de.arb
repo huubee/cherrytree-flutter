@@ -1,0 +1,25 @@
+{
+  "@@locale": "de",
+  "appTitle": "Cherrytree Flutter",
+  "loading": "Wird geladen…",
+  "saveFailed": "Notizen konnten nicht gespeichert werden. Speicher prüfen.",
+  "errorWithMessage": "Fehler: {error}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addRootNoteTooltip": "Hauptnotiz hinzufügen",
+  "drawerNotesTitle": "Notizen",
+  "menuAddChild": "Unterpunkt hinzufügen",
+  "menuDeleteSubtree": "Zweig löschen",
+  "untitledNote": "Ohne Titel",
+  "emptyEditorHint": "Notiz auswählen oder neue anlegen.",
+  "fieldTitle": "Titel",
+  "fieldBody": "Text",
+  "newNoteTitle": "Neue Notiz",
+  "seedWelcomeTitle": "Willkommen",
+  "seedWelcomeBody": "Dies ist Spike A: ein lokaler Notizbaum. Bearbeiten Sie Titel und Text; fügen Sie Notizen über das +-Menü hinzu. Daten werden nur auf diesem Gerät gespeichert — Import von CherryTree-Dateien folgt später."
+}

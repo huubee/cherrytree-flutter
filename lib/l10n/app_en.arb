@@ -1,0 +1,25 @@
+{
+  "@@locale": "en",
+  "appTitle": "Cherrytree Flutter",
+  "loading": "Loading…",
+  "saveFailed": "Could not save notes. Check storage permissions and free space.",
+  "errorWithMessage": "Error: {error}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addRootNoteTooltip": "Add root note",
+  "drawerNotesTitle": "Notes",
+  "menuAddChild": "Add child",
+  "menuDeleteSubtree": "Delete subtree",
+  "untitledNote": "Untitled",
+  "emptyEditorHint": "Select a note or add one.",
+  "fieldTitle": "Title",
+  "fieldBody": "Body",
+  "newNoteTitle": "New note",
+  "seedWelcomeTitle": "Welcome",
+  "seedWelcomeBody": "This is Spike A: a local tree of notes. Edit titles and body text; add nodes from the + menu. Data is saved on this device only — CherryTree file import comes later."
+}
