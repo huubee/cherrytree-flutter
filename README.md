@@ -41,6 +41,7 @@ Exact milestones may shift; check issues and pull requests for current work.
 
 | Doc | Use it for |
 | --- | ---------- |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | **How to contribute** — PR expectations, CI, reviews, and links to rules. |
 | [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) | **Canonical checklist** — what is done (`[x]`), not started (`[ ]`), or in progress (`[-]`). |
 | [`CHANGELOG.md`](CHANGELOG.md) | **What shipped** in each version; **Unreleased** summarizes recent work before a tag. |
 | This README (roadmap table above) | **High-level phases** (Spike A/B/C) without duplicating every checkbox. |

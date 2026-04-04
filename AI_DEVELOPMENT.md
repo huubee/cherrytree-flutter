@@ -8,7 +8,8 @@ Short, **task-oriented** context for automated and assistant-driven work. Humans
 2. [`AGENTS.md`](AGENTS.md) — boundaries, verify commands, architecture rules.
 3. [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) — what is done vs planned (checkboxes).
 4. [`CHANGELOG.md`](CHANGELOG.md) — what changed recently; align version in [`pubspec.yaml`](pubspec.yaml) when you cut a release.
-5. [`DEVELOPMENT_GUIDELINES.md`](DEVELOPMENT_GUIDELINES.md) — style and maintainability (if present).
+5. [`CONTRIBUTING.md`](CONTRIBUTING.md) — for **human** PRs: CI expectations, reviews, and scope (automation should still follow [`AGENTS.md`](AGENTS.md)).
+6. [`DEVELOPMENT_GUIDELINES.md`](DEVELOPMENT_GUIDELINES.md) — style and maintainability (if present).
 
 ## What this project is
 

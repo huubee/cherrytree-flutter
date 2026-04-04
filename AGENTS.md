@@ -19,6 +19,8 @@ For human-oriented development practices, see [`DEVELOPMENT_GUIDELINES.md`](DEVE
 
 ## Commands to verify changes
 
+These match **[`.github/workflows/ci.yml`](.github/workflows/ci.yml)** on pull requests:
+
 ```bash
 cd cherrytree_flutter   # or the full path on the contributor’s machine
 flutter pub get
