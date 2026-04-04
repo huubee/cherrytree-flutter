@@ -36,7 +36,7 @@ Optional: `flutter build apk --debug` (Android) — iOS builds require macOS/Xco
 - **Models** should stay free of Flutter when possible (`lib/models/`).
 - **Persistence** belongs in services/repositories; **widgets** should not construct file paths directly.
 - **Stateful async loading:** If using `FutureBuilder`, do not assign mutable app state from `snapshot.data` on every rebuild if that snapshot is stale — it will overwrite user edits. Prefer `??=` or loading exactly once into state.
-- **File size:** prefer **~300 lines or fewer** per file; split widgets and helpers instead of growing one file indefinitely.
+- **File size:** prefer **~300 lines or fewer** per file; split widgets and helpers instead of growing one file indefinitely. See [`DEVELOPMENT_GUIDELINES.md`](DEVELOPMENT_GUIDELINES.md) § Maintainability for hotspots (`notes_home_page`, `lib/notes/`, `notes_home_scaffold`).
 - **DRY:** extract repeated UI into widgets or shared helpers; avoid copy-paste across screens.
 - **Comments:** explain **why** (intent, invariants, gotchas), not what the code already says.
 - For more detail, see [`DEVELOPMENT_GUIDELINES.md`](DEVELOPMENT_GUIDELINES.md) § Maintainability.

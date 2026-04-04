@@ -63,8 +63,7 @@ import 'app_localizations_nl.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -72,8 +71,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -85,19 +83,18 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('de'),
     Locale('en'),
-    Locale('nl'),
+    Locale('nl')
   ];
 
   /// No description provided for @appTitle.
@@ -111,6 +108,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading…'**
   String get loading;
+
+  /// No description provided for @noOpenDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'No open documents.'**
+  String get noOpenDocuments;
 
   /// No description provided for @saveFailed.
   ///
@@ -190,6 +193,114 @@ abstract class AppLocalizations {
   /// **'Spike B: local tree of notes with read-only import of unencrypted CherryTree .ctd (XML) and .ctb (SQLite) files. Rich text is shown as plain text; images and tables are omitted.'**
   String get seedWelcomeBody;
 
+  /// No description provided for @exportCherryTreeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Export to CherryTree file'**
+  String get exportCherryTreeTooltip;
+
+  /// No description provided for @exportCherryTreeSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export format'**
+  String get exportCherryTreeSheetTitle;
+
+  /// No description provided for @exportAsCtdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'XML (.ctd)'**
+  String get exportAsCtdTitle;
+
+  /// No description provided for @exportAsCtdSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Single-file document; good for small trees and diff-friendly text.'**
+  String get exportAsCtdSubtitle;
+
+  /// No description provided for @exportAsCtbTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SQLite (.ctb)'**
+  String get exportAsCtbTitle;
+
+  /// No description provided for @exportAsCtbSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Database file; better for large documents on mobile and desktop.'**
+  String get exportAsCtbSubtitle;
+
+  /// No description provided for @exportCherryTreeDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save CherryTree export'**
+  String get exportCherryTreeDialogTitle;
+
+  /// No description provided for @exportFileNameDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'File name'**
+  String get exportFileNameDialogTitle;
+
+  /// No description provided for @exportFileNameFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get exportFileNameFieldLabel;
+
+  /// No description provided for @exportFileNameContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get exportFileNameContinue;
+
+  /// No description provided for @exportDestinationSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where to put the file?'**
+  String get exportDestinationSheetTitle;
+
+  /// No description provided for @exportSaveToDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to this device'**
+  String get exportSaveToDeviceTitle;
+
+  /// No description provided for @exportSaveToDeviceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a folder (local storage)'**
+  String get exportSaveToDeviceSubtitle;
+
+  /// No description provided for @exportShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share via another app'**
+  String get exportShareTitle;
+
+  /// No description provided for @exportShareSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud storage, email, or other destinations'**
+  String get exportShareSubtitle;
+
+  /// No description provided for @exportCherryTreeSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Export saved.'**
+  String get exportCherryTreeSuccess;
+
+  /// No description provided for @exportCherryTreeShareSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Share sheet opened.'**
+  String get exportCherryTreeShareSuccess;
+
+  /// No description provided for @exportCherryTreeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not export: {error}'**
+  String exportCherryTreeFailed(String error);
+
   /// No description provided for @importCherryTreeTooltip.
   ///
   /// In en, this message translates to:
@@ -219,6 +330,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Replace'**
   String get importReplaceConfirm;
+
+  /// No description provided for @importTabTargetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import location'**
+  String get importTabTargetTitle;
+
+  /// No description provided for @importTabTargetMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace the current tab’s notes or open the import in a new tab?'**
+  String get importTabTargetMessage;
+
+  /// No description provided for @importTabReplaceCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace current tab'**
+  String get importTabReplaceCurrent;
+
+  /// No description provided for @importTabOpenNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New tab'**
+  String get importTabOpenNew;
+
+  /// No description provided for @newTabTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'New tab'**
+  String get newTabTooltip;
+
+  /// No description provided for @closeTabTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Close tab'**
+  String get closeTabTooltip;
+
+  /// No description provided for @renameTabTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-press to rename'**
+  String get renameTabTooltip;
+
+  /// No description provided for @renameTabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename tab'**
+  String get renameTabTitle;
+
+  /// No description provided for @renameTabFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tab name'**
+  String get renameTabFieldLabel;
+
+  /// No description provided for @renameTabDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to use the first root note’s title.'**
+  String get renameTabDescription;
+
+  /// No description provided for @renameTabSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get renameTabSave;
 
   /// No description provided for @importEncryptedError.
   ///
@@ -293,8 +470,7 @@ abstract class AppLocalizations {
   String get settingsUseDarkThemeSubtitle;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -303,28 +479,26 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['de', 'en', 'nl'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['de', 'en', 'nl'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'de':
-      return AppLocalizationsDe();
-    case 'en':
-      return AppLocalizationsEn();
-    case 'nl':
-      return AppLocalizationsNl();
+    case 'de': return AppLocalizationsDe();
+    case 'en': return AppLocalizationsEn();
+    case 'nl': return AppLocalizationsNl();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
+    'that was used.'
   );
 }

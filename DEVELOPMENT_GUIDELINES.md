@@ -39,18 +39,24 @@ Spike A uses a **single JSON file** per device for local notes. That will evolve
 - **Versions:** add dependencies at **stable** releases that satisfy [`pubspec.yaml`](pubspec.yaml) **`environment.sdk`** and Flutter’s constraints. Use normal **SemVer** ranges from pub.dev (typically **`^x.y.z`**, e.g. via `flutter pub add` or a hand-edited constraint); commit **`pubspec.lock`** with the change.
 - Do **not** treat “always the newest version on pub.dev” as a standing rule — that creates unnecessary churn. **Dependabot** (see [`.github/dependabot.yml`](.github/dependabot.yml)) and intentional PRs handle upgrades; skim **changelogs** for **major** bumps and mention breaking changes in the PR when relevant.
 
-## Maintainability: file size, DRY, comments
+## Maintainability
 
-These ideas align with common practice and with the generic template in [`old_DEVELOPMENT_GUIDELINES.md`](old_DEVELOPMENT_GUIDELINES.md); they are adapted for Flutter and this codebase.
+These ideas align with common practice and with the generic template in [`old_DEVELOPMENT_GUIDELINES.md`](old_DEVELOPMENT_GUIDELINES.md); they are adapted for Flutter and this codebase. Agent-oriented reminders also live in [`AGENTS.md`](AGENTS.md) (file size, DRY, comments).
 
 ### File size and structure
 
 - **Soft limit:** aim for **about 300 lines or fewer** per library file. If a file keeps growing, it is usually doing too much — split out widgets, models, or helpers.
 - **One primary public type per file** when practical (e.g. one screen widget, one repository class). Small `part` files or private classes in the same file are fine if they stay easy to navigate.
+- **Generated or data-heavy files** (e.g. long static lists) may exceed the limit; add a short header comment pointing to the generator or upstream source so they are not edited by hand.
+
+### Refactoring hotspots (this repo)
+
+- **`lib/notes_home_page.dart`** — owns document load, debounced save, and tree/edit actions. Keep it **under ~300 lines**; move new **import/export** or **dialogs** into `lib/notes/` (see [`cherrytree_file_actions.dart`](lib/notes/cherrytree_file_actions.dart)) and **layout shells** into `lib/widgets/` (see [`notes_home_scaffold.dart`](lib/widgets/notes_home_scaffold.dart)).
+- **Feature-adjacent helpers** can live under **`lib/notes/`** without pulling in Flutter where avoidable; keep **models** in `lib/models/` and **persistence** in `lib/services/`.
 
 ### DRY and reusable pieces
 
-- **Don’t copy-paste** identical UI or logic; extract **widgets** (`lib/widgets/` or under a feature folder) or **functions** / **extensions** when the same pattern appears three times or is clearly reusable.
+- **Don’t copy-paste** identical UI or logic; extract **widgets** (`lib/widgets/` or a feature folder) or **functions** / **extensions** when the same pattern appears three times or is clearly reusable.
 - **Prefer composition** over giant widgets: small, named widgets are easier to test and reuse.
 - Repeated **layout values** (padding, radii) should eventually live in **theme** or a small shared constants module — avoid scattering magic numbers once the design stabilizes.
 
@@ -62,14 +68,20 @@ These ideas align with common practice and with the generic template in [`old_DE
 
 ### User-facing strings and theming
 
-- **Long term:** plan for **internationalization** (Flutter gen-l10n / `AppLocalizations`) so strings are not hardcoded forever.
-- **Short term (Spike A):** literal strings in UI are acceptable; when adding new screens, keep strings in obvious places so they are easy to migrate to ARB files later.
+- **Strings:** use Flutter **gen-l10n** (`AppLocalizations`, `lib/l10n/*.arb`) for user-visible text.
 - Prefer **`Theme.of(context)`** / **`ColorScheme`** / **`TextTheme`** over one-off hex colors and raw font sizes where it keeps the UI consistent.
 
 ### Logging
 
 - Do not rely on **`print`** for permanent diagnostics in library code; use **`dart:developer`** (`log`) or a small app logger with levels, especially in release-oriented paths.
 - Never log secrets, tokens, or full note bodies if they could be sensitive.
+
+## User manual
+
+- **Location:** [`docs/USER_MANUAL.md`](docs/USER_MANUAL.md) — written for **people using the app**, not for implementation details.
+- **Why it exists:** Updating this file **as features land** avoids a painful “write the manual at the end” pass and reduces drift between what the app does and what docs claim.
+- **When to update:** In the **same PR** as the change when you add or materially change **user-visible** behavior (new flows, buttons, limits, or troubleshooting). A short paragraph or bullet list is enough; perfection is optional; honesty about temporary gaps is welcome.
+- **What not to duplicate:** Keep architecture, file formats, and contributor setup in this guide, [`README.md`](README.md), or code — the user manual should stay task-oriented (“how do I …?”).
 
 ## Code style
 
@@ -86,4 +98,4 @@ These ideas align with common practice and with the generic template in [`old_DE
 
 - `flutter analyze` clean; `flutter test` passing (or explain skipped tests).
 - No stray `print` / debug noise intended only for local debugging.
-- If you touched user-visible behavior, update [`README.md`](README.md) when it matters to contributors or users.
+- If you touched user-visible behavior, update [`README.md`](README.md) when it matters to contributors or users, and update [`docs/USER_MANUAL.md`](docs/USER_MANUAL.md) when it matters to **end users** (see [User manual](#user-manual)).

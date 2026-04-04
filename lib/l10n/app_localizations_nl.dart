@@ -15,8 +15,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get loading => 'Laden…';
 
   @override
-  String get saveFailed =>
-      'Notities konden niet worden opgeslagen. Controleer opslag en vrije ruimte.';
+  String get noOpenDocuments => 'Geen open documenten.';
+
+  @override
+  String get saveFailed => 'Notities konden niet worden opgeslagen. Controleer opslag en vrije ruimte.';
 
   @override
   String errorWithMessage(String error) {
@@ -54,8 +56,63 @@ class AppLocalizationsNl extends AppLocalizations {
   String get seedWelcomeTitle => 'Welkom';
 
   @override
-  String get seedWelcomeBody =>
-      'Spike B: lokale notities met alleen-lezen import van onversleutelde CherryTree .ctd (XML) en .ctb (SQLite). Rijke tekst wordt als platte tekst getoond; afbeeldingen en tabellen worden weggelaten.';
+  String get seedWelcomeBody => 'Spike B: lokale notities met alleen-lezen import van onversleutelde CherryTree .ctd (XML) en .ctb (SQLite). Rijke tekst wordt als platte tekst getoond; afbeeldingen en tabellen worden weggelaten.';
+
+  @override
+  String get exportCherryTreeTooltip => 'Exporteren naar CherryTree-bestand';
+
+  @override
+  String get exportCherryTreeSheetTitle => 'Exportformaat';
+
+  @override
+  String get exportAsCtdTitle => 'XML (.ctd)';
+
+  @override
+  String get exportAsCtdSubtitle => 'Eén bestand; handig voor kleine bomen en diffen.';
+
+  @override
+  String get exportAsCtbTitle => 'SQLite (.ctb)';
+
+  @override
+  String get exportAsCtbSubtitle => 'Databasebestand; beter voor grote documenten.';
+
+  @override
+  String get exportCherryTreeDialogTitle => 'CherryTree-export opslaan';
+
+  @override
+  String get exportFileNameDialogTitle => 'Bestandsnaam';
+
+  @override
+  String get exportFileNameFieldLabel => 'Naam';
+
+  @override
+  String get exportFileNameContinue => 'Doorgaan';
+
+  @override
+  String get exportDestinationSheetTitle => 'Waar wilt u het bestand zetten?';
+
+  @override
+  String get exportSaveToDeviceTitle => 'Opslaan op dit apparaat';
+
+  @override
+  String get exportSaveToDeviceSubtitle => 'Kies een map (lokale opslag)';
+
+  @override
+  String get exportShareTitle => 'Delen via een andere app';
+
+  @override
+  String get exportShareSubtitle => 'Cloudopslag, e-mail of andere bestemmingen';
+
+  @override
+  String get exportCherryTreeSuccess => 'Export opgeslagen.';
+
+  @override
+  String get exportCherryTreeShareSuccess => 'Deelvenster geopend.';
+
+  @override
+  String exportCherryTreeFailed(String error) {
+    return 'Exporteren mislukt: $error';
+  }
 
   @override
   String get importCherryTreeTooltip => 'CherryTree-bestand importeren';
@@ -64,8 +121,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get importReplaceTitle => 'Lokale notities vervangen?';
 
   @override
-  String get importReplaceMessage =>
-      'Dit vervangt alle in deze app opgeslagen notities door het geïmporteerde CherryTree-document. Doorgaan?';
+  String get importReplaceMessage => 'Dit vervangt alle in deze app opgeslagen notities door het geïmporteerde CherryTree-document. Doorgaan?';
 
   @override
   String get importCancel => 'Annuleren';
@@ -74,12 +130,43 @@ class AppLocalizationsNl extends AppLocalizations {
   String get importReplaceConfirm => 'Vervangen';
 
   @override
-  String get importEncryptedError =>
-      'Versleutelde CherryTree-documenten (.ctz / .ctx) worden nog niet ondersteund.';
+  String get importTabTargetTitle => 'Importlocatie';
 
   @override
-  String get importUnsupportedFileType =>
-      'Kies een CherryTree-.ctd- of .ctb-bestand.';
+  String get importTabTargetMessage => 'Het huidige tabblad vervangen of de import in een nieuw tabblad openen?';
+
+  @override
+  String get importTabReplaceCurrent => 'Huidige tabblad vervangen';
+
+  @override
+  String get importTabOpenNew => 'Nieuw tabblad';
+
+  @override
+  String get newTabTooltip => 'Nieuw tabblad';
+
+  @override
+  String get closeTabTooltip => 'Tabblad sluiten';
+
+  @override
+  String get renameTabTooltip => 'Lang indrukken om te hernoemen';
+
+  @override
+  String get renameTabTitle => 'Tabblad hernoemen';
+
+  @override
+  String get renameTabFieldLabel => 'Tabnaam';
+
+  @override
+  String get renameTabDescription => 'Laat leeg om de titel van de eerste hoofdnotitie te gebruiken.';
+
+  @override
+  String get renameTabSave => 'Opslaan';
+
+  @override
+  String get importEncryptedError => 'Versleutelde CherryTree-documenten (.ctz / .ctx) worden nog niet ondersteund.';
+
+  @override
+  String get importUnsupportedFileType => 'Kies een CherryTree-.ctd- of .ctb-bestand.';
 
   @override
   String importFailedMessage(String error) {
@@ -111,6 +198,5 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsUseDarkTheme => 'Donker thema';
 
   @override
-  String get settingsUseDarkThemeSubtitle =>
-      'Donkerblauw, vergelijkbaar met desktop CherryTree';
+  String get settingsUseDarkThemeSubtitle => 'Donkerblauw, vergelijkbaar met desktop CherryTree';
 }

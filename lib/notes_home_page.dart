@@ -1,20 +1,17 @@
 import 'dart:async';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
-import 'cherrytree/cherrytree_document_reader.dart';
 import 'l10n/app_localizations.dart';
+import 'models/document_tab.dart';
 import 'models/note_document.dart';
-import 'services/document_storage_prefs.dart';
+import 'notes/cherrytree_file_actions.dart';
 import 'services/note_repository.dart';
 import 'settings_page.dart';
-import 'theme/app_spacing.dart';
 import 'theme/app_timing.dart';
 import 'widgets/ct_app_bar.dart';
-import 'widgets/node_editor.dart';
-import 'widgets/tree_panel.dart';
+import 'widgets/notes_home_scaffold.dart';
 
 class NotesHomePage extends StatefulWidget {
   const NotesHomePage({super.key, this.repository, this.onSetUseDarkTheme});
@@ -30,17 +27,21 @@ class NotesHomePage extends StatefulWidget {
 }
 
 class _NotesHomePageState extends State<NotesHomePage>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   late final NoteRepository _repo = widget.repository ?? NoteRepository();
   final _uuid = const Uuid();
-  NoteDocument? _doc;
-  String? _selectedId;
+  List<DocumentTab> _tabs = [];
+  int _activeTabIndex = 0;
+  TabController? _tabController;
   bool _loading = true;
   Object? _loadError;
   Timer? _saveDebounce;
   SaveState _saveState = SaveState.idle;
   bool _isSaving = false;
   bool _saveRequested = false;
+
+  DocumentTab get _activeTab => _tabs[_activeTabIndex];
+  NoteDocument get _doc => _activeTab.document;
 
   @override
   void initState() {
@@ -52,9 +53,9 @@ class _NotesHomePageState extends State<NotesHomePage>
   @override
   void dispose() {
     _saveDebounce?.cancel();
+    _tabController?.removeListener(_onTabChanged);
+    _tabController?.dispose();
     WidgetsBinding.instance.removeObserver(this);
-    // Flush once: debounced edits may not have run yet; the process can exit
-    // immediately after dispose.
     unawaited(_persist());
     super.dispose();
   }
@@ -63,10 +64,41 @@ class _NotesHomePageState extends State<NotesHomePage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
       _saveDebounce?.cancel();
-      // Same rationale as [dispose]: backgrounding often precedes process death;
-      // do not rely on the debounce timer firing later.
       unawaited(_persist());
     }
+  }
+
+  void _recreateTabController({int? initialIndex}) {
+    _tabController?.removeListener(_onTabChanged);
+    _tabController?.dispose();
+    if (_tabs.isEmpty) {
+      _tabController = null;
+      return;
+    }
+    final idx = (initialIndex ?? _activeTabIndex).clamp(0, _tabs.length - 1);
+    _tabController = TabController(
+      length: _tabs.length,
+      initialIndex: idx,
+      vsync: this,
+    );
+    _activeTabIndex = _tabController!.index;
+    _tabController!.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    final c = _tabController;
+    if (c == null || c.indexIsChanging) return;
+    final i = c.index;
+    if (i == _activeTabIndex) return;
+    unawaited(_switchToTabIndex(i));
+  }
+
+  Future<void> _switchToTabIndex(int i) async {
+    if (i < 0 || i >= _tabs.length || i == _activeTabIndex) return;
+    await _repo.saveTab(_tabs[_activeTabIndex]);
+    if (!mounted) return;
+    setState(() => _activeTabIndex = i);
+    await _repo.saveSession(_tabs, _tabs[i].id);
   }
 
   Future<void> _loadDocument() async {
@@ -75,12 +107,13 @@ class _NotesHomePageState extends State<NotesHomePage>
       _loadError = null;
     });
     try {
-      final d = await _repo.load();
+      final result = await _repo.loadTabs();
       if (!mounted) return;
-      final roots = d.childrenOf(null);
       setState(() {
-        _doc = d;
-        _selectedId ??= roots.isNotEmpty ? roots.first.id : null;
+        _tabs = result.tabs;
+        _activeTabIndex = result.tabs.indexWhere((t) => t.id == result.activeTabId);
+        if (_activeTabIndex < 0) _activeTabIndex = 0;
+        _recreateTabController();
         _loading = false;
       });
     } catch (e) {
@@ -93,11 +126,8 @@ class _NotesHomePageState extends State<NotesHomePage>
   }
 
   Future<void> _persist() async {
-    final d = _doc;
-    if (d == null) return;
+    if (_tabs.isEmpty) return;
 
-    // Serialize saves: overlapping [save] calls on the same repository could
-    // interleave writes or drop the latest document snapshot.
     if (_isSaving) {
       _saveRequested = true;
       return;
@@ -109,7 +139,9 @@ class _NotesHomePageState extends State<NotesHomePage>
       setState(() => _saveState = SaveState.saving);
     }
 
-    final ok = await _repo.save(d);
+    final t = _activeTab;
+    final ok = await _repo.saveTab(t);
+    await _repo.saveSession(_tabs, t.id);
 
     if (mounted) {
       setState(() => _saveState = ok ? SaveState.saved : SaveState.error);
@@ -128,7 +160,6 @@ class _NotesHomePageState extends State<NotesHomePage>
     }
     _isSaving = false;
 
-    // If another save was requested while we were saving, trigger it now.
     if (_saveRequested) {
       unawaited(_persist());
     }
@@ -136,8 +167,6 @@ class _NotesHomePageState extends State<NotesHomePage>
 
   void _schedulePersistAfterEdit() {
     _saveDebounce?.cancel();
-    // Coalesce rapid typing into one I/O pass; immediate saves stay on
-    // [_persistImmediately] for structural edits (add/delete).
     _saveDebounce = Timer(AppTiming.saveDebounce, () {
       if (!mounted) return;
       unawaited(_persist());
@@ -149,8 +178,61 @@ class _NotesHomePageState extends State<NotesHomePage>
     unawaited(_persist());
   }
 
+  Future<void> _addNewTab(AppLocalizations l10n) async {
+    if (_tabs.isEmpty) return;
+    await _repo.saveTab(_tabs[_activeTabIndex]);
+    if (!mounted) return;
+    final id = _uuid.v4();
+    final doc = NoteDocument(
+      nodes: [
+        NoteNode(
+          id: _uuid.v4(),
+          parentId: null,
+          title: l10n.newNoteTitle,
+          body: '',
+          sortIndex: 0,
+        ),
+      ],
+    );
+    final tab = DocumentTab(
+      id: id,
+      document: doc,
+      selectedNodeId: doc.childrenOf(null).first.id,
+    );
+    setState(() {
+      _tabs.add(tab);
+      _activeTabIndex = _tabs.length - 1;
+      _recreateTabController(initialIndex: _activeTabIndex);
+    });
+    await _repo.saveSession(_tabs, tab.id);
+    await _repo.saveTab(tab);
+  }
+
+  Future<void> _closeTab(int index) async {
+    if (_tabs.length <= 1) return;
+    await _repo.saveTab(_tabs[index]);
+    final oldActive = _activeTabIndex;
+    final removed = _tabs.removeAt(index);
+    await _repo.deleteTabFile(removed.id);
+    final newActiveIndex = () {
+      if (index < oldActive) {
+        return oldActive - 1;
+      }
+      if (index == oldActive) {
+        return index >= _tabs.length ? _tabs.length - 1 : index;
+      }
+      return oldActive;
+    }();
+    if (!mounted) return;
+    setState(() {
+      _activeTabIndex = newActiveIndex;
+      _recreateTabController(initialIndex: newActiveIndex);
+    });
+    await _repo.saveSession(_tabs, _tabs[newActiveIndex].id);
+  }
+
   void _addRoot(AppLocalizations l10n) {
-    final d = _doc!;
+    final d = _doc;
     final id = _uuid.v4();
     d.nodes.add(
       NoteNode(
@@ -161,12 +243,12 @@ class _NotesHomePageState extends State<NotesHomePage>
         sortIndex: d.nextSortIndex(null),
       ),
     );
-    setState(() => _selectedId = id);
+    setState(() => _activeTab.selectedNodeId = id);
     _persistImmediately();
   }
 
   void _addChild(String parentId, AppLocalizations l10n) {
-    final d = _doc!;
+    final d = _doc;
     final id = _uuid.v4();
     d.nodes.add(
       NoteNode(
@@ -177,24 +259,24 @@ class _NotesHomePageState extends State<NotesHomePage>
         sortIndex: d.nextSortIndex(parentId),
       ),
     );
-    setState(() => _selectedId = id);
+    setState(() => _activeTab.selectedNodeId = id);
     _persistImmediately();
   }
 
   void _delete(String id) {
-    final d = _doc!;
+    final d = _doc;
     d.removeSubtree(id);
-    if (_selectedId == id ||
-        (_selectedId != null && d.find(_selectedId!) == null)) {
+    if (_activeTab.selectedNodeId == id ||
+        (_activeTab.selectedNodeId != null &&
+            d.find(_activeTab.selectedNodeId!) == null)) {
       final roots = d.childrenOf(null);
-      _selectedId = roots.isNotEmpty ? roots.first.id : null;
+      _activeTab.selectedNodeId = roots.isNotEmpty ? roots.first.id : null;
     }
     setState(() {});
     _persistImmediately();
   }
 
-  /// Path from root to the selected note, e.g. `Parent / Child` (CherryTree-style).
-  String? _breadcrumbPath(
+  List<BreadcrumbSegment>? _breadcrumbSegments(
     AppLocalizations l10n,
     NoteDocument doc,
     String? selectedId,
@@ -203,8 +285,13 @@ class _NotesHomePageState extends State<NotesHomePage>
     final path = doc.pathFromRoot(selectedId);
     if (path.isEmpty) return null;
     return path
-        .map((n) => n.title.trim().isEmpty ? l10n.untitledNote : n.title)
-        .join(' / ');
+        .map(
+          (n) => BreadcrumbSegment(
+            id: n.id,
+            label: n.title.trim().isEmpty ? l10n.untitledNote : n.title,
+          ),
+        )
+        .toList();
   }
 
   void _openSettings() {
@@ -220,104 +307,112 @@ class _NotesHomePageState extends State<NotesHomePage>
   }
 
   Future<void> _importCherryTree() async {
-    final l10n = AppLocalizations.of(context)!;
-    // Use FileType.any (iOS: public.item). FileType.custom + ctb/ctd maps to
-    // dynamic UTIs that file_picker drops, which greys out files in OneDrive
-    // and other document providers that only expose generic types.
-    final picked = await FilePicker.platform.pickFiles(
-      type: FileType.any,
-      // Some document providers (cloud) return bytes without a stable sandbox
-      // path; [CherrytreeDocumentReader] needs bytes or path to import.
-      withData: true,
+    final outcome = await CherrytreeFileActions.pickAndReadCherryTreeImport(
+      context,
     );
-    if (picked == null || picked.files.isEmpty) return;
+    if (outcome == null || !mounted) return;
+    final target = await CherrytreeFileActions.showImportTabTargetDialog(
+      context,
+    );
+    if (target == null || !mounted) return;
+
+    if (target == CherrytreeImportTabTarget.replaceCurrent) {
+      final newTab = CherrytreeFileActions.documentTabFromImport(
+        _activeTab.id,
+        outcome,
+      );
+      setState(() {
+        _tabs[_activeTabIndex] = newTab;
+      });
+    } else {
+      await _repo.saveTab(_activeTab);
+      if (!mounted) return;
+      final newTab = CherrytreeFileActions.documentTabFromImport(
+        _uuid.v4(),
+        outcome,
+      );
+      setState(() {
+        _tabs.add(newTab);
+        _activeTabIndex = _tabs.length - 1;
+        _recreateTabController(initialIndex: _activeTabIndex);
+      });
+    }
+    _saveDebounce?.cancel();
+    await _persist();
     if (!mounted) return;
-
-    final name = picked.files.single.name.toLowerCase();
-    if (name.endsWith('.ctz') || name.endsWith('.ctx')) {
-      ScaffoldMessenger.of(
+    if (outcome.result.hasWarnings) {
+      await CherrytreeFileActions.showImportWarningsDialog(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.importEncryptedError)));
-      return;
+        outcome.result.warnings,
+      );
     }
-    if (!name.endsWith('.ctd') && !name.endsWith('.ctb')) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.importUnsupportedFileType)));
-      return;
-    }
+  }
 
-    final confirm = await showDialog<bool>(
+  Future<void> _exportCherryTree() async {
+    await CherrytreeFileActions.exportDocument(context, _doc);
+  }
+
+  void _onEditorChanged() {
+    setState(() {});
+    _schedulePersistAfterEdit();
+  }
+
+  String _tabTitle(AppLocalizations l10n, DocumentTab t) {
+    final label = t.tabLabel?.trim();
+    if (label != null && label.isNotEmpty) return label;
+    final roots = t.document.childrenOf(null);
+    if (roots.isEmpty) return l10n.untitledNote;
+    final n = roots.first;
+    return n.title.trim().isEmpty ? l10n.untitledNote : n.title;
+  }
+
+  Future<void> _renameTab(int index) async {
+    if (index < 0 || index >= _tabs.length) return;
+    final l10n = AppLocalizations.of(context)!;
+    final t = _tabs[index];
+    final controller = TextEditingController(text: _tabTitle(l10n, t));
+    final result = await showDialog<String?>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n.importReplaceTitle),
-        content: Text(l10n.importReplaceMessage),
+        title: Text(l10n.renameTabTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              l10n.renameTabDescription,
+              style: Theme.of(ctx).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                labelText: l10n.renameTabFieldLabel,
+              ),
+              autofocus: true,
+              onSubmitted: (v) => Navigator.pop(ctx, v),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
+            onPressed: () => Navigator.pop(ctx),
             child: Text(l10n.importCancel),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l10n.importReplaceConfirm),
+            onPressed: () => Navigator.pop(ctx, controller.text),
+            child: Text(l10n.renameTabSave),
           ),
         ],
       ),
     );
-    if (confirm != true) return;
-    if (!mounted) return;
-
-    try {
-      final platformFile = picked.files.single;
-      final r = await CherrytreeDocumentReader.readFromPickedFile(platformFile);
-      if (!mounted) return;
-      final path = platformFile.path;
-      if (path != null) {
-        final lower = platformFile.name.toLowerCase();
-        if (lower.endsWith('.ctd')) {
-          await DocumentStoragePrefs.setCherrytreeFile(mode: 'ctd', path: path);
-        } else if (lower.endsWith('.ctb')) {
-          await DocumentStoragePrefs.setCherrytreeFile(mode: 'ctb', path: path);
-        }
-      }
-      // If [path] is null, prefs stay unset: [NoteRepository] keeps JSON-only
-      // persistence for the next launch even though this session edited the import.
-      setState(() {
-        _doc = r.document;
-        final roots = r.document.childrenOf(null);
-        _selectedId = roots.isNotEmpty ? roots.first.id : null;
-      });
-      _saveDebounce?.cancel();
-      await _persist();
-      if (!mounted) return;
-      if (r.hasWarnings) {
-        await showDialog<void>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(l10n.importWarningsTitle),
-            content: SingleChildScrollView(
-              child: SelectableText(r.warnings.join('\n\n')),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(l10n.importWarningsOk),
-              ),
-            ],
-          ),
-        );
-      }
-    } on CherrytreeEncryptedImportException {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.importEncryptedError)));
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.importFailedMessage('$e'))));
-    }
+    controller.dispose();
+    if (!mounted || result == null) return;
+    final trimmed = result.trim();
+    setState(() {
+      _tabs[index].tabLabel = trimmed.isEmpty ? null : trimmed;
+    });
+    _persistImmediately();
   }
 
   @override
@@ -332,109 +427,100 @@ class _NotesHomePageState extends State<NotesHomePage>
         body: Center(child: Text(l10n.errorWithMessage('$_loadError'))),
       );
     }
-    final doc = _doc!;
-    final selected = _selectedId != null ? doc.find(_selectedId!) : null;
-    final breadcrumbPath = _breadcrumbPath(l10n, doc, _selectedId);
-
-    // Use MediaQuery for the wide/narrow breakpoint — not LayoutBuilder. Nesting
-    // LayoutBuilder around Scaffold + TreePanel (PopupMenuButton / Tooltip overlays)
-    // can trigger "RenderLayoutBuilder was mutated during performLayout" on some builds.
-    final wide =
-        MediaQuery.sizeOf(context).width >= AppSpacing.wideLayoutBreakpoint;
-    if (wide) {
-      return Scaffold(
-        appBar: CTAppBar(
-          breadcrumbPath: breadcrumbPath,
-          onOpenSettings: widget.onSetUseDarkTheme != null
-              ? _openSettings
-              : null,
-          onAddRoot: () => _addRoot(l10n),
-          saveState: _saveState,
-          onImportCherryTree: () {
-            unawaited(_importCherryTree());
-          },
-        ),
-        body: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              width: AppSpacing.sidebarWidth,
-              child: Material(
-                elevation: 1,
-                child: TreePanel(
-                  doc: doc,
-                  selectedId: _selectedId,
-                  onSelect: (id) => setState(() => _selectedId = id),
-                  onAddChild: (id) => _addChild(id, l10n),
-                  onDelete: _delete,
-                ),
-              ),
-            ),
-            Expanded(
-              child: NodeEditor(
-                // New editor state per note so the Quill controller does not keep
-                // the previous note's content when the selection changes.
-                key: ValueKey(_selectedId),
-                node: selected,
-                onChanged: () {
-                  setState(() {});
-                  _schedulePersistAfterEdit();
-                },
-              ),
-            ),
-          ],
-        ),
-      );
+    final tc = _tabController;
+    if (_tabs.isEmpty || tc == null) {
+      return Scaffold(body: Center(child: Text(l10n.noOpenDocuments)));
     }
 
-    return Scaffold(
-      appBar: CTAppBar(
-        breadcrumbPath: breadcrumbPath,
-        onOpenSettings: widget.onSetUseDarkTheme != null ? _openSettings : null,
-        onAddRoot: () => _addRoot(l10n),
-        saveState: _saveState,
-        onImportCherryTree: () {
-          unawaited(_importCherryTree());
-        },
-        leading: Builder(
-          builder: (ctx) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(ctx).openDrawer(),
+    final doc = _doc;
+    final selectedId = _activeTab.selectedNodeId;
+    final breadcrumbSegments = _breadcrumbSegments(l10n, doc, selectedId);
+    final theme = Theme.of(context);
+
+    final tabStrip = Material(
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: TabBar(
+              controller: tc,
+              isScrollable: true,
+              tabs: [
+                for (var i = 0; i < _tabs.length; i++)
+                  Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Tooltip(
+                            message: l10n.renameTabTooltip,
+                            child: GestureDetector(
+                              onLongPress: () => unawaited(_renameTab(i)),
+                              behavior: HitTestBehavior.opaque,
+                              child: Align(
+                                alignment: AlignmentDirectional.centerStart,
+                                child: Text(
+                                  _tabTitle(l10n, _tabs[i]),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (_tabs.length > 1)
+                          Tooltip(
+                            message: l10n.closeTabTooltip,
+                            child: InkWell(
+                              onTap: () => unawaited(_closeTab(i)),
+                              customBorder: const CircleBorder(),
+                              child: const Padding(
+                                padding: EdgeInsetsDirectional.only(
+                                  start: 4,
+                                ),
+                                child: Icon(Icons.close, size: 18),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ),
-      drawer: Drawer(
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DrawerHeader(child: Text(l10n.drawerNotesTitle)),
-              Expanded(
-                child: TreePanel(
-                  doc: doc,
-                  selectedId: _selectedId,
-                  onSelect: (id) {
-                    setState(() => _selectedId = id);
-                    Navigator.of(context).pop();
-                  },
-                  onAddChild: (id) => _addChild(id, l10n),
-                  onDelete: _delete,
-                ),
-              ),
-            ],
+          IconButton(
+            tooltip: l10n.newTabTooltip,
+            icon: const Icon(Icons.add),
+            onPressed: () => unawaited(_addNewTab(l10n)),
           ),
-        ),
+        ],
       ),
-      body: NodeEditor(
-        // New editor state per note so the Quill controller does not keep
-        // the previous note's content when the selection changes.
-        key: ValueKey(_selectedId),
-        node: selected,
-        onChanged: () {
-          setState(() {});
-          _schedulePersistAfterEdit();
-        },
-      ),
+    );
+
+    return NotesHomeScaffold(
+      doc: doc,
+      selectedId: selectedId,
+      breadcrumbSegments: breadcrumbSegments,
+      onBreadcrumbTap: (id) => setState(() => _activeTab.selectedNodeId = id),
+      tabStrip: tabStrip,
+      saveState: _saveState,
+      onOpenSettings: widget.onSetUseDarkTheme != null ? _openSettings : null,
+      onAddRoot: _addRoot,
+      onImportCherryTree: () {
+        unawaited(_importCherryTree());
+      },
+      onExportCherryTree: () {
+        unawaited(_exportCherryTree());
+      },
+      onTreeSelectWide: (id) => setState(() => _activeTab.selectedNodeId = id),
+      onTreeSelectDrawer: (id) {
+        setState(() => _activeTab.selectedNodeId = id);
+        Navigator.of(context).pop();
+      },
+      onAddChild: _addChild,
+      onDelete: _delete,
+      onEditorChanged: _onEditorChanged,
+      l10n: l10n,
     );
   }
 }

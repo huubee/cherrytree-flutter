@@ -146,12 +146,33 @@ class CherrytreeQuillBridge {
     if (attrs['italic'] == true) m[_kStyle] = _vItalic;
     if (attrs['underline'] == true) m[_kUnderline] = 'true';
     if (attrs['strike'] == true) m[_kStrikethrough] = 'true';
-    final fg = attrs['color'];
-    if (fg != null && '$fg'.isNotEmpty) m[_kForeground] = '$fg';
-    final bg = attrs['background'];
-    if (bg != null && '$bg'.isNotEmpty) m[_kBackground] = '$bg';
+    final fg = _ctRgb24FromQuillColor(attrs['color']?.toString());
+    if (fg != null) m[_kForeground] = fg;
+    final bg = _ctRgb24FromQuillColor(attrs['background']?.toString());
+    if (bg != null) m[_kBackground] = bg;
     final link = attrs['link'];
     if (link != null && '$link'.isNotEmpty) m[_kLink] = '$link';
     return m;
+  }
+
+  /// Flutter Quill’s toolbar uses [`colorToHex`] → `#AARRGGBB` (see flutter_quill
+  /// `color_button.dart`). CherryTree and GTK [foreground] / [background] expect
+  /// `#RRGGBB` (24-bit RGB), same as desktop CherryTree files.
+  static String? _ctRgb24FromQuillColor(String? raw) {
+    if (raw == null) return null;
+    var s = raw.trim();
+    if (s.isEmpty) return null;
+    if (s.startsWith('#')) s = s.substring(1);
+    if (s.length == 8) {
+      // AARRGGBB → RRGGBB
+      return '#${s.substring(2, 8)}'.toLowerCase();
+    }
+    if (s.length == 6) {
+      return '#$s'.toLowerCase();
+    }
+    if (s.length == 3) {
+      return '#${s[0]}${s[0]}${s[1]}${s[1]}${s[2]}${s[2]}'.toLowerCase();
+    }
+    return raw;
   }
 }

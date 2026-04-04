@@ -1,8 +1,25 @@
 import 'package:cherrytree_flutter/rich/cherrytree_quill_bridge.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:xml/xml.dart';
 
 void main() {
+  test('Quill #AARRGGBB is exported as CherryTree #RRGGBB for GTK', () {
+    final doc = Document.fromJson([
+      <String, dynamic>{
+        'insert': 'Painted',
+        'attributes': <String, dynamic>{
+          'color': '#FFFF00FF',
+          'background': '#80FF0000',
+        },
+      },
+      <String, dynamic>{'insert': '\n'},
+    ]);
+    final xml = CherrytreeQuillBridge.sqliteTxtFromDocument(doc);
+    expect(xml, contains('foreground="#ff00ff"'));
+    expect(xml, contains('background="#ff0000"'));
+  });
+
   test('two consecutive rich_text (checkbox + link) stays one line in plain text', () {
     final xml = '''
 <node unique_id="1" master_id="0" name="Root" prog_lang="custom-colors">

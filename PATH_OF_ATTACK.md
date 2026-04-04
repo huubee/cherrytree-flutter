@@ -45,7 +45,7 @@ Goal: trustworthy tree + editor + persistence on device, without CherryTree file
 
 ### Deferred (explicitly not Spike A)
 
-- [ ] Export to CherryTree `.ctd` / `.ctb` (read-only import is Spike B)
+- [x] Export to CherryTree `.ctd` / `.ctb` (app bar **save as** → format sheet → system save dialog; [`CherrytreeDocumentExport`](lib/cherrytree/cherrytree_document_export.dart))
 - [ ] Round-trip parity with desktop CherryTree files
 
 ---

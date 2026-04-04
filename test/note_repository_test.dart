@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cherrytree_flutter/models/document_tab.dart';
 import 'package:cherrytree_flutter/models/note_document.dart';
 
 import 'rich_test_utils.dart';
@@ -77,6 +78,128 @@ void main() {
       final repo = NoteRepository(resolveFile: () async => file);
       final loaded = await repo.load();
       expect(loaded.find('x')?.title, 'Hi');
+    });
+
+    test('loadTabs round-trips saveTab and saveSession including tabLabel', () async {
+      final jsonFile = File('${tempDir.path}/notes.json');
+      final repo = NoteRepository(resolveFile: () async => jsonFile);
+      final doc1 = NoteDocument(
+        nodes: [
+          NoteNode(
+            id: 'a',
+            parentId: null,
+            title: 'Alpha',
+            body: '',
+            sortIndex: 0,
+          ),
+        ],
+      );
+      final doc2 = NoteDocument(
+        nodes: [
+          NoteNode(
+            id: 'b',
+            parentId: null,
+            title: 'Beta',
+            body: '',
+            sortIndex: 0,
+          ),
+        ],
+      );
+      final t1 = DocumentTab(
+        id: 'id-1',
+        document: doc1,
+        selectedNodeId: 'a',
+      );
+      final t2 = DocumentTab(
+        id: 'id-2',
+        document: doc2,
+        selectedNodeId: 'b',
+        tabLabel: 'Project B',
+      );
+      expect(await repo.saveTab(t1), isTrue);
+      expect(await repo.saveTab(t2), isTrue);
+      await repo.saveSession([t1, t2], 'id-2');
+
+      final repo2 = NoteRepository(resolveFile: () async => jsonFile);
+      final r = await repo2.loadTabs();
+      expect(r.tabs.length, 2);
+      expect(r.activeTabId, 'id-2');
+      expect(r.tabs[0].id, 'id-1');
+      expect(r.tabs[0].selectedNodeId, 'a');
+      expect(r.tabs[0].document.find('a')?.title, 'Alpha');
+      expect(r.tabs[1].id, 'id-2');
+      expect(r.tabs[1].document.find('b')?.title, 'Beta');
+      expect(r.tabs[1].tabLabel, 'Project B');
+    });
+
+    test('loadTabs uses first tab when activeTabId is unknown', () async {
+      final jsonFile = File('${tempDir.path}/notes.json');
+      final repo = NoteRepository(resolveFile: () async => jsonFile);
+      final doc1 = NoteDocument(
+        nodes: [
+          NoteNode(
+            id: 'a',
+            parentId: null,
+            title: 'A',
+            body: '',
+            sortIndex: 0,
+          ),
+        ],
+      );
+      final doc2 = NoteDocument(
+        nodes: [
+          NoteNode(
+            id: 'b',
+            parentId: null,
+            title: 'B',
+            body: '',
+            sortIndex: 0,
+          ),
+        ],
+      );
+      final t1 = DocumentTab(
+        id: 'id-1',
+        document: doc1,
+        selectedNodeId: 'a',
+      );
+      final t2 = DocumentTab(
+        id: 'id-2',
+        document: doc2,
+        selectedNodeId: 'b',
+      );
+      expect(await repo.saveTab(t1), isTrue);
+      expect(await repo.saveTab(t2), isTrue);
+      await repo.saveSession([t1, t2], 'no-such-tab');
+
+      final repo2 = NoteRepository(resolveFile: () async => jsonFile);
+      final r = await repo2.loadTabs();
+      expect(r.activeTabId, 'id-1');
+    });
+
+    test('deleteTabFile removes tab JSON', () async {
+      final jsonFile = File('${tempDir.path}/notes.json');
+      final repo = NoteRepository(resolveFile: () async => jsonFile);
+      final doc = NoteDocument(
+        nodes: [
+          NoteNode(
+            id: 'a',
+            parentId: null,
+            title: 'A',
+            body: '',
+            sortIndex: 0,
+          ),
+        ],
+      );
+      final tab = DocumentTab(
+        id: 'gone',
+        document: doc,
+        selectedNodeId: 'a',
+      );
+      expect(await repo.saveTab(tab), isTrue);
+      final tabPath = File('${tempDir.path}/tab_gone.json');
+      expect(await tabPath.exists(), isTrue);
+      await repo.deleteTabFile('gone');
+      expect(await tabPath.exists(), isFalse);
     });
   });
 }

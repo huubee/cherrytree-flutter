@@ -14,6 +14,10 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 
 ## [Unreleased]
 
+### Changed
+
+- Refactored [`lib/notes_home_page.dart`](lib/notes_home_page.dart): CherryTree import/export moved to [`lib/notes/cherrytree_file_actions.dart`](lib/notes/cherrytree_file_actions.dart); wide/narrow layout to [`lib/widgets/notes_home_scaffold.dart`](lib/widgets/notes_home_scaffold.dart). [`DEVELOPMENT_GUIDELINES.md`](DEVELOPMENT_GUIDELINES.md) § Maintainability documents the pattern.
+
 ### Added <!-- omit in toc -->
 
 - **Contributor safeguards:** GitHub Actions CI on `main` (analyze + test), Dependabot for `pub` and Actions, [`CONTRIBUTING.md`](CONTRIBUTING.md), and [`CODEOWNERS`](.github/CODEOWNERS). Branch protection on `main` (PRs, approvals, Code Owners, **signed commits**) is documented in [`CONTRIBUTING.md`](CONTRIBUTING.md) and the README.
@@ -38,6 +42,12 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 ### Known issues
 
 - **Import with no filesystem path:** Some providers return **bytes only** (no stable sandbox `path`). The import still works for the session, but **`DocumentStoragePrefs` is not set**, so the next launch uses **JSON only** until the user imports again from a source that exposes a path (or a future flow copies the file into app storage). Further UX is tracked in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md).
+
+## [0.3.0] — 2026-04-04
+
+### Added
+
+- **Export:** Save current notes as CherryTree **`.ctd`** (XML) or **`.ctb`** (SQLite) via the app bar (save-as icon) → format sheet → OS save dialog. Uses [`CtdDocumentWriter`](lib/cherrytree/ctd_document_writer.dart) / [`CtbDocumentWriter`](lib/cherrytree/ctb_document_writer.dart); [`CherrytreeDocumentExport`](lib/cherrytree/cherrytree_document_export.dart) builds bytes (SQLite via a temp file on mobile). Localized EN / NL / DE.
 
 ## [0.1.0] — 2026-04-03
 

@@ -28,7 +28,7 @@ Work is phased so the effort stays manageable:
 
 | Phase | Focus |
 | ----- | ----- |
-| **Spike A** | Core mobile UX: tree of nodes, simple editing, **local JSON persistence**. |
+| **Spike A** | Core mobile UX: tree of nodes, simple editing, **local JSON persistence**; **export** to `.ctd` / `.ctb`. |
 | **Spike B** | **Read-only import** of unencrypted `.ctd` / `.ctb` (plain text; rich text shown as plain; embedded objects omitted with warnings). |
 | **Spike C** | **Round-trip** saves without corrupting documents opened in desktop CherryTree (starting with narrow cases: e.g. unencrypted, single-file). |
 | **Later** | Richer parity (imports, encryption, multifile storage, etc.) only after the foundations above are solid. |
@@ -104,6 +104,10 @@ flutter test             # Unit / widget tests
 ### CherryTree import (Spike B)
 
 Use the **folder** icon on the AppBar to import an unencrypted **`.ctd`** or **`.ctb`** file (replace flow with confirmation). On **iOS**, the system picker shows **all document types**; only `.ctd`/`.ctb` are accepted afterward — this avoids **greyed-out** entries in **OneDrive** and other providers where strict extension filters do not match how the file is exposed. If the provider does not return a **file path**, the app still imports for that session and keeps a **JSON backup** in app documents; **round-trip to the same CherryTree file** may require importing again once we improve path handling (see **Unreleased → Known issues** in [`CHANGELOG.md`](CHANGELOG.md)).
+
+### CherryTree export
+
+Use the **save as** (export) icon next to import. Choose **XML (.ctd)** or **SQLite (.ctb)**, then pick a location in the system save dialog. The written files use the same serializers as read-only import; opening them in desktop CherryTree is the next step toward full **Spike C** round-trip validation.
 
 ---
 
