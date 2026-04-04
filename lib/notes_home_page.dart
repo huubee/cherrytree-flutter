@@ -268,98 +268,97 @@ class _NotesHomePageState extends State<NotesHomePage>
     final doc = _doc!;
     final selected = _selectedId != null ? doc.find(_selectedId!) : null;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final wide =
-            constraints.maxWidth >= AppSpacing.wideLayoutBreakpoint;
-        if (wide) {
-          return Scaffold(
-            appBar: CTAppBar(
-              onAddRoot: () => _addRoot(l10n),
-              saveState: _saveState,
-              onImportCherryTree: () {
-                unawaited(_importCherryTree());
-              },
-            ),
-            body: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(
-                  width: AppSpacing.sidebarWidth,
-                  child: Material(
-                    elevation: 1,
-                    child: TreePanel(
-                      doc: doc,
-                      selectedId: _selectedId,
-                      onSelect: (id) => setState(() => _selectedId = id),
-                      onAddChild: (id) => _addChild(id, l10n),
-                      onDelete: _delete,
-                    ),
-                  ),
+    // Use MediaQuery for the wide/narrow breakpoint — not LayoutBuilder. Nesting
+    // LayoutBuilder around Scaffold + TreePanel (PopupMenuButton / Tooltip overlays)
+    // can trigger "RenderLayoutBuilder was mutated during performLayout" on some builds.
+    final wide =
+        MediaQuery.sizeOf(context).width >= AppSpacing.wideLayoutBreakpoint;
+    if (wide) {
+      return Scaffold(
+        appBar: CTAppBar(
+          onAddRoot: () => _addRoot(l10n),
+          saveState: _saveState,
+          onImportCherryTree: () {
+            unawaited(_importCherryTree());
+          },
+        ),
+        body: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: AppSpacing.sidebarWidth,
+              child: Material(
+                elevation: 1,
+                child: TreePanel(
+                  doc: doc,
+                  selectedId: _selectedId,
+                  onSelect: (id) => setState(() => _selectedId = id),
+                  onAddChild: (id) => _addChild(id, l10n),
+                  onDelete: _delete,
                 ),
-                Expanded(
-                  child: NodeEditor(
-                    key: ValueKey(_selectedId),
-                    node: selected,
-                    onChanged: () {
-                      setState(() {});
-                      _schedulePersistAfterEdit();
-                    },
-                  ),
-                ),
-              ],
+              ),
             ),
-          );
-        }
+            Expanded(
+              child: NodeEditor(
+                key: ValueKey(_selectedId),
+                node: selected,
+                onChanged: () {
+                  setState(() {});
+                  _schedulePersistAfterEdit();
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
-        return Scaffold(
-          appBar: CTAppBar(
-            onAddRoot: () => _addRoot(l10n),
-            saveState: _saveState,
-            onImportCherryTree: () {
-              unawaited(_importCherryTree());
-            },
-            leading: Builder(
-              builder: (ctx) => IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () => Scaffold.of(ctx).openDrawer(),
+    return Scaffold(
+      appBar: CTAppBar(
+        onAddRoot: () => _addRoot(l10n),
+        saveState: _saveState,
+        onImportCherryTree: () {
+          unawaited(_importCherryTree());
+        },
+        leading: Builder(
+          builder: (ctx) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(ctx).openDrawer(),
+          ),
+        ),
+      ),
+      drawer: Drawer(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              DrawerHeader(
+                child: Text(l10n.drawerNotesTitle),
               ),
-            ),
-          ),
-          drawer: Drawer(
-            child: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  DrawerHeader(
-                    child: Text(l10n.drawerNotesTitle),
-                  ),
-                  Expanded(
-                    child: TreePanel(
-                      doc: doc,
-                      selectedId: _selectedId,
-                      onSelect: (id) {
-                        setState(() => _selectedId = id);
-                        Navigator.of(context).pop();
-                      },
-                      onAddChild: (id) => _addChild(id, l10n),
-                      onDelete: _delete,
-                    ),
-                  ),
-                ],
+              Expanded(
+                child: TreePanel(
+                  doc: doc,
+                  selectedId: _selectedId,
+                  onSelect: (id) {
+                    setState(() => _selectedId = id);
+                    Navigator.of(context).pop();
+                  },
+                  onAddChild: (id) => _addChild(id, l10n),
+                  onDelete: _delete,
+                ),
               ),
-            ),
+            ],
           ),
-          body: NodeEditor(
-            key: ValueKey(_selectedId),
-            node: selected,
-            onChanged: () {
-              setState(() {});
-              _schedulePersistAfterEdit();
-            },
-          ),
-        );
-      },
+        ),
+      ),
+      body: NodeEditor(
+        key: ValueKey(_selectedId),
+        node: selected,
+        onChanged: () {
+          setState(() {});
+          _schedulePersistAfterEdit();
+        },
+      ),
     );
   }
 }

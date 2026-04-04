@@ -20,10 +20,18 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 - **Spike B (read-only import):** import unencrypted CherryTree `.ctd` (XML) and `.ctb` (SQLite) via the app bar; tree and plain text come from `rich_text` slots and plain-syntax nodes; images/tables/code boxes are skipped with user-visible warnings; encrypted `.ctz`/`.ctx` are rejected. Dependencies: `xml`, `sqflite`, `file_picker`.
 - Integration tests for Android/iOS simulating load, edit, background, and relaunch sequences.
 - Added visual save status indicator (pulsing cloud) to the AppBar with resilient concurrent save handling.
+- **Dependency policy:** [`DEVELOPMENT_GUIDELINES.md`](DEVELOPMENT_GUIDELINES.md) § Dependencies and [`AGENTS.md`](AGENTS.md) now describe using **stable**, SDK-compatible SemVer constraints, committing `pubspec.lock`, and upgrades via Dependabot or reviewed PRs rather than ad-hoc “always latest” bumps.
+- **Notes tree:** expand/collapse branches in the tree panel (chevron); imported documents still start fully expanded; adding a child from the ⋮ menu keeps that parent expanded.
+
+### Fixed
+
+- **Android — import file picker:** `AndroidManifest.xml` declares a `<queries>` intent for `ACTION_OPEN_DOCUMENT` (plus `OPENABLE` / `*/*`) so `resolveActivity` can see the system document UI on **Android 11+**; `MainActivity` extends **`FlutterFragmentActivity`**. Together this fixes the picker not opening on device ([issue #1](https://github.com/huubee/cherrytree-flutter/issues/1) closed).
+- **Notes home layout:** wide vs narrow breakpoint uses **`MediaQuery.sizeOf`** instead of a top-level **`LayoutBuilder`**, avoiding a **`RenderLayoutBuilder` / overlay** assertion when `PopupMenuButton`, `Tooltip`, or similar overlays attach during layout.
+- **Tree panel:** expansion state is pruned in **`didUpdateWidget`** instead of mutating the expansion set during **`build`**.
 
 ### Known issues
 
-- **CherryTree import (AppBar folder icon):** the file picker may not open on device in some cases; see [GitHub issue #1](https://github.com/huubee/cherrytree-flutter/issues/1) and [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) (Spike B → Follow-up).
+- None specific to import or the notes tree; next UX work (breadcrumbs, theme, richer body) is listed in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) under **Later** / Spike follow-ups.
 
 ## [0.1.0] — 2026-04-03
 

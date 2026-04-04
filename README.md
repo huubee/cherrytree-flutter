@@ -48,7 +48,7 @@ Exact milestones may shift; check issues and pull requests for current work.
 
 Merges to **`main`** use GitHub branch protection: pull requests, approvals, **Code Owners** review, **signed commits**, and green CI. See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-**Known issues** are called out in **Unreleased** in the changelog and in **Follow-up** under the relevant spike in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) (e.g. import file picker on device).
+**Known gaps** and **planned UX** are called out in **Unreleased** in the changelog and in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) (per-spike checkboxes and later items).
 
 ---
 

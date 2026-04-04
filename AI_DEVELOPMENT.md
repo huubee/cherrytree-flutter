@@ -16,8 +16,7 @@ Short, **task-oriented** context for automated and assistant-driven work. Humans
 - **Unofficial** Flutter app for **Android and iOS** only: CherryTree-*style* hierarchical notes.
 - **Not** the [official CherryTree](https://github.com/giuspen/cherrytree) desktop repo; do not edit upstream unless the user asks for a separate contribution.
 - **Spike A:** local tree + editor + JSON persistence.
-- **Spike B (current):** read-only import of unencrypted `.ctd` / `.ctb` (see `lib/cherrytree/`); no write-back to CherryTree files yet ([`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md)).
-- **Open issue:** AppBar import (folder icon) may not open the system file picker on device — see **Spike B → Follow-up** in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md).
+- **Spike B:** read-only import of unencrypted `.ctd` / `.ctb` (see `lib/cherrytree/`); no write-back to CherryTree files yet ([`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md)). On Android 11+, the manifest must include `OPEN_DOCUMENT` `<queries>` and `MainActivity` must extend `FlutterFragmentActivity` so the file picker opens reliably.
 
 ## Default workflow for agents
 

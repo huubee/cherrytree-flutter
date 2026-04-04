@@ -36,6 +36,8 @@ Spike A uses a **single JSON file** per device for local notes. That will evolve
 
 - Add packages with a **one-line rationale** in the PR/commit (e.g. “path_provider: OS document directory”).
 - Prefer **small, maintained** packages; avoid pulling in a large framework for a single call site unless the team agrees.
+- **Versions:** add dependencies at **stable** releases that satisfy [`pubspec.yaml`](pubspec.yaml) **`environment.sdk`** and Flutter’s constraints. Use normal **SemVer** ranges from pub.dev (typically **`^x.y.z`**, e.g. via `flutter pub add` or a hand-edited constraint); commit **`pubspec.lock`** with the change.
+- Do **not** treat “always the newest version on pub.dev” as a standing rule — that creates unnecessary churn. **Dependabot** (see [`.github/dependabot.yml`](.github/dependabot.yml)) and intentional PRs handle upgrades; skim **changelogs** for **major** bumps and mention breaking changes in the PR when relevant.
 
 ## Maintainability: file size, DRY, comments
 

@@ -4,7 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../models/note_document.dart';
 import '../theme/app_spacing.dart';
 
-class TreePanel extends StatelessWidget {
+class TreePanel extends StatefulWidget {
   const TreePanel({
     super.key,
     required this.doc,
@@ -21,6 +21,42 @@ class TreePanel extends StatelessWidget {
   final void Function(String id) onDelete;
 
   @override
+  State<TreePanel> createState() => _TreePanelState();
+}
+
+class _TreePanelState extends State<TreePanel> {
+  /// Parent node ids whose children are visible. Defaults to all parents expanded.
+  final Set<String> _expanded = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _expanded.addAll(_parentIdsWithChildren(widget.doc));
+  }
+
+  @override
+  void didUpdateWidget(TreePanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.doc != widget.doc) {
+      _expanded
+        ..clear()
+        ..addAll(_parentIdsWithChildren(widget.doc));
+    } else {
+      _expanded.removeWhere((id) => widget.doc.find(id) == null);
+    }
+  }
+
+  static Set<String> _parentIdsWithChildren(NoteDocument doc) {
+    final ids = <String>{};
+    for (final n in doc.nodes) {
+      if (doc.childrenOf(n.id).isNotEmpty) {
+        ids.add(n.id);
+      }
+    }
+    return ids;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return ListView(
@@ -35,11 +71,13 @@ class TreePanel extends StatelessWidget {
     String? parentId,
     int depth,
   ) {
-    // DFS traversal of the document graph to render the tree sequentially in a single ListView.
-    // This avoids nested ListViews or complex slivers, keeping the layout simple and performant.
     final out = <Widget>[];
-    for (final n in doc.childrenOf(parentId)) {
-      final isSel = n.id == selectedId;
+    for (final n in widget.doc.childrenOf(parentId)) {
+      final isSel = n.id == widget.selectedId;
+      final children = widget.doc.childrenOf(n.id);
+      final hasChildren = children.isNotEmpty;
+      final isExpanded = hasChildren && _expanded.contains(n.id);
+
       out.add(
         Padding(
           padding: EdgeInsets.only(
@@ -48,16 +86,53 @@ class TreePanel extends StatelessWidget {
           child: ListTile(
             dense: true,
             selected: isSel,
+            leading: SizedBox(
+              width: 32,
+              height: 32,
+              child: hasChildren
+                  ? IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                      icon: Icon(
+                        isExpanded
+                            ? Icons.keyboard_arrow_down
+                            : Icons.keyboard_arrow_right,
+                      ),
+                      tooltip: isExpanded
+                          ? MaterialLocalizations.of(context)
+                              .expandedIconTapHint
+                          : MaterialLocalizations.of(context)
+                              .collapsedIconTapHint,
+                      onPressed: () {
+                        setState(() {
+                          if (isExpanded) {
+                            _expanded.remove(n.id);
+                          } else {
+                            _expanded.add(n.id);
+                          }
+                        });
+                      },
+                    )
+                  : null,
+            ),
             title: Text(
               n.title.trim().isEmpty ? l10n.untitledNote : n.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            onTap: () => onSelect(n.id),
+            onTap: () => widget.onSelect(n.id),
             trailing: PopupMenuButton<String>(
               onSelected: (value) {
-                if (value == 'add') onAddChild(n.id);
-                if (value == 'del') onDelete(n.id);
+                if (value == 'add') {
+                  widget.onAddChild(n.id);
+                  setState(() => _expanded.add(n.id));
+                }
+                if (value == 'del') {
+                  widget.onDelete(n.id);
+                }
               },
               itemBuilder: (context) => [
                 PopupMenuItem(
@@ -73,7 +148,9 @@ class TreePanel extends StatelessWidget {
           ),
         ),
       );
-      out.addAll(_buildLevel(context, l10n, n.id, depth + 1));
+      if (hasChildren && isExpanded) {
+        out.addAll(_buildLevel(context, l10n, n.id, depth + 1));
+      }
     }
     return out;
   }

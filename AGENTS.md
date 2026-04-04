@@ -16,6 +16,7 @@ For human-oriented development practices, see [`DEVELOPMENT_GUIDELINES.md`](DEVE
 - **Do not** modify the upstream CherryTree C++ repository as part of this work unless the user explicitly asks for a separate contribution flow.
 - **Do not** reintroduce `web/`, `windows/`, `linux/`, or `macos/` platform folders unless the maintainers change scope.
 - **Keep diffs focused:** match existing style; avoid unrelated refactors and drive-by dependency upgrades.
+- **Dependency versions:** prefer **stable**, SDK-compatible constraints as in [`DEVELOPMENT_GUIDELINES.md`](DEVELOPMENT_GUIDELINES.md) § Dependencies; use Dependabot or small reviewed PRs for upgrades instead of ad-hoc “latest everywhere” bumps.
 
 ## Commands to verify changes
 

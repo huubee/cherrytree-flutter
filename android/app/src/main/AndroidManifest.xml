@@ -41,5 +41,13 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Android 11+ package visibility: file_picker uses resolveActivity() before
+             startActivityForResult(ACTION_OPEN_DOCUMENT). Without this, resolveActivity
+             can return null and the system document picker never opens. -->
+        <intent>
+            <action android:name="android.intent.action.OPEN_DOCUMENT"/>
+            <category android:name="android.intent.category.OPENABLE"/>
+            <data android:mimeType="*/*"/>
+        </intent>
     </queries>
 </manifest>

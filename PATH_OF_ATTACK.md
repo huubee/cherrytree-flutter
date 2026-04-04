@@ -56,9 +56,16 @@ Goal: trustworthy tree + editor + persistence on device, without CherryTree file
 - [x] Read-only import of a narrow subset: unencrypted `.ctd` (XML) and `.ctb` (SQLite); body text from `rich_text` / plain nodes (images, tables, code boxes omitted with messaging)
 - [x] Clear UX when a feature is unsupported (replace-data confirmation, post-import warnings, encrypted `.ctz`/`.ctx` rejected)
 
-### Follow-up (known gaps)
+### Follow-up (addressed on `main`)
 
-- [-] **Import file picker:** the AppBar folder action should open the OS file picker (`FilePicker` + replace/import flow). As of 2026-04-04 this does not open the picker on device in some runs — **needs investigation** (permissions, `file_picker` platform setup, or lifecycle). **GitHub:** [#1](https://github.com/huubee/cherrytree-flutter/issues/1).
+- [x] **Import file picker:** AppBar folder action opens the OS file picker (`FilePicker` + replace/import flow). On Android 11+, `AndroidManifest.xml` must declare an `<queries>` intent for `OPEN_DOCUMENT` so `resolveActivity` can see the system document UI; `MainActivity` extends `FlutterFragmentActivity`. (Previously tracked as GitHub [#1](https://github.com/huubee/cherrytree-flutter/issues/1), now closed.)
+- [x] **Tree expand/collapse** in the notes panel (chevrons) so large imports are easier to navigate.
+
+### Later UX (not scheduled — desktop parity)
+
+- [ ] Path **breadcrumbs** (or subtitle) for the selected node
+- [ ] Optional **dark** theme closer to desktop CherryTree
+- [ ] **Richer body** presentation (e.g. monospace, line-preserving layout; later: checklist / rich text)
 
 ---
 
