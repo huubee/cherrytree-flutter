@@ -4,8 +4,13 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
+import '../cherrytree/ctb_document_reader.dart';
+import '../cherrytree/ctb_document_writer.dart';
+import '../cherrytree/ctd_document_reader.dart';
+import '../cherrytree/ctd_document_writer.dart';
 import '../l10n/l10n_utils.dart';
 import '../models/note_document.dart';
+import 'document_storage_prefs.dart';
 
 class NoteRepository {
   NoteRepository({Future<File> Function()? resolveFile})
@@ -23,6 +28,32 @@ class NoteRepository {
   }
 
   Future<NoteDocument> load() async {
+    final mode = await DocumentStoragePrefs.getCherrytreeMode();
+    final ctPath = await DocumentStoragePrefs.getCherrytreePath();
+    if (mode != null &&
+        ctPath != null &&
+        mode.isNotEmpty &&
+        ctPath.isNotEmpty) {
+      final ctFile = File(ctPath);
+      if (await ctFile.exists()) {
+        try {
+          if (mode == 'ctd') {
+            final bytes = await ctFile.readAsBytes();
+            return CtdDocumentReader.readBytes(bytes).document;
+          }
+          if (mode == 'ctb') {
+            return (await CtbDocumentReader.readPath(ctPath)).document;
+          }
+        } on Object catch (e, st) {
+          developer.log(
+            'CherryTree file load failed, falling back to JSON',
+            error: e,
+            stackTrace: st,
+          );
+        }
+      }
+    }
+
     final f = await _file();
     if (!await f.exists()) {
       return _seedDocument();
@@ -37,17 +68,36 @@ class NoteRepository {
     }
   }
 
-  /// Persists [doc] to app documents. Returns `false` if the write failed.
+  /// Persists [doc] to app documents (JSON backup) and, when configured, to the
+  /// imported CherryTree [.ctd] / [.ctb] path. Returns `false` if the JSON backup failed.
   Future<bool> save(NoteDocument doc) async {
     try {
       final f = await _file();
       final encoder = JsonEncoder.withIndent('  ');
       await f.writeAsString(encoder.convert(doc.toJson()));
-      return true;
     } on Object catch (e, st) {
-      developer.log('Failed to save notes', error: e, stackTrace: st);
+      developer.log('Failed to save notes JSON', error: e, stackTrace: st);
       return false;
     }
+
+    final mode = await DocumentStoragePrefs.getCherrytreeMode();
+    final ctPath = await DocumentStoragePrefs.getCherrytreePath();
+    if (mode != null && ctPath != null && ctPath.isNotEmpty) {
+      try {
+        if (mode == 'ctd') {
+          await CtdDocumentWriter.writeToFile(ctPath, doc);
+        } else if (mode == 'ctb') {
+          await CtbDocumentWriter.writeToPath(ctPath, doc);
+        }
+      } on Object catch (e, st) {
+        developer.log(
+          'Failed to save CherryTree document (JSON backup was written)',
+          error: e,
+          stackTrace: st,
+        );
+      }
+    }
+    return true;
   }
 
   NoteDocument _seedDocument() {

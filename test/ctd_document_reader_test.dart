@@ -1,6 +1,8 @@
 import 'package:cherrytree_flutter/cherrytree/ctd_document_reader.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'rich_test_utils.dart';
+
 void main() {
   group('CtdDocumentReader', () {
     test('reads tree and plain rich_text', () {
@@ -18,9 +20,9 @@ void main() {
       final r = CtdDocumentReader.readString(xml);
       expect(r.document.nodes.length, 2);
       expect(r.document.find('ct-1')?.title, 'Root');
-      expect(r.document.find('ct-1')?.body, 'Hello');
+      expect(plainBody(r.document.find('ct-1')!.body), 'Hello');
       expect(r.document.find('ct-2')?.parentId, 'ct-1');
-      expect(r.document.find('ct-2')?.body, 'Nested');
+      expect(plainBody(r.document.find('ct-2')!.body), 'Nested');
     });
   });
 }

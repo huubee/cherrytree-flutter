@@ -118,10 +118,14 @@ class _TreePanelState extends State<TreePanel> {
                     )
                   : null,
             ),
-            title: Text(
-              n.title.trim().isEmpty ? l10n.untitledNote : n.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+            title: Tooltip(
+              message:
+                  n.title.trim().isEmpty ? l10n.untitledNote : n.title.trim(),
+              child: Text(
+                n.title.trim().isEmpty ? l10n.untitledNote : n.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             onTap: () => widget.onSelect(n.id),
             trailing: PopupMenuButton<String>(

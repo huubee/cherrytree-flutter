@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'cherrytree/cherrytree_document_reader.dart';
 import 'l10n/app_localizations.dart';
 import 'models/note_document.dart';
+import 'services/document_storage_prefs.dart';
 import 'services/note_repository.dart';
 import 'settings_page.dart';
 import 'theme/app_spacing.dart';
@@ -242,9 +243,19 @@ class _NotesHomePageState extends State<NotesHomePage>
     if (!mounted) return;
 
     try {
+      final platformFile = picked.files.single;
       final r =
-          await CherrytreeDocumentReader.readFromPickedFile(picked.files.single);
+          await CherrytreeDocumentReader.readFromPickedFile(platformFile);
       if (!mounted) return;
+      final path = platformFile.path;
+      if (path != null) {
+        final lower = platformFile.name.toLowerCase();
+        if (lower.endsWith('.ctd')) {
+          await DocumentStoragePrefs.setCherrytreeFile(mode: 'ctd', path: path);
+        } else if (lower.endsWith('.ctb')) {
+          await DocumentStoragePrefs.setCherrytreeFile(mode: 'ctb', path: path);
+        }
+      }
       setState(() {
         _doc = r.document;
         final roots = r.document.childrenOf(null);

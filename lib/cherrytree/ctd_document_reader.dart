@@ -1,6 +1,8 @@
 import 'package:xml/xml.dart';
 
 import '../models/note_document.dart';
+import '../rich/cherrytree_quill_bridge.dart';
+import '../rich/note_body_codec.dart';
 import 'cherrytree_read_result.dart';
 import 'ct_body_plain.dart';
 import 'ct_constants.dart';
@@ -58,7 +60,9 @@ class CtdDocumentReader {
       if (masterId <= 0) {
         title = el.getAttribute('name') ?? '';
         final parsed = CtBodyPlain.fromCtdNode(el, w);
-        body = parsed.$1;
+        body = NoteBodyCodec.documentToStorage(
+          CherrytreeQuillBridge.documentFromCtdNode(el),
+        );
         if (parsed.$2) anyUnsupportedSlots = true;
         primary[uid] = _PrimaryContent(title: title, body: body);
       } else {

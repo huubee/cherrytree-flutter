@@ -1,5 +1,8 @@
 import 'dart:collection';
 
+import '../cherrytree/ct_body_plain.dart';
+import '../rich/note_body_codec.dart';
+
 class NoteNode {
   NoteNode({
     required this.id,
@@ -24,11 +27,15 @@ class NoteNode {
       };
 
   factory NoteNode.fromJson(Map<String, dynamic> json) {
+    final rawBody = json['body'] as String? ?? '';
+    final body = NoteBodyCodec.looksLikeQuillDeltaJson(rawBody)
+        ? rawBody
+        : CtBodyPlain.normalizeSeparatedCheckboxLines(rawBody);
     return NoteNode(
       id: json['id'] as String,
       parentId: json['parentId'] as String?,
       title: json['title'] as String? ?? '',
-      body: json['body'] as String? ?? '',
+      body: body,
       sortIndex: (json['sortIndex'] as num?)?.toInt() ?? 0,
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'l10n/app_localizations.dart';
@@ -67,7 +68,10 @@ class _CherrytreeFlutterAppState extends State<CherrytreeFlutterApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: [
+        ...AppLocalizations.localizationsDelegates,
+        FlutterQuillLocalizations.delegate,
+      ],
       supportedLocales: AppLocalizations.supportedLocales,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

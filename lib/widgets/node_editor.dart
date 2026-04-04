@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/note_document.dart';
+import '../rich/note_body_codec.dart';
 import '../theme/app_spacing.dart';
 
 class NodeEditor extends StatefulWidget {
@@ -20,34 +22,47 @@ class NodeEditor extends StatefulWidget {
 
 class _NodeEditorState extends State<NodeEditor> {
   late TextEditingController _title;
-  late TextEditingController _body;
-
-  static const double _bodyFontSize = 14;
-  static const double _bodyLineHeight = 1.5;
+  late QuillController _quill;
+  late FocusNode _bodyFocus;
+  late ScrollController _bodyScroll;
 
   @override
   void initState() {
     super.initState();
     final n = widget.node;
     _title = TextEditingController(text: n?.title ?? '');
-    _body = TextEditingController(text: n?.body ?? '');
+    _bodyFocus = FocusNode();
+    _bodyScroll = ScrollController();
+    _quill = QuillController(
+      document: NoteBodyCodec.documentFromStorage(n?.body ?? ''),
+      selection: const TextSelection.collapsed(offset: 0),
+    );
+    _quill.addListener(_onQuillChanged);
+  }
+
+  void _onQuillChanged() {
+    final n = widget.node;
+    if (n == null) return;
+    n.body = NoteBodyCodec.documentToStorage(_quill.document);
+    widget.onChanged();
   }
 
   @override
   void didUpdateWidget(covariant NodeEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // When the user selects a different note in the TreePanel, the parent passes a new NodeDocument down.
-    // If we only relied on initState, the text controllers would retain the old note's text.
     if (oldWidget.node?.id != widget.node?.id) {
       _title.text = widget.node?.title ?? '';
-      _body.text = widget.node?.body ?? '';
+      _quill.document = NoteBodyCodec.documentFromStorage(widget.node?.body ?? '');
     }
   }
 
   @override
   void dispose() {
+    _quill.removeListener(_onQuillChanged);
+    _quill.dispose();
     _title.dispose();
-    _body.dispose();
+    _bodyFocus.dispose();
+    _bodyScroll.dispose();
     super.dispose();
   }
 
@@ -62,12 +77,6 @@ class _NodeEditorState extends State<NodeEditor> {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-
-    final bodyStyle = theme.textTheme.bodyMedium?.copyWith(
-      fontFamily: 'monospace',
-      fontSize: _bodyFontSize,
-      height: _bodyLineHeight,
-    );
 
     final bodyFill = isDark
         ? scheme.surfaceContainerHighest.withValues(alpha: 0.45)
@@ -95,30 +104,46 @@ class _NodeEditorState extends State<NodeEditor> {
             },
           ),
           const SizedBox(height: AppSpacing.editorFieldGap),
+          QuillSimpleToolbar(
+            controller: _quill,
+            config: const QuillSimpleToolbarConfig(
+              showFontFamily: false,
+              showFontSize: false,
+              multiRowsDisplay: false,
+              showSearchButton: false,
+              showLink: false,
+              showCodeBlock: false,
+              showQuote: false,
+              showIndent: false,
+              showListNumbers: false,
+              showListBullets: false,
+              showListCheck: false,
+              showSubscript: false,
+              showSuperscript: false,
+              showHeaderStyle: false,
+              showLineHeightButton: false,
+              showInlineCode: false,
+              showAlignmentButtons: false,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
           Expanded(
-            child: TextField(
-              controller: _body,
-              style: bodyStyle,
-              strutStyle: StrutStyle(
-                fontFamily: 'monospace',
-                fontSize: _bodyFontSize,
-                height: _bodyLineHeight,
-                leadingDistribution: TextLeadingDistribution.even,
+            child: Material(
+              color: bodyFill,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+                side: BorderSide(color: theme.dividerColor),
               ),
-              decoration: InputDecoration(
-                labelText: l10n.fieldBody,
-                alignLabelWithHint: true,
-                border: const OutlineInputBorder(),
-                filled: true,
-                fillColor: bodyFill,
+              clipBehavior: Clip.antiAlias,
+              child: QuillEditor.basic(
+                controller: _quill,
+                focusNode: _bodyFocus,
+                scrollController: _bodyScroll,
+                config: QuillEditorConfig(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  expands: true,
+                ),
               ),
-              maxLines: null,
-              expands: true,
-              textAlignVertical: TextAlignVertical.top,
-              onChanged: (v) {
-                n.body = v;
-                widget.onChanged();
-              },
             ),
           ),
         ],

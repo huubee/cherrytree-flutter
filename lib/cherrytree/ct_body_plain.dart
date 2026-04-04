@@ -1,10 +1,46 @@
 import 'package:xml/xml.dart';
 
+import '../rich/cherrytree_quill_bridge.dart';
+import '../rich/note_body_codec.dart';
 import 'ct_constants.dart';
 
 /// Plain-text extraction for Spike B: titles and body text only (no images/tables/code boxes).
 class CtBodyPlain {
   CtBodyPlain._();
+
+  /// When each `<rich_text>` slot becomes one line, a checkbox and its label can end up
+  /// on adjacent lines (`[ ]` then `smbtree`). Merge those into a single line like CherryTree.
+  static String normalizeSeparatedCheckboxLines(String body) {
+    final raw = body.split(RegExp(r'\r?\n'));
+    final out = <String>[];
+    for (var i = 0; i < raw.length; i++) {
+      final line = raw[i];
+      if (i + 1 < raw.length &&
+          _isStandaloneCheckboxOnly(line) &&
+          _isMergeableCheckboxContinuation(raw[i + 1])) {
+        out.add('${line.trimRight()} ${raw[i + 1].trimLeft()}');
+        i++;
+      } else {
+        out.add(line);
+      }
+    }
+    return out.join('\n');
+  }
+
+  static bool _isStandaloneCheckboxOnly(String line) {
+    final t = line.trim();
+    if (t.isEmpty) return false;
+    return RegExp(r'^(?:[-*+]\s+)?\[[ xX]\]\s*$').hasMatch(t);
+  }
+
+  /// Next line after a standalone checkbox line: real content, not another empty checkbox.
+  static bool _isMergeableCheckboxContinuation(String line) {
+    final t = line.trimLeft();
+    if (t.isEmpty) return false;
+    if (_isStandaloneCheckboxOnly(line)) return false;
+    if (RegExp(r'^#+\s').hasMatch(t)) return false;
+    return true;
+  }
 
   static String richTextDirectText(XmlElement el) {
     return el.children
@@ -39,7 +75,10 @@ class CtBodyPlain {
           unsupportedSlot = true;
       }
     }
-    return (out.toString().trimRight(), unsupportedSlot);
+    return (
+      normalizeSeparatedCheckboxLines(out.toString().trimRight()),
+      unsupportedSlot,
+    );
   }
 
   /// [txt] column for rich-text nodes: XML with root `<node>` wrapping `<rich_text>` slots.
@@ -53,7 +92,7 @@ class CtBodyPlain {
           buffer.writeln(richTextDirectText(child));
         }
       }
-      return buffer.toString().trimRight();
+      return normalizeSeparatedCheckboxLines(buffer.toString().trimRight());
     } on Object {
       return txt;
     }
@@ -66,8 +105,9 @@ class CtBodyPlain {
     final t = txt ?? '';
     final syn = syntax ?? '';
     if (syn == kCherrytreeRichTextSyntaxId) {
-      return fromSqliteRichTxt(t);
+      final doc = CherrytreeQuillBridge.documentFromSqliteRichTxt(t);
+      return NoteBodyCodec.documentToStorage(doc);
     }
-    return t;
+    return normalizeSeparatedCheckboxLines(t);
   }
 }
