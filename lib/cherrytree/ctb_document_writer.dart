@@ -72,7 +72,8 @@ class CtbDocumentWriter {
       }
       for (final n in doc.nodes) {
         final nid = idMap[n.id];
-        final pid = n.parentId == null ? 0 : idMap[n.parentId!]!;
+        final parentId = n.parentId;
+        final pid = parentId == null ? 0 : idMap[parentId];
         final siblings = doc.childrenOf(n.parentId);
         final seq = siblings.indexWhere((x) => x.id == n.id) + 1;
         batch.insert('children', {
