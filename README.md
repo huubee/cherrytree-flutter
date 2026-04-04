@@ -46,6 +46,8 @@ Exact milestones may shift; check issues and pull requests for current work.
 | [`CHANGELOG.md`](CHANGELOG.md) | **What shipped** in each version; **Unreleased** summarizes recent work before a tag. |
 | This README (roadmap table above) | **High-level phases** (Spike A/B/C) without duplicating every checkbox. |
 
+Merges to **`main`** use GitHub branch protection: pull requests, approvals, **Code Owners** review, **signed commits**, and green CI. See [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 **Known issues** are called out in **Unreleased** in the changelog and in **Follow-up** under the relevant spike in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) (e.g. import file picker on device).
 
 ---

@@ -24,7 +24,19 @@ Thanks for helping. This project is **GPLv3** — see [`LICENSE`](LICENSE). It i
 ## Reviews and CI
 
 - Pull requests should pass **[GitHub Actions](.github/workflows/ci.yml)** (`flutter analyze`, `flutter test`).
-- Maintainers should enable **branch protection** on `main`: require PRs, require the CI check to pass before merge, and use **CODEOWNERS** (see [`.github/CODEOWNERS`](.github/CODEOWNERS)) so the right people are notified.
+
+## Branch protection on `main`
+
+The default branch is protected. In practice that means:
+
+| Rule | What you need to do |
+| ---- | -------------------- |
+| **Pull request required** | Open a PR; do not push directly to `main`. |
+| **Approvals** | At least one approving review before merge. |
+| **Code Owners** | A review from someone listed in [`.github/CODEOWNERS`](.github/CODEOWNERS) is required. |
+| **Signed commits** | Commits must be **signed** (GPG or SSH) and show as “Verified” on GitHub. Configure signing on your machine, then rebase or amend if older commits are unsigned. See [Signing commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) and [Displaying verification for all commits](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rules-for-repositories/about-rule-sets#require-signed-commits). |
+
+Squash-merge still counts as long as the resulting commit satisfies the rule (GitHub documents behavior for squash vs merge — prefer signing locally before pushing your branch).
 
 ## Security
 

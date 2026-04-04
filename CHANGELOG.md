@@ -16,7 +16,7 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 
 ### Added <!-- omit in toc -->
 
-- **Contributor safeguards:** GitHub Actions CI on `main` (analyze + test), Dependabot for `pub` and Actions, [`CONTRIBUTING.md`](CONTRIBUTING.md), and [`CODEOWNERS`](.github/CODEOWNERS). Maintainers should turn on branch protection to require the CI check before merge.
+- **Contributor safeguards:** GitHub Actions CI on `main` (analyze + test), Dependabot for `pub` and Actions, [`CONTRIBUTING.md`](CONTRIBUTING.md), and [`CODEOWNERS`](.github/CODEOWNERS). Branch protection on `main` (PRs, approvals, Code Owners, **signed commits**) is documented in [`CONTRIBUTING.md`](CONTRIBUTING.md) and the README.
 - **Spike B (read-only import):** import unencrypted CherryTree `.ctd` (XML) and `.ctb` (SQLite) via the app bar; tree and plain text come from `rich_text` slots and plain-syntax nodes; images/tables/code boxes are skipped with user-visible warnings; encrypted `.ctz`/`.ctx` are rejected. Dependencies: `xml`, `sqflite`, `file_picker`.
 - Integration tests for Android/iOS simulating load, edit, background, and relaunch sequences.
 - Added visual save status indicator (pulsing cloud) to the AppBar with resilient concurrent save handling.
