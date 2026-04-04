@@ -187,8 +187,62 @@ abstract class AppLocalizations {
   /// No description provided for @seedWelcomeBody.
   ///
   /// In en, this message translates to:
-  /// **'This is Spike A: a local tree of notes. Edit titles and body text; add nodes from the + menu. Data is saved on this device only — CherryTree file import comes later.'**
+  /// **'Spike B: local tree of notes with read-only import of unencrypted CherryTree .ctd (XML) and .ctb (SQLite) files. Rich text is shown as plain text; images and tables are omitted.'**
   String get seedWelcomeBody;
+
+  /// No description provided for @importCherryTreeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Import CherryTree file'**
+  String get importCherryTreeTooltip;
+
+  /// No description provided for @importReplaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace local notes?'**
+  String get importReplaceTitle;
+
+  /// No description provided for @importReplaceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This replaces all notes stored in this app with the imported CherryTree document. Continue?'**
+  String get importReplaceMessage;
+
+  /// No description provided for @importCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get importCancel;
+
+  /// No description provided for @importReplaceConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get importReplaceConfirm;
+
+  /// No description provided for @importEncryptedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted CherryTree documents (.ctz / .ctx) are not supported yet.'**
+  String get importEncryptedError;
+
+  /// No description provided for @importFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not import: {error}'**
+  String importFailedMessage(String error);
+
+  /// No description provided for @importWarningsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import notes'**
+  String get importWarningsTitle;
+
+  /// No description provided for @importWarningsOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get importWarningsOk;
 }
 
 class _AppLocalizationsDelegate

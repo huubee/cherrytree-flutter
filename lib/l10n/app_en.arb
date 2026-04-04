@@ -21,5 +21,21 @@
   "fieldBody": "Body",
   "newNoteTitle": "New note",
   "seedWelcomeTitle": "Welcome",
-  "seedWelcomeBody": "This is Spike A: a local tree of notes. Edit titles and body text; add nodes from the + menu. Data is saved on this device only — CherryTree file import comes later."
+  "seedWelcomeBody": "Spike B: local tree of notes with read-only import of unencrypted CherryTree .ctd (XML) and .ctb (SQLite) files. Rich text is shown as plain text; images and tables are omitted.",
+  "importCherryTreeTooltip": "Import CherryTree file",
+  "importReplaceTitle": "Replace local notes?",
+  "importReplaceMessage": "This replaces all notes stored in this app with the imported CherryTree document. Continue?",
+  "importCancel": "Cancel",
+  "importReplaceConfirm": "Replace",
+  "importEncryptedError": "Encrypted CherryTree documents (.ctz / .ctx) are not supported yet.",
+  "importFailedMessage": "Could not import: {error}",
+  "@importFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "importWarningsTitle": "Import notes",
+  "importWarningsOk": "OK"
 }

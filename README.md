@@ -28,14 +28,24 @@ Work is phased so the effort stays manageable:
 
 | Phase | Focus |
 | ----- | ----- |
-| **Spike A** | Core mobile UX: tree of nodes, simple editing, **local persistence** (no CherryTree file formats yet). |
-| **Spike B** | Read **real CherryTree documents** (e.g. `.ctd` / `.ctb`) using the upstream project and tests as the spec. |
+| **Spike A** | Core mobile UX: tree of nodes, simple editing, **local JSON persistence**. |
+| **Spike B** | **Read-only import** of unencrypted `.ctd` / `.ctb` (plain text; rich text shown as plain; embedded objects omitted with warnings). |
 | **Spike C** | **Round-trip** saves without corrupting documents opened in desktop CherryTree (starting with narrow cases: e.g. unencrypted, single-file). |
 | **Later** | Richer parity (imports, encryption, multifile storage, etc.) only after the foundations above are solid. |
 
 Exact milestones may shift; check issues and pull requests for current work.
 
 **Checklist (Spike A → later):** [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) · **Changelog:** [`CHANGELOG.md`](CHANGELOG.md) · **AI assistants:** [`AI_DEVELOPMENT.md`](AI_DEVELOPMENT.md).
+
+### Where we stand (for contributors)
+
+| Doc | Use it for |
+| --- | ---------- |
+| [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) | **Canonical checklist** — what is done (`[x]`), not started (`[ ]`), or in progress (`[-]`). |
+| [`CHANGELOG.md`](CHANGELOG.md) | **What shipped** in each version; **Unreleased** summarizes recent work before a tag. |
+| This README (roadmap table above) | **High-level phases** (Spike A/B/C) without duplicating every checkbox. |
+
+**Known issues** are called out in **Unreleased** in the changelog and in **Follow-up** under the relevant spike in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) (e.g. import file picker on device).
 
 ---
 

@@ -55,5 +55,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get seedWelcomeBody =>
-      'This is Spike A: a local tree of notes. Edit titles and body text; add nodes from the + menu. Data is saved on this device only — CherryTree file import comes later.';
+      'Spike B: local tree of notes with read-only import of unencrypted CherryTree .ctd (XML) and .ctb (SQLite) files. Rich text is shown as plain text; images and tables are omitted.';
+
+  @override
+  String get importCherryTreeTooltip => 'Import CherryTree file';
+
+  @override
+  String get importReplaceTitle => 'Replace local notes?';
+
+  @override
+  String get importReplaceMessage =>
+      'This replaces all notes stored in this app with the imported CherryTree document. Continue?';
+
+  @override
+  String get importCancel => 'Cancel';
+
+  @override
+  String get importReplaceConfirm => 'Replace';
+
+  @override
+  String get importEncryptedError =>
+      'Encrypted CherryTree documents (.ctz / .ctx) are not supported yet.';
+
+  @override
+  String importFailedMessage(String error) {
+    return 'Could not import: $error';
+  }
+
+  @override
+  String get importWarningsTitle => 'Import notes';
+
+  @override
+  String get importWarningsOk => 'OK';
 }

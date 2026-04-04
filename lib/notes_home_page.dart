@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import 'cherrytree/cherrytree_document_reader.dart';
 import 'l10n/app_localizations.dart';
 import 'models/note_document.dart';
 import 'services/note_repository.dart';
@@ -175,6 +177,78 @@ class _NotesHomePageState extends State<NotesHomePage>
     _persistImmediately();
   }
 
+  Future<void> _importCherryTree() async {
+    final l10n = AppLocalizations.of(context)!;
+    final picked = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['ctd', 'ctb'],
+      withData: true,
+    );
+    if (picked == null || picked.files.isEmpty) return;
+    if (!mounted) return;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.importReplaceTitle),
+        content: Text(l10n.importReplaceMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.importCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.importReplaceConfirm),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    if (!mounted) return;
+
+    try {
+      final r =
+          await CherrytreeDocumentReader.readFromPickedFile(picked.files.single);
+      if (!mounted) return;
+      setState(() {
+        _doc = r.document;
+        final roots = r.document.childrenOf(null);
+        _selectedId = roots.isNotEmpty ? roots.first.id : null;
+      });
+      _saveDebounce?.cancel();
+      await _persist();
+      if (!mounted) return;
+      if (r.hasWarnings) {
+        await showDialog<void>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(l10n.importWarningsTitle),
+            content: SingleChildScrollView(
+              child: SelectableText(r.warnings.join('\n\n')),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(l10n.importWarningsOk),
+              ),
+            ],
+          ),
+        );
+      }
+    } on CherrytreeEncryptedImportException {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.importEncryptedError)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.importFailedMessage('$e'))),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -203,6 +277,9 @@ class _NotesHomePageState extends State<NotesHomePage>
             appBar: CTAppBar(
               onAddRoot: () => _addRoot(l10n),
               saveState: _saveState,
+              onImportCherryTree: () {
+                unawaited(_importCherryTree());
+              },
             ),
             body: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -239,6 +316,9 @@ class _NotesHomePageState extends State<NotesHomePage>
           appBar: CTAppBar(
             onAddRoot: () => _addRoot(l10n),
             saveState: _saveState,
+            onImportCherryTree: () {
+              unawaited(_importCherryTree());
+            },
             leading: Builder(
               builder: (ctx) => IconButton(
                 icon: const Icon(Icons.menu),

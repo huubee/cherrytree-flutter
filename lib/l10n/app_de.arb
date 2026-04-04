@@ -21,5 +21,21 @@
   "fieldBody": "Text",
   "newNoteTitle": "Neue Notiz",
   "seedWelcomeTitle": "Willkommen",
-  "seedWelcomeBody": "Dies ist Spike A: ein lokaler Notizbaum. Bearbeiten Sie Titel und Text; fügen Sie Notizen über das +-Menü hinzu. Daten werden nur auf diesem Gerät gespeichert — Import von CherryTree-Dateien folgt später."
+  "seedWelcomeBody": "Spike B: lokale Notizen mit schreibgeschütztem Import unverschlüsselter CherryTree-.ctd- (XML) und .ctb-Dateien (SQLite). Rich-Text wird als Klartext angezeigt; Bilder und Tabellen werden ausgelassen.",
+  "importCherryTreeTooltip": "CherryTree-Datei importieren",
+  "importReplaceTitle": "Lokale Notizen ersetzen?",
+  "importReplaceMessage": "Damit werden alle in dieser App gespeicherten Notizen durch das importierte CherryTree-Dokument ersetzt. Fortfahren?",
+  "importCancel": "Abbrechen",
+  "importReplaceConfirm": "Ersetzen",
+  "importEncryptedError": "Verschlüsselte CherryTree-Dokumente (.ctz / .ctx) werden noch nicht unterstützt.",
+  "importFailedMessage": "Import fehlgeschlagen: {error}",
+  "@importFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "importWarningsTitle": "Hinweise zum Import",
+  "importWarningsOk": "OK"
 }

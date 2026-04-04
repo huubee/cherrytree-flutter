@@ -10,12 +10,14 @@ class CTAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.onAddRoot,
     required this.saveState,
     this.leading,
+    this.onImportCherryTree,
   });
 
   final String? titleText;
   final VoidCallback onAddRoot;
   final SaveState saveState;
   final Widget? leading;
+  final VoidCallback? onImportCherryTree;
 
   @override
   State<CTAppBar> createState() => _CTAppBarState();
@@ -97,6 +99,12 @@ class _CTAppBarState extends State<CTAppBar>
       ),
       leading: widget.leading,
       actions: [
+        if (widget.onImportCherryTree != null)
+          IconButton(
+            icon: const Icon(Icons.folder_open_outlined),
+            tooltip: l10n.importCherryTreeTooltip,
+            onPressed: widget.onImportCherryTree,
+          ),
         IconButton(
           icon: const Icon(Icons.note_add_outlined),
           tooltip: l10n.addRootNoteTooltip,

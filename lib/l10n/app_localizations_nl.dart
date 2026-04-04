@@ -55,5 +55,36 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get seedWelcomeBody =>
-      'Dit is Spike A: een lokale boom van notities. Bewerk titels en tekst; voeg notities toe via het +-menu. Gegevens worden alleen op dit apparaat opgeslagen — import van CherryTree-bestanden volgt later.';
+      'Spike B: lokale notities met alleen-lezen import van onversleutelde CherryTree .ctd (XML) en .ctb (SQLite). Rijke tekst wordt als platte tekst getoond; afbeeldingen en tabellen worden weggelaten.';
+
+  @override
+  String get importCherryTreeTooltip => 'CherryTree-bestand importeren';
+
+  @override
+  String get importReplaceTitle => 'Lokale notities vervangen?';
+
+  @override
+  String get importReplaceMessage =>
+      'Dit vervangt alle in deze app opgeslagen notities door het geïmporteerde CherryTree-document. Doorgaan?';
+
+  @override
+  String get importCancel => 'Annuleren';
+
+  @override
+  String get importReplaceConfirm => 'Vervangen';
+
+  @override
+  String get importEncryptedError =>
+      'Versleutelde CherryTree-documenten (.ctz / .ctx) worden nog niet ondersteund.';
+
+  @override
+  String importFailedMessage(String error) {
+    return 'Importeren mislukt: $error';
+  }
+
+  @override
+  String get importWarningsTitle => 'Opmerkingen bij import';
+
+  @override
+  String get importWarningsOk => 'OK';
 }

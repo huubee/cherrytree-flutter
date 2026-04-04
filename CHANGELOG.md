@@ -16,8 +16,13 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 
 ### Added <!-- omit in toc -->
 
+- **Spike B (read-only import):** import unencrypted CherryTree `.ctd` (XML) and `.ctb` (SQLite) via the app bar; tree and plain text come from `rich_text` slots and plain-syntax nodes; images/tables/code boxes are skipped with user-visible warnings; encrypted `.ctz`/`.ctx` are rejected. Dependencies: `xml`, `sqflite`, `file_picker`.
 - Integration tests for Android/iOS simulating load, edit, background, and relaunch sequences.
 - Added visual save status indicator (pulsing cloud) to the AppBar with resilient concurrent save handling.
+
+### Known issues
+
+- **CherryTree import (AppBar folder icon):** the file picker may not open on device in some cases; tracked for follow-up in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) (Spike B → Follow-up).
 
 ## [0.1.0] — 2026-04-03
 

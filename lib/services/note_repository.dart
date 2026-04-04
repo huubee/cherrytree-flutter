@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../l10n/l10n_utils.dart';
@@ -47,10 +46,6 @@ class NoteRepository {
       return true;
     } on Object catch (e, st) {
       developer.log('Failed to save notes', error: e, stackTrace: st);
-      if (kDebugMode) {
-        // ignore: avoid_print
-        print('NoteRepository.save failed: $e');
-      }
       return false;
     }
   }

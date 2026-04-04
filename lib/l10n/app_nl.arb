@@ -21,5 +21,21 @@
   "fieldBody": "Tekst",
   "newNoteTitle": "Nieuwe notitie",
   "seedWelcomeTitle": "Welkom",
-  "seedWelcomeBody": "Dit is Spike A: een lokale boom van notities. Bewerk titels en tekst; voeg notities toe via het +-menu. Gegevens worden alleen op dit apparaat opgeslagen — import van CherryTree-bestanden volgt later."
+  "seedWelcomeBody": "Spike B: lokale notities met alleen-lezen import van onversleutelde CherryTree .ctd (XML) en .ctb (SQLite). Rijke tekst wordt als platte tekst getoond; afbeeldingen en tabellen worden weggelaten.",
+  "importCherryTreeTooltip": "CherryTree-bestand importeren",
+  "importReplaceTitle": "Lokale notities vervangen?",
+  "importReplaceMessage": "Dit vervangt alle in deze app opgeslagen notities door het geïmporteerde CherryTree-document. Doorgaan?",
+  "importCancel": "Annuleren",
+  "importReplaceConfirm": "Vervangen",
+  "importEncryptedError": "Versleutelde CherryTree-documenten (.ctz / .ctx) worden nog niet ondersteund.",
+  "importFailedMessage": "Importeren mislukt: {error}",
+  "@importFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "importWarningsTitle": "Opmerkingen bij import",
+  "importWarningsOk": "OK"
 }

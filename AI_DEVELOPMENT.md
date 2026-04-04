@@ -14,7 +14,9 @@ Short, **task-oriented** context for automated and assistant-driven work. Humans
 
 - **Unofficial** Flutter app for **Android and iOS** only: CherryTree-*style* hierarchical notes.
 - **Not** the [official CherryTree](https://github.com/giuspen/cherrytree) desktop repo; do not edit upstream unless the user asks for a separate contribution.
-- **Spike A (current):** local tree + editor + JSON persistence; **no** `.ctd`/`.ctb` compatibility yet.
+- **Spike A:** local tree + editor + JSON persistence.
+- **Spike B (current):** read-only import of unencrypted `.ctd` / `.ctb` (see `lib/cherrytree/`); no write-back to CherryTree files yet ([`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md)).
+- **Open issue:** AppBar import (folder icon) may not open the system file picker on device — see **Spike B → Follow-up** in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md).
 
 ## Default workflow for agents
 
@@ -31,12 +33,13 @@ Short, **task-oriented** context for automated and assistant-driven work. Humans
 - Increment **+BUILD** for every store submission (Android/iOS) once you ship.
 - Add a dated section in **`CHANGELOG.md`** when the maintainer tags a release (e.g. `0.1.1` or `0.2.0`).
 
-## Tech anchors (Spike A)
+## Tech anchors
 
 | Area | Location |
 | ---- | -------- |
 | Document model | `lib/models/note_document.dart` |
 | Persistence | `lib/services/note_repository.dart` (JSON file) |
+| CherryTree import (read-only) | `lib/cherrytree/` (`.ctd` XML, `.ctb` SQLite) |
 | Main UI | `lib/notes_home_page.dart` |
 | Localization | `lib/l10n/*.arb`, generated `lib/l10n/app_localizations*.dart` |
 | Theme / spacing / debounce | `lib/theme/` |
