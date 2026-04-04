@@ -88,10 +88,13 @@ Goal: trustworthy tree + editor + persistence on device, without CherryTree file
 
 Cross-check desktop behaviour against the **CherryTree User Manual** ([giuspen.net/cherrytreemanual](http://giuspen.net/cherrytreemanual/), mirror [giuspen.com/cherrytreemanual](https://giuspen.com/cherrytreemanual/)) and the **reference C++ sources** in [giuspen/cherrytree](https://github.com/giuspen/cherrytree) (notably [`src/ct/ct_treestore.h`](https://github.com/giuspen/cherrytree/blob/master/src/ct/ct_treestore.h) `CtNodeData`, [`src/ct/ct_config.h`](https://github.com/giuspen/cherrytree/blob/master/src/ct/ct_config.h) `CtConfig`). The HTML manual may lag the current app; confirm renamed or new features in upstream when implementing.
 
+A **broader feature narrative** (third-party checklist) lives in [`EXTENSIVE_LIST.md`](EXTENSIVE_LIST.md); rows below remain the **authoritative T/L/S** tracking tables. Merge new ideas from `EXTENSIVE_LIST.md` here when you commit to implementing them.
+
 **Triage tags (this section only):**
 
 | Tag | Meaning |
 |-----|---------|
+
 | **T** | Target for this Flutter app — use `- [ ]` / `- [x]` when tracking backlog. |
 | **L** | Later — desirable parity but blocked on spikes, editor depth, or scope. |
 | **S** | Skip — desktop-only or explicitly out of scope for mobile unless revisited. |
@@ -105,7 +108,8 @@ Fields in `CtNodeData` (persistence for ordinary nodes; shared-node fields omitt
 ### Per-node: New / Change Node Properties (manual §6.1; dialog)
 
 | Feature | Tag | Notes |
-|--------|-----|--------|
+|---------|-----|-------|
+
 | Node name | T | [x] `NoteNode.title` |
 | Bold title in tree | T | [ ] not in `NoteNode`; XML `is_bold` not round-tripped |
 | Custom title color | T | [ ] `foregroundRgb24` |
@@ -119,8 +123,10 @@ Fields in `CtNodeData` (persistence for ordinary nodes; shared-node fields omitt
 ### Tree operations (manual §6.2)
 
 | Feature | Tag | Notes |
-|--------|-----|--------|
+|---------|-----|-------|
+
 | Add sibling / subnode | T | [x] structural actions in app (verify parity with desktop semantics) |
+| Rename node title | T | [x] `NodeEditor` title field (not tree inline-F2) |
 | Duplicate node | L | |
 | Bookmarks add/remove | L | |
 | Insert today’s node | S | desktop convenience; optional **L** |
@@ -135,7 +141,8 @@ Fields in `CtNodeData` (persistence for ordinary nodes; shared-node fields omitt
 ### Files & storage (manual §5)
 
 | Feature | Tag | Notes |
-|--------|-----|--------|
+|---------|-----|-------|
+
 | New / open / recent | L | mobile uses JSON + import; full “recent docs” **L** |
 | Save / Save As | L | Spike C writes `.ctd`/`.ctb` |
 | SQLite vs XML, `.ctx`/`.ctz` encrypted | L | encryption **Later** (see Spike C / Later) |
@@ -149,15 +156,43 @@ Fields in `CtNodeData` (persistence for ordinary nodes; shared-node fields omitt
 ### Text & formatting (manual §7)
 
 | Feature | Tag | Notes |
-|--------|-----|--------|
+|---------|-----|-------|
+
 | Plain / rich / syntax node bodies | L | rich path via Quill; plain/code **L** |
 | Editing, formatting, lists, etc. | L | rich text phase 2; see Spike B omissions |
 | Search in node content (manual §7.6) | L | |
 
+### Search & replace (advanced; desktop “Find” dialog)
+
+| Feature | Tag | Notes |
+|---------|-----|-------|
+
+| Case-sensitive / match whole word / regex | L | |
+| Scope: current node, node + subnodes, whole tree | L | |
+| Replace in body (incl. multi-node / batch) | L | |
+| Replace in node names / tags (see tree ops) | L | overlaps “Find in node names” |
+
+### Supplemental checklist (Gemini / `EXTENSIVE_LIST.md` gaps)
+
+Items called out in [`EXTENSIVE_LIST.md`](EXTENSIVE_LIST.md) that are not spelled out in the tables above; **L** unless the app explicitly skips them (**S**).
+
+| Feature | Tag | Notes |
+|---------|-----|-------|
+
+| Rich text headers H4–H6 (not only H1–H3) | L | desktop supports scalable tags |
+| Table: column sort; export table to CSV | L | |
+| Image: rotate; save image as PNG | L | import of images partial |
+| Multifile XML (document as folder) | L | multifile storage in “Later” |
+| Focus / distraction-free mode (hide tree or toolbar) | L | mobile layout differs |
+| Extensive keyboard shortcut map (tablet + keyboard) | L | optional cheat sheet |
+| Inter-app copy/paste preserving rich text | L | strong mobile UX target |
+| Competitor imports (KeepNote, Zim, Tomboy, …) | L | CherryTree-only import for now |
+
 ### Embedded objects (manual §8)
 
 | Feature | Tag | Notes |
-|--------|-----|--------|
+|---------|-----|-------|
+
 | Images | L | import warns / omits |
 | Tables | L | |
 | Codebox | L | |
@@ -184,7 +219,8 @@ Fields in `CtNodeData` (persistence for ordinary nodes; shared-node fields omitt
 ### Quick reference: manual TOC → sections
 
 | Manual § | Topic |
-|----------|--------|
+|----------|-------|
+
 | 4 | Quick start: interface, node management, insert objects, save, export |
 | 5 | Files: open/save, vacuum, storage types, password, print, import/export formats, CLI |
 | 6 | Nodes: create properties, manage tree |
@@ -198,4 +234,4 @@ Fields in `CtNodeData` (persistence for ordinary nodes; shared-node fields omitt
 
 When you complete a step, turn `[ ]` into `[x]` in the same PR as the code change, and add a short note under [`CHANGELOG.md`](CHANGELOG.md) **Unreleased** (or the release section you are cutting).
 
-**Parity inventory:** Rows in [CherryTree parity inventory](#cherrytree-parity-inventory-manual--upstream-code) follow the same rule: when a **T** item is implemented, set its checkbox to `[x]` in the same PR and mention the behaviour in **Unreleased**. If the manual and code disagree, prefer **`CtNodeData` / `CtConfig`** and add a short note in the table. Re-skim the manual or upstream on major CherryTree releases if parity matters.
+**Parity inventory:** Rows in [CherryTree parity inventory](#cherrytree-parity-inventory-manual--upstream-code) follow the same rule: when a **T** item is implemented, set its checkbox to `[x]` in the same PR and mention the behaviour in **Unreleased**. If the manual and code disagree, prefer **`CtNodeData` / `CtConfig`** and add a short note in the table. Re-skim the manual or upstream on major CherryTree releases if parity matters. Narrative checklists such as [`EXTENSIVE_LIST.md`](EXTENSIVE_LIST.md) should be merged into the parity tables when work is scheduled, not left as a second source of truth for **T**/**L**/**S**.
