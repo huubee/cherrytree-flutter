@@ -43,7 +43,7 @@ class CtdDocumentWriter {
     final uid = idMap[n.id];
     b.element(
       'node',
-      attributes: _nodeAttributes(uid, n.title, n.body),
+      attributes: _nodeAttributes(uid, n),
       nest: () {
         if (NoteBodyCodec.looksLikeQuillDeltaJson(n.body)) {
           final docBody = NoteBodyCodec.documentFromStorage(n.body);
@@ -64,16 +64,16 @@ class CtdDocumentWriter {
   }
 
   /// Defaults mirror typical CherryTree exports (see [CtdDocumentReader] tests).
-  static Map<String, String> _nodeAttributes(int uniqueId, String title, String body) => {
+  static Map<String, String> _nodeAttributes(int uniqueId, NoteNode n) => {
         'unique_id': '$uniqueId',
         'master_id': '0',
-        'name': title,
-        'prog_lang': _progLangForBody(body),
+        'name': n.title,
+        'prog_lang': _progLangForBody(n.body),
         'tags': '',
         'readonly': '0',
         'nosearch_me': '0',
         'nosearch_ch': '0',
-        'custom_icon_id': '0',
+        'custom_icon_id': '${n.customIconId}',
         'is_bold': '0',
         'foreground': '',
         'ts_creation': '0',

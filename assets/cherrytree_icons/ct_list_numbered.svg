@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="ct_list_numbered.svg"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   id="svg29"
+   version="1.1"
+   viewBox="0 0 4.2333332 4.2333332"
+   height="16"
+   width="16">
+  <defs
+     id="defs23" />
+  <sodipodi:namedview
+     inkscape:snap-global="false"
+     units="px"
+     inkscape:window-maximized="1"
+     inkscape:window-y="22"
+     inkscape:window-x="-8"
+     inkscape:window-height="715"
+     inkscape:window-width="1366"
+     showgrid="true"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="7.5000002"
+     inkscape:cx="5.1446261"
+     inkscape:zoom="22.475478"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base">
+    <inkscape:grid
+       id="grid16"
+       type="xygrid" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata26">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Capa 1">
+    <path
+       style="opacity:1;fill:#333333;fill-opacity:1;stroke-width:0.281963;marker:none"
+       d="M 0.67355448,1.0583415 0.1463957,1.6775037 0.40997513,1.9632261 C 0.54576757,1.8366757 0.67355448,1.6615976 0.67355448,1.6615976 V 3.1697404 H 1.200713 V 1.0583415 Z"
+       id="path12" />
+    <circle
+       style="fill:#333333;stroke-width:1.71979;stroke-linecap:round;stop-color:#000000"
+       id="path10"
+       cx="1.8307036"
+       cy="2.8875453"
+       r="0.27954695" />
+    <path
+       id="path17"
+       d="M 2.3846365,2.6467996 V 3.1727304 H 4.2334381 V 2.6467996 Z"
+       style="color:#bebebe;fill:#333333;stroke-width:0.328692;marker:none" />
+  </g>
+</svg>

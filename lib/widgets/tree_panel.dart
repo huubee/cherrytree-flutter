@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../cherrytree/cherrytree_stock_icons.dart';
 import '../l10n/app_localizations.dart';
 import '../models/note_document.dart';
 import '../theme/app_spacing.dart';
@@ -87,14 +88,32 @@ class _TreePanelState extends State<TreePanel> {
             dense: true,
             selected: isSel,
             leading: SizedBox(
-              width: 32,
+              width: 64,
               height: 32,
-              child: hasChildren
-                  ? IconButton(
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CherrytreeStockIcons.treeIconForNode(
+                      customIconId: n.customIconId,
+                      treeDepth: depth,
+                      size: 22,
+                      fallback: Icon(
+                        Icons.description_outlined,
+                        size: 22,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  if (hasChildren)
+                    IconButton(
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
+                      style: IconButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(32, 32),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        visualDensity: VisualDensity.compact,
                       ),
                       icon: Icon(
                         isExpanded
@@ -116,7 +135,10 @@ class _TreePanelState extends State<TreePanel> {
                         });
                       },
                     )
-                  : null,
+                  else
+                    const SizedBox(width: 32, height: 32),
+                ],
+              ),
             ),
             title: Tooltip(
               message:

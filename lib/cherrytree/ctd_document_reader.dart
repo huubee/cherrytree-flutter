@@ -56,9 +56,12 @@ class CtdDocumentReader {
 
       late String title;
       late String body;
+      var customIconId = 0;
 
       if (masterId <= 0) {
         title = el.getAttribute('name') ?? '';
+        final iconStr = el.getAttribute('custom_icon_id');
+        customIconId = int.tryParse(iconStr ?? '') ?? 0;
         final parsed = CtBodyPlain.fromCtdNode(el, w);
         body = NoteBodyCodec.documentToStorage(
           CherrytreeQuillBridge.documentFromCtdNode(el),
@@ -84,6 +87,7 @@ class CtdDocumentReader {
           title: title,
           body: body,
           sortIndex: sortIndex,
+          customIconId: customIconId,
         ),
       );
 

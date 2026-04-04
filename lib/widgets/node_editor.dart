@@ -3,6 +3,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/note_document.dart';
+import '../rich/cherrytree_checkbox_toggle.dart';
 import '../rich/note_body_codec.dart';
 import '../theme/app_spacing.dart';
 
@@ -117,7 +118,7 @@ class _NodeEditorState extends State<NodeEditor> {
               showIndent: false,
               showListNumbers: false,
               showListBullets: false,
-              showListCheck: false,
+              showListCheck: true,
               showSubscript: false,
               showSuperscript: false,
               showHeaderStyle: false,
@@ -142,6 +143,14 @@ class _NodeEditorState extends State<NodeEditor> {
                 config: QuillEditorConfig(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   expands: true,
+                  onTapUp: (details, getPosition) {
+                    final pos = getPosition(details.globalPosition);
+                    CherrytreeCheckboxToggle.tryToggleAtTapOffset(
+                      _quill,
+                      pos.offset,
+                    );
+                    return false;
+                  },
                 ),
               ),
             ),

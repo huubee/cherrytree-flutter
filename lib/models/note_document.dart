@@ -10,6 +10,7 @@ class NoteNode {
     required this.title,
     required this.body,
     required this.sortIndex,
+    this.customIconId = 0,
   });
 
   final String id;
@@ -18,12 +19,16 @@ class NoteNode {
   String body;
   int sortIndex;
 
+  /// CherryTree stock icon index (see upstream `CtStockIcon` / `custom_icon_id` in XML / `is_ro` in SQLite).
+  int customIconId;
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'parentId': parentId,
         'title': title,
         'body': body,
         'sortIndex': sortIndex,
+        'customIconId': customIconId,
       };
 
   factory NoteNode.fromJson(Map<String, dynamic> json) {
@@ -37,6 +42,7 @@ class NoteNode {
       title: json['title'] as String? ?? '',
       body: body,
       sortIndex: (json['sortIndex'] as num?)?.toInt() ?? 0,
+      customIconId: (json['customIconId'] as num?)?.toInt() ?? 0,
     );
   }
 }

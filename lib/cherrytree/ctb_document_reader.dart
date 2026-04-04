@@ -83,6 +83,7 @@ class CtbDocumentReader {
       final name = nodeRow['name'] as String? ?? '';
       final txt = nodeRow['txt'] as String?;
       final syntax = nodeRow['syntax'] as String?;
+      final customIconId = _customIconIdFromIsRo(nodeRow['is_ro']);
 
       final hasCode = _truthy(nodeRow['has_codebox']);
       final hasTbl = _truthy(nodeRow['has_table']);
@@ -102,6 +103,7 @@ class CtbDocumentReader {
           title: name,
           body: body,
           sortIndex: sortIndex++,
+          customIconId: customIconId,
         ),
       );
 
@@ -134,5 +136,12 @@ class CtbDocumentReader {
     if (v is bool) return v;
     if (v is int) return v != 0;
     return v == 1;
+  }
+
+  /// CherryTree packs `custom_icon_id` in the high bits of `is_ro` (see upstream `ct_storage_sqlite.cc`).
+  static int _customIconIdFromIsRo(Object? isRo) {
+    if (isRo == null) return 0;
+    final v = isRo is int ? isRo : int.tryParse(isRo.toString()) ?? 0;
+    return v >> 1;
   }
 }

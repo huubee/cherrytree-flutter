@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="ct_find.svg"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 12.7 12.7"
+   height="48"
+   width="48">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     inkscape:window-maximized="1"
+     inkscape:window-y="22"
+     inkscape:window-x="-8"
+     inkscape:window-height="715"
+     inkscape:window-width="1366"
+     units="px"
+     inkscape:showpageshadow="false"
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="3.4701713"
+     inkscape:cx="3.540083"
+     inkscape:zoom="2.6866197"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Capa 1">
+    <path
+       id="path39"
+       style="fill:#333333;stroke-width:2.26957;stroke-linecap:round;stop-color:#000000"
+       d="M 5.0601193,0.0061551 A 5.0524082,5.0401756 0 0 0 0.00746497,5.0465762 5.0524082,5.0401756 0 0 0 5.0601193,10.086998 5.0524082,5.0401756 0 0 0 7.9293939,9.1948097 c 0.033462,0.056923 0.071464,0.1115404 0.1205229,0.1604804 l 3.1201492,3.1125939 c 0.308632,0.307885 0.805559,0.307885 1.114191,0 l 0.184664,-0.184732 c 0.308632,-0.307885 0.308632,-0.803609 0,-1.111494 L 9.349289,8.0595798 C 9.3021308,8.012536 9.2492335,7.9751123 9.1946263,7.9424446 A 5.0524082,5.0401756 0 0 0 10.112257,5.0465762 5.0524082,5.0401756 0 0 0 5.0601193,0.0061551 Z m -0.036726,1.0691803 a 3.9806855,3.9710477 0 0 1 0.036726,0 3.9806855,3.9710477 0 0 1 3.980879,3.9712408 A 3.9806855,3.9710477 0 0 1 5.0601193,9.017817 3.9806855,3.9710477 0 0 1 1.0792402,5.0465762 3.9806855,3.9710477 0 0 1 5.0233933,1.0753354 Z" />
+  </g>
+</svg>

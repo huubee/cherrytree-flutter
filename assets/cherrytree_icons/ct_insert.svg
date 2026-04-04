@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="ct_insert.svg"
+   id="svg6"
+   version="1.1"
+   width="24"
+   height="24">
+  <sodipodi:namedview
+     inkscape:current-layer="svg6"
+     inkscape:window-maximized="1"
+     inkscape:window-y="22"
+     inkscape:window-x="-8"
+     inkscape:cy="7.9987557"
+     inkscape:cx="8"
+     inkscape:zoom="13.7373"
+     showgrid="false"
+     id="namedview17"
+     inkscape:window-height="715"
+     inkscape:window-width="1366"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     guidetolerance="10"
+     gridtolerance="10"
+     objecttolerance="10"
+     borderopacity="1"
+     bordercolor="#666666"
+     pagecolor="#ffffff" />
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10">
+    <linearGradient
+       id="linearGradient1168">
+      <stop
+         offset="0"
+         style="stop-color:#ffffff;stop-opacity:1"
+         id="stop1160" />
+      <stop
+         offset="0.41666666"
+         style="stop-color:#ffffff;stop-opacity:0.23529412"
+         id="stop1162" />
+      <stop
+         offset="0.67927718"
+         style="stop-color:#ffffff;stop-opacity:0.15686275"
+         id="stop1164" />
+      <stop
+         offset="1"
+         style="stop-color:#ffffff;stop-opacity:0.39215687"
+         id="stop1166" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient1168"
+       id="linearGradient946"
+       x1="8"
+       y1="2"
+       x2="8"
+       y2="14"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient851">
+      <stop
+         style="stop-color:#ffe16b;stop-opacity:1"
+         offset="0"
+         id="stop847" />
+      <stop
+         style="stop-color:#f9c440;stop-opacity:1"
+         offset="1"
+         id="stop849" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient851"
+       id="linearGradient1129"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-23.314286,-3.4714286)"
+       x1="31.292801"
+       y1="4.9792409"
+       x2="31.314285"
+       y2="17.471428" />
+  </defs>
+  <path
+     style="opacity:1;vector-effect:none;fill:url(#linearGradient1129);fill-opacity:1;stroke:#ad5f00;stroke-width:0.992271;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.498039;marker:none"
+     id="path1047"
+     d="M 11.978516,5.5090567 A 0.49279965,0.49279965 0 0 0 11.548828,5.8039786 L 9.9277344,9.5090567 H 5.75 A 0.49279965,0.49279965 0 0 0 5.4238281,10.370385 l 3.25,2.880859 -1.6386719,4.583984 a 0.49279965,0.49279965 0 0 0 0.7226563,0.585938 L 12,15.829369 l 4.242188,2.591797 a 0.49279965,0.49279965 0 0 0 0.722656,-0.585938 l -1.638672,-4.583984 3.25,-2.880859 A 0.49279965,0.49279965 0 0 0 18.25,9.5090567 H 14.072266 L 12.451172,5.8039786 A 0.49279965,0.49279965 0 0 0 11.978516,5.5090567 Z" />
+  <path
+     style="opacity:0.8;vector-effect:none;fill:url(#linearGradient946);fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none"
+     d="m 12,6 -1.75,4 H 5.75 L 9.25,13.101563 7.5,18 12,15.25 16.5,18 14.75,13.101563 18.25,10 h -4.5 z m 0,2.4941406 0.833984,1.9062504 A 1.0001,1.0001 0 0 0 13.75,11 h 1.863281 l -1.527343,1.353516 A 1.0001,1.0001 0 0 0 13.808594,13.4375 l 0.796875,2.232422 -2.083985,-1.273438 a 1.0001,1.0001 0 0 0 -1.042968,0 L 9.3945312,15.669922 10.191406,13.4375 A 1.0001,1.0001 0 0 0 9.9140625,12.353516 L 8.3867188,11 H 10.25 a 1.0001,1.0001 0 0 0 0.916016,-0.599609 z"
+     id="path1047-5" />
+</svg>

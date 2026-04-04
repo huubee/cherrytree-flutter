@@ -84,6 +84,118 @@ Goal: trustworthy tree + editor + persistence on device, without CherryTree file
 
 ---
 
+## CherryTree parity inventory (manual + upstream code)
+
+Cross-check desktop behaviour against the **CherryTree User Manual** ([giuspen.net/cherrytreemanual](http://giuspen.net/cherrytreemanual/), mirror [giuspen.com/cherrytreemanual](https://giuspen.com/cherrytreemanual/)) and the **reference C++ sources** in [giuspen/cherrytree](https://github.com/giuspen/cherrytree) (notably [`src/ct/ct_treestore.h`](https://github.com/giuspen/cherrytree/blob/master/src/ct/ct_treestore.h) `CtNodeData`, [`src/ct/ct_config.h`](https://github.com/giuspen/cherrytree/blob/master/src/ct/ct_config.h) `CtConfig`). The HTML manual may lag the current app; confirm renamed or new features in upstream when implementing.
+
+**Triage tags (this section only):**
+
+| Tag | Meaning |
+|-----|---------|
+| **T** | Target for this Flutter app — use `- [ ]` / `- [x]` when tracking backlog. |
+| **L** | Later — desirable parity but blocked on spikes, editor depth, or scope. |
+| **S** | Skip — desktop-only or explicitly out of scope for mobile unless revisited. |
+
+Only **T** rows use task checkboxes so **L** / **S** items do not imply commitment.
+
+### Upstream per-node model (`CtNodeData`)
+
+Fields in `CtNodeData` (persistence for ordinary nodes; shared-node fields omitted here): `nodeId`, `sequence`, `name`, `syntax`, `tags`, `isReadOnly`, `customIconId`, `isBold`, `excludeMeFromSearch`, `excludeChildrenFromSearch`, `foregroundRgb24`, `tsCreation`, `tsLastSave`, plus text buffer / anchored widgets for body content.
+
+### Per-node: New / Change Node Properties (manual §6.1; dialog)
+
+| Feature | Tag | Notes |
+|--------|-----|--------|
+| Node name | T | [x] `NoteNode.title` |
+| Bold title in tree | T | [ ] not in `NoteNode`; XML `is_bold` not round-tripped |
+| Custom title color | T | [ ] `foregroundRgb24` |
+| Custom stock icon | T | [x] import + tree display `customIconId`; [ ] in-app picker + edit properties UI |
+| Node type: rich / plain / code + language | L | `syntax`; Spike B reads; editor is rich-first |
+| Tags for search | T | [ ] `tags` |
+| Read-only | T | [ ] `isReadOnly` |
+| Exclude this node / subnodes from search | L | `excludeMeFromSearch`, `excludeChildrenFromSearch` |
+| Unique id (read-only in dialog) | S | informational; maps to storage ids |
+
+### Tree operations (manual §6.2)
+
+| Feature | Tag | Notes |
+|--------|-----|--------|
+| Add sibling / subnode | T | [x] structural actions in app (verify parity with desktop semantics) |
+| Duplicate node | L | |
+| Bookmarks add/remove | L | |
+| Insert today’s node | S | desktop convenience; optional **L** |
+| Tree info (counts) | L | |
+| Move up/down/left/right, change parent | L | drag reorder **S** on mobile; buttons **L** |
+| Sort tree / sort branch | L | |
+| Find / replace in node names and tags | L | |
+| Inherit syntax from parent | L | code nodes |
+| Delete node | T | [x] |
+| Selection history back/forward | L | |
+
+### Files & storage (manual §5)
+
+| Feature | Tag | Notes |
+|--------|-----|--------|
+| New / open / recent | L | mobile uses JSON + import; full “recent docs” **L** |
+| Save / Save As | L | Spike C writes `.ctd`/`.ctb` |
+| SQLite vs XML, `.ctx`/`.ctz` encrypted | L | encryption **Later** (see Spike C / Later) |
+| Save and Vacuum (SQLite) | L | |
+| Password change via Save As | L | |
+| Page setup / print | S | |
+| Import from other apps (HTML, folder, …) | L | narrow import may stay CherryTree-only |
+| Export PDF/HTML/txt/CT | L | |
+| CLI open/export | S | |
+
+### Text & formatting (manual §7)
+
+| Feature | Tag | Notes |
+|--------|-----|--------|
+| Plain / rich / syntax node bodies | L | rich path via Quill; plain/code **L** |
+| Editing, formatting, lists, etc. | L | rich text phase 2; see Spike B omissions |
+| Search in node content (manual §7.6) | L | |
+
+### Embedded objects (manual §8)
+
+| Feature | Tag | Notes |
+|--------|-----|--------|
+| Images | L | import warns / omits |
+| Tables | L | |
+| Codebox | L | |
+| Embedded files | L | |
+| Links (web, file, node, folder) | L | partial rich handling |
+| Anchors, TOC, timestamps, special chars, horizontal rule | L | |
+
+### App-wide preferences (manual §9; `CtConfig`)
+
+**Text & code (§9.1–9.4):** tab width, spaces/tabs, wrapping, indent, line numbers, vertical spacing, timestamp format, horizontal rule, special chars, double-click word chars, smart quotes, symbol replace, spell check, RT/PT themes, whitespace / current line / codebox / embedded file / undo limit, PT/code style schemes, **code execution** + terminal — mostly **L**; spell check **L**; execution **S** on mobile.
+
+**Tree (§9.5–9.6):** tree light/dark/custom colors; **default node icons** (cherries per level / single icon / none) — **T** partial ([`CherrytreeNodeIconTheme`](lib/cherrytree/cherrytree_node_icon_theme.dart), [ ] load in UI + Settings); aux icon hide; restore expand/collapse; expand all / collapse all; bookmarks visible — **L** (expand state [x] session-only); tree right side **S**/minimal **L**; click-to-focus text, click-to-expand — **L**; last visited nodes in header **S**.
+
+**Fonts (§9.7):** RT/PT/code/tree fonts — **L** (mobile system + theme tokens first).
+
+**Links (§9.8):** custom actions, link colors, underline, relative paths, anchor size — **L**.
+
+**Toolbar (§9.9):** configurable toolbar — **S**.
+
+**Keyboard shortcuts (§9.10):** — **L** (platform conventions; optional cheat sheet).
+
+**Misc (§9.11):** autosave, backups, systray, proxy, word count, etc. — **L** / **S** as appropriate (autosave [x] app debounce; backup copies **L**).
+
+### Quick reference: manual TOC → sections
+
+| Manual § | Topic |
+|----------|--------|
+| 4 | Quick start: interface, node management, insert objects, save, export |
+| 5 | Files: open/save, vacuum, storage types, password, print, import/export formats, CLI |
+| 6 | Nodes: create properties, manage tree |
+| 7 | Text: plain, rich, syntax highlighting, editing, formatting, search |
+| 8 | Objects: images, tables, codebox, files, links, anchors, TOC, timestamps, … |
+| 9 | Settings: text/code, tree, fonts, links, toolbar, shortcuts, misc |
+
+---
+
 ## How to update this file
 
 When you complete a step, turn `[ ]` into `[x]` in the same PR as the code change, and add a short note under [`CHANGELOG.md`](CHANGELOG.md) **Unreleased** (or the release section you are cutting).
+
+**Parity inventory:** Rows in [CherryTree parity inventory](#cherrytree-parity-inventory-manual--upstream-code) follow the same rule: when a **T** item is implemented, set its checkbox to `[x]` in the same PR and mention the behaviour in **Unreleased**. If the manual and code disagree, prefer **`CtNodeData` / `CtConfig`** and add a short note in the table. Re-skim the manual or upstream on major CherryTree releases if parity matters.
