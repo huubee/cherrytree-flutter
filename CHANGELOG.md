@@ -22,7 +22,7 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 
 ### Known issues
 
-- **CherryTree import (AppBar folder icon):** the file picker may not open on device in some cases; tracked for follow-up in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) (Spike B → Follow-up).
+- **CherryTree import (AppBar folder icon):** the file picker may not open on device in some cases; see [GitHub issue #1](https://github.com/huubee/cherrytree-flutter/issues/1) and [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) (Spike B → Follow-up).
 
 ## [0.1.0] — 2026-04-03
 

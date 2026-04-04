@@ -58,7 +58,7 @@ Goal: trustworthy tree + editor + persistence on device, without CherryTree file
 
 ### Follow-up (known gaps)
 
-- [-] **Import file picker:** the AppBar folder action should open the OS file picker (`FilePicker` + replace/import flow). As of 2026-04-04 this does not open the picker on device in some runs — **needs investigation** (permissions, `file_picker` platform setup, or lifecycle).
+- [-] **Import file picker:** the AppBar folder action should open the OS file picker (`FilePicker` + replace/import flow). As of 2026-04-04 this does not open the picker on device in some runs — **needs investigation** (permissions, `file_picker` platform setup, or lifecycle). **GitHub:** [#1](https://github.com/huubee/cherrytree-flutter/issues/1).
 
 ---
 
