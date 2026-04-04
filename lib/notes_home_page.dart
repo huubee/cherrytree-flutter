@@ -17,11 +17,7 @@ import 'widgets/node_editor.dart';
 import 'widgets/tree_panel.dart';
 
 class NotesHomePage extends StatefulWidget {
-  const NotesHomePage({
-    super.key,
-    this.repository,
-    this.onSetUseDarkTheme,
-  });
+  const NotesHomePage({super.key, this.repository, this.onSetUseDarkTheme});
 
   /// Injected in tests; production uses app documents directory.
   final NoteRepository? repository;
@@ -35,8 +31,7 @@ class NotesHomePage extends StatefulWidget {
 
 class _NotesHomePageState extends State<NotesHomePage>
     with WidgetsBindingObserver {
-  late final NoteRepository _repo =
-      widget.repository ?? NoteRepository();
+  late final NoteRepository _repo = widget.repository ?? NoteRepository();
   final _uuid = const Uuid();
   NoteDocument? _doc;
   String? _selectedId;
@@ -58,6 +53,8 @@ class _NotesHomePageState extends State<NotesHomePage>
   void dispose() {
     _saveDebounce?.cancel();
     WidgetsBinding.instance.removeObserver(this);
+    // Flush once: debounced edits may not have run yet; the process can exit
+    // immediately after dispose.
     unawaited(_persist());
     super.dispose();
   }
@@ -66,6 +63,8 @@ class _NotesHomePageState extends State<NotesHomePage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
       _saveDebounce?.cancel();
+      // Same rationale as [dispose]: backgrounding often precedes process death;
+      // do not rely on the debounce timer firing later.
       unawaited(_persist());
     }
   }
@@ -97,6 +96,8 @@ class _NotesHomePageState extends State<NotesHomePage>
     final d = _doc;
     if (d == null) return;
 
+    // Serialize saves: overlapping [save] calls on the same repository could
+    // interleave writes or drop the latest document snapshot.
     if (_isSaving) {
       _saveRequested = true;
       return;
@@ -112,11 +113,11 @@ class _NotesHomePageState extends State<NotesHomePage>
 
     if (mounted) {
       setState(() => _saveState = ok ? SaveState.saved : SaveState.error);
-      
+
       if (ok) {
         Timer(const Duration(seconds: 2), () {
           if (mounted && _saveState == SaveState.saved) {
-             setState(() => _saveState = SaveState.idle);
+            setState(() => _saveState = SaveState.idle);
           }
         });
       } else {
@@ -126,7 +127,7 @@ class _NotesHomePageState extends State<NotesHomePage>
       }
     }
     _isSaving = false;
-    
+
     // If another save was requested while we were saving, trigger it now.
     if (_saveRequested) {
       unawaited(_persist());
@@ -135,6 +136,8 @@ class _NotesHomePageState extends State<NotesHomePage>
 
   void _schedulePersistAfterEdit() {
     _saveDebounce?.cancel();
+    // Coalesce rapid typing into one I/O pass; immediate saves stay on
+    // [_persistImmediately] for structural edits (add/delete).
     _saveDebounce = Timer(AppTiming.saveDebounce, () {
       if (!mounted) return;
       unawaited(_persist());
@@ -149,13 +152,15 @@ class _NotesHomePageState extends State<NotesHomePage>
   void _addRoot(AppLocalizations l10n) {
     final d = _doc!;
     final id = _uuid.v4();
-    d.nodes.add(NoteNode(
-      id: id,
-      parentId: null,
-      title: l10n.newNoteTitle,
-      body: '',
-      sortIndex: d.nextSortIndex(null),
-    ));
+    d.nodes.add(
+      NoteNode(
+        id: id,
+        parentId: null,
+        title: l10n.newNoteTitle,
+        body: '',
+        sortIndex: d.nextSortIndex(null),
+      ),
+    );
     setState(() => _selectedId = id);
     _persistImmediately();
   }
@@ -163,13 +168,15 @@ class _NotesHomePageState extends State<NotesHomePage>
   void _addChild(String parentId, AppLocalizations l10n) {
     final d = _doc!;
     final id = _uuid.v4();
-    d.nodes.add(NoteNode(
-      id: id,
-      parentId: parentId,
-      title: l10n.newNoteTitle,
-      body: '',
-      sortIndex: d.nextSortIndex(parentId),
-    ));
+    d.nodes.add(
+      NoteNode(
+        id: id,
+        parentId: parentId,
+        title: l10n.newNoteTitle,
+        body: '',
+        sortIndex: d.nextSortIndex(parentId),
+      ),
+    );
     setState(() => _selectedId = id);
     _persistImmediately();
   }
@@ -214,13 +221,31 @@ class _NotesHomePageState extends State<NotesHomePage>
 
   Future<void> _importCherryTree() async {
     final l10n = AppLocalizations.of(context)!;
+    // Use FileType.any (iOS: public.item). FileType.custom + ctb/ctd maps to
+    // dynamic UTIs that file_picker drops, which greys out files in OneDrive
+    // and other document providers that only expose generic types.
     final picked = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['ctd', 'ctb'],
+      type: FileType.any,
+      // Some document providers (cloud) return bytes without a stable sandbox
+      // path; [CherrytreeDocumentReader] needs bytes or path to import.
       withData: true,
     );
     if (picked == null || picked.files.isEmpty) return;
     if (!mounted) return;
+
+    final name = picked.files.single.name.toLowerCase();
+    if (name.endsWith('.ctz') || name.endsWith('.ctx')) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.importEncryptedError)));
+      return;
+    }
+    if (!name.endsWith('.ctd') && !name.endsWith('.ctb')) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.importUnsupportedFileType)));
+      return;
+    }
 
     final confirm = await showDialog<bool>(
       context: context,
@@ -244,8 +269,7 @@ class _NotesHomePageState extends State<NotesHomePage>
 
     try {
       final platformFile = picked.files.single;
-      final r =
-          await CherrytreeDocumentReader.readFromPickedFile(platformFile);
+      final r = await CherrytreeDocumentReader.readFromPickedFile(platformFile);
       if (!mounted) return;
       final path = platformFile.path;
       if (path != null) {
@@ -256,6 +280,8 @@ class _NotesHomePageState extends State<NotesHomePage>
           await DocumentStoragePrefs.setCherrytreeFile(mode: 'ctb', path: path);
         }
       }
+      // If [path] is null, prefs stay unset: [NoteRepository] keeps JSON-only
+      // persistence for the next launch even though this session edited the import.
       setState(() {
         _doc = r.document;
         final roots = r.document.childrenOf(null);
@@ -283,14 +309,14 @@ class _NotesHomePageState extends State<NotesHomePage>
       }
     } on CherrytreeEncryptedImportException {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.importEncryptedError)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.importEncryptedError)));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.importFailedMessage('$e'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.importFailedMessage('$e'))));
     }
   }
 
@@ -299,15 +325,11 @@ class _NotesHomePageState extends State<NotesHomePage>
     final l10n = AppLocalizations.of(context)!;
 
     if (_loading) {
-      return Scaffold(
-        body: Center(child: Text(l10n.loading)),
-      );
+      return Scaffold(body: Center(child: Text(l10n.loading)));
     }
     if (_loadError != null) {
       return Scaffold(
-        body: Center(
-          child: Text(l10n.errorWithMessage('$_loadError')),
-        ),
+        body: Center(child: Text(l10n.errorWithMessage('$_loadError'))),
       );
     }
     final doc = _doc!;
@@ -323,8 +345,9 @@ class _NotesHomePageState extends State<NotesHomePage>
       return Scaffold(
         appBar: CTAppBar(
           breadcrumbPath: breadcrumbPath,
-          onOpenSettings:
-              widget.onSetUseDarkTheme != null ? _openSettings : null,
+          onOpenSettings: widget.onSetUseDarkTheme != null
+              ? _openSettings
+              : null,
           onAddRoot: () => _addRoot(l10n),
           saveState: _saveState,
           onImportCherryTree: () {
@@ -349,6 +372,8 @@ class _NotesHomePageState extends State<NotesHomePage>
             ),
             Expanded(
               child: NodeEditor(
+                // New editor state per note so the Quill controller does not keep
+                // the previous note's content when the selection changes.
                 key: ValueKey(_selectedId),
                 node: selected,
                 onChanged: () {
@@ -365,8 +390,7 @@ class _NotesHomePageState extends State<NotesHomePage>
     return Scaffold(
       appBar: CTAppBar(
         breadcrumbPath: breadcrumbPath,
-        onOpenSettings:
-            widget.onSetUseDarkTheme != null ? _openSettings : null,
+        onOpenSettings: widget.onSetUseDarkTheme != null ? _openSettings : null,
         onAddRoot: () => _addRoot(l10n),
         saveState: _saveState,
         onImportCherryTree: () {
@@ -384,9 +408,7 @@ class _NotesHomePageState extends State<NotesHomePage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DrawerHeader(
-                child: Text(l10n.drawerNotesTitle),
-              ),
+              DrawerHeader(child: Text(l10n.drawerNotesTitle)),
               Expanded(
                 child: TreePanel(
                   doc: doc,
@@ -404,6 +426,8 @@ class _NotesHomePageState extends State<NotesHomePage>
         ),
       ),
       body: NodeEditor(
+        // New editor state per note so the Quill controller does not keep
+        // the previous note's content when the selection changes.
         key: ValueKey(_selectedId),
         node: selected,
         onChanged: () {

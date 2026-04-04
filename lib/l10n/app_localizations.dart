@@ -226,6 +226,12 @@ abstract class AppLocalizations {
   /// **'Encrypted CherryTree documents (.ctz / .ctx) are not supported yet.'**
   String get importEncryptedError;
 
+  /// No description provided for @importUnsupportedFileType.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose a CherryTree .ctd or .ctb file.'**
+  String get importUnsupportedFileType;
+
   /// No description provided for @importFailedMessage.
   ///
   /// In en, this message translates to:

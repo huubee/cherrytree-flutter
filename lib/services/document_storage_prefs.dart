@@ -2,6 +2,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// When set, the app loads/saves the working copy from this CherryTree file path
 /// (in addition to the JSON backup in app documents).
+///
+/// JSON always remains the Spike A safety net: if prefs are unset or the CT path
+/// is unusable, [NoteRepository.load] still has a local document to open.
 class DocumentStoragePrefs {
   DocumentStoragePrefs._();
 

@@ -13,7 +13,9 @@ class CherrytreeDocumentReader {
   CherrytreeDocumentReader._();
 
   /// Import from a [FilePicker] result (uses [PlatformFile.path] when present, otherwise bytes + temp file for [.ctb]).
-  static Future<CherrytreeReadResult> readFromPickedFile(PlatformFile file) async {
+  static Future<CherrytreeReadResult> readFromPickedFile(
+    PlatformFile file,
+  ) async {
     final name = file.name.toLowerCase();
     if (name.endsWith('.ctz') || name.endsWith('.ctx')) {
       throw CherrytreeEncryptedImportException();
@@ -29,9 +31,14 @@ class CherrytreeDocumentReader {
       return CtdDocumentReader.readBytes(bytes);
     }
     if (name.endsWith('.ctb')) {
+      // [sqflite] opens SQLite by file path; unlike [.ctd] we cannot parse CTB
+      // purely from an in-memory buffer at this layer.
       final dir = await getTemporaryDirectory();
       final temp = File(
-        p.join(dir.path, 'ct_import_${DateTime.now().millisecondsSinceEpoch}.ctb'),
+        p.join(
+          dir.path,
+          'ct_import_${DateTime.now().millisecondsSinceEpoch}.ctb',
+        ),
       );
       await temp.writeAsBytes(bytes, flush: true);
       try {
@@ -40,11 +47,13 @@ class CherrytreeDocumentReader {
         try {
           await temp.delete();
         } on Object {
-          // best-effort cleanup
+          // Do not mask import errors if delete fails; temp cleanup is best-effort.
         }
       }
     }
-    throw FormatException('Unsupported file type. Use a CherryTree .ctd or .ctb document.');
+    throw FormatException(
+      'Unsupported file type. Use a CherryTree .ctd or .ctb document.',
+    );
   }
 
   static Future<CherrytreeReadResult> readFile(String path) async {
@@ -59,7 +68,9 @@ class CherrytreeDocumentReader {
     if (lower.endsWith('.ctb')) {
       return CtbDocumentReader.readPath(path);
     }
-    throw FormatException('Unsupported file type. Use a CherryTree .ctd or .ctb document.');
+    throw FormatException(
+      'Unsupported file type. Use a CherryTree .ctd or .ctb document.',
+    );
   }
 }
 

@@ -28,6 +28,7 @@
   "importCancel": "Cancel",
   "importReplaceConfirm": "Replace",
   "importEncryptedError": "Encrypted CherryTree documents (.ctz / .ctx) are not supported yet.",
+  "importUnsupportedFileType": "Please choose a CherryTree .ctd or .ctb file.",
   "importFailedMessage": "Could not import: {error}",
   "@importFailedMessage": {
     "placeholders": {

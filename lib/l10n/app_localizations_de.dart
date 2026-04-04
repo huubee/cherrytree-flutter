@@ -78,6 +78,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Verschlüsselte CherryTree-Dokumente (.ctz / .ctx) werden noch nicht unterstützt.';
 
   @override
+  String get importUnsupportedFileType =>
+      'Bitte wählen Sie eine CherryTree-.ctd- oder .ctb-Datei.';
+
+  @override
   String importFailedMessage(String error) {
     return 'Import fehlgeschlagen: $error';
   }

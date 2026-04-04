@@ -101,6 +101,10 @@ flutter analyze          # Static analysis
 flutter test             # Unit / widget tests
 ```
 
+### CherryTree import (Spike B)
+
+Use the **folder** icon on the AppBar to import an unencrypted **`.ctd`** or **`.ctb`** file (replace flow with confirmation). On **iOS**, the system picker shows **all document types**; only `.ctd`/`.ctb` are accepted afterward — this avoids **greyed-out** entries in **OneDrive** and other providers where strict extension filters do not match how the file is exposed. If the provider does not return a **file path**, the app still imports for that session and keeps a **JSON backup** in app documents; **round-trip to the same CherryTree file** may require importing again once we improve path handling (see **Unreleased → Known issues** in [`CHANGELOG.md`](CHANGELOG.md)).
+
 ---
 
 ## Building for Android

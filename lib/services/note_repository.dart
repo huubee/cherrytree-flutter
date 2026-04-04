@@ -14,7 +14,7 @@ import 'document_storage_prefs.dart';
 
 class NoteRepository {
   NoteRepository({Future<File> Function()? resolveFile})
-      : _resolveFile = resolveFile;
+    : _resolveFile = resolveFile;
 
   /// Override for tests; default uses app documents + [defaultFileName].
   final Future<File> Function()? _resolveFile;
@@ -37,6 +37,8 @@ class NoteRepository {
       final ctFile = File(ctPath);
       if (await ctFile.exists()) {
         try {
+          // CT load is best-effort: missing permissions, moved file, or format
+          // drift should not brick the app — JSON (or seed) remains the fallback.
           if (mode == 'ctd') {
             final bytes = await ctFile.readAsBytes();
             return CtdDocumentReader.readBytes(bytes).document;
@@ -80,6 +82,8 @@ class NoteRepository {
       return false;
     }
 
+    // JSON is the contract for success: callers surface save failure from that
+    // only. CherryTree write-back is additive and must not undo a good backup.
     final mode = await DocumentStoragePrefs.getCherrytreeMode();
     final ctPath = await DocumentStoragePrefs.getCherrytreePath();
     if (mode != null && ctPath != null && ctPath.isNotEmpty) {

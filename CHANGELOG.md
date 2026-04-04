@@ -33,10 +33,11 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 - **Tree panel:** expansion state is pruned in **`didUpdateWidget`** instead of mutating the expansion set during **`build`**.
 - **AppBar title:** title + save indicator **`Row`** uses **`Expanded`** on the title text with **ellipsis** so narrow layouts no longer overflow when many action icons are present.
 - **Android `shared_preferences`:** load theme **after the first frame**; theme toggle applies **optimistically** then persists with **`try/catch`** to avoid Pigeon channel errors (`SharedPreferencesApi.getAll`) during early startup or flaky channels.
+- **iOS / cloud document providers — import picker:** CherryTree import uses **`FileType.any`** and then validates **`.ctd` / `.ctb`** in the app. **`FileType.custom`** with those extensions maps to **dynamic UTIs** on iOS that **`file_picker` drops**, which left files **greyed out and unselectable** in providers such as **OneDrive**. Wrong extensions show a localized snackbar (`importUnsupportedFileType`).
 
 ### Known issues
 
-- None specific to import or the notes tree; further UX (e.g. rich-text body) is listed in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md).
+- **Import with no filesystem path:** Some providers return **bytes only** (no stable sandbox `path`). The import still works for the session, but **`DocumentStoragePrefs` is not set**, so the next launch uses **JSON only** until the user imports again from a source that exposes a path (or a future flow copies the file into app storage). Further UX is tracked in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md).
 
 ## [0.1.0] — 2026-04-03
 

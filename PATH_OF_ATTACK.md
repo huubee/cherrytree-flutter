@@ -58,7 +58,7 @@ Goal: trustworthy tree + editor + persistence on device, without CherryTree file
 
 ### Follow-up (addressed on `main`)
 
-- [x] **Import file picker:** AppBar folder action opens the OS file picker (`FilePicker` + replace/import flow). On Android 11+, `AndroidManifest.xml` must declare an `<queries>` intent for `OPEN_DOCUMENT` so `resolveActivity` can see the system document UI; `MainActivity` extends `FlutterFragmentActivity`. (Previously tracked as GitHub [#1](https://github.com/huubee/cherrytree-flutter/issues/1), now closed.)
+- [x] **Import file picker:** AppBar folder action opens the OS file picker (`FilePicker` + replace/import flow). On Android 11+, `AndroidManifest.xml` must declare an `<queries>` intent for `OPEN_DOCUMENT` so `resolveActivity` can see the system document UI; `MainActivity` extends `FlutterFragmentActivity`. (Previously tracked as GitHub [#1](https://github.com/huubee/cherrytree-flutter/issues/1), now closed.) On **iOS**, use **`FileType.any`** and validate `.ctd`/`.ctb` in Dart — **`FileType.custom`** + those extensions maps to UTIs **`file_picker` discards**, which greys out files in **OneDrive** and similar providers.
 - [x] **Tree expand/collapse** in the notes panel (chevrons) so large imports are easier to navigate.
 
 ### Later UX (not scheduled — desktop parity)
