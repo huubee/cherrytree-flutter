@@ -79,6 +79,37 @@ void main() {
       expect(doc.nodes.map((n) => n.id).toList(), ['other']);
     });
 
+    test('pathFromRoot returns root-to-node chain', () {
+      final doc = NoteDocument(
+        nodes: [
+          NoteNode(
+            id: 'root',
+            parentId: null,
+            title: 'R',
+            body: '',
+            sortIndex: 0,
+          ),
+          NoteNode(
+            id: 'mid',
+            parentId: 'root',
+            title: 'M',
+            body: '',
+            sortIndex: 0,
+          ),
+          NoteNode(
+            id: 'leaf',
+            parentId: 'mid',
+            title: 'L',
+            body: '',
+            sortIndex: 0,
+          ),
+        ],
+      );
+      final p = doc.pathFromRoot('leaf');
+      expect(p.map((n) => n.id).toList(), ['root', 'mid', 'leaf']);
+      expect(doc.pathFromRoot('missing'), isEmpty);
+    });
+
     test('JSON round-trip preserves nodes', () {
       final original = NoteDocument(
         nodes: [

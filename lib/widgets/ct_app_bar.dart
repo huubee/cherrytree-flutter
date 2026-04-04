@@ -7,6 +7,8 @@ class CTAppBar extends StatefulWidget implements PreferredSizeWidget {
   const CTAppBar({
     super.key,
     this.titleText,
+    this.breadcrumbPath,
+    this.onOpenSettings,
     required this.onAddRoot,
     required this.saveState,
     this.leading,
@@ -14,6 +16,9 @@ class CTAppBar extends StatefulWidget implements PreferredSizeWidget {
   });
 
   final String? titleText;
+  /// Path from root to selected note, e.g. `A / B / C` (shown under the title).
+  final String? breadcrumbPath;
+  final VoidCallback? onOpenSettings;
   final VoidCallback onAddRoot;
   final SaveState saveState;
   final Widget? leading;
@@ -22,8 +27,16 @@ class CTAppBar extends StatefulWidget implements PreferredSizeWidget {
   @override
   State<CTAppBar> createState() => _CTAppBarState();
 
+  static const double _breadcrumbBarHeight = 26;
+
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize {
+    final hasBreadcrumb =
+        breadcrumbPath != null && breadcrumbPath!.trim().isNotEmpty;
+    return Size.fromHeight(
+      kToolbarHeight + (hasBreadcrumb ? _breadcrumbBarHeight : 0),
+    );
+  }
 }
 
 class _CTAppBarState extends State<CTAppBar>
@@ -88,17 +101,59 @@ class _CTAppBarState extends State<CTAppBar>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final breadcrumb = widget.breadcrumbPath?.trim();
+    final hasBreadcrumb = breadcrumb != null && breadcrumb.isNotEmpty;
+
     return AppBar(
       title: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(widget.titleText ?? l10n.appTitle),
+          Expanded(
+            child: Text(
+              widget.titleText ?? l10n.appTitle,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
           const SizedBox(width: 8),
           _buildSaveIndicator(),
         ],
       ),
+      bottom: hasBreadcrumb
+          ? PreferredSize(
+              preferredSize: const Size.fromHeight(CTAppBar._breadcrumbBarHeight),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    start: 16,
+                    end: 16,
+                    bottom: 6,
+                  ),
+                  child: Semantics(
+                    label: breadcrumb,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Text(
+                        breadcrumb,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : null,
       leading: widget.leading,
       actions: [
+        if (widget.onOpenSettings != null)
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: l10n.settingsTooltip,
+            onPressed: widget.onOpenSettings,
+          ),
         if (widget.onImportCherryTree != null)
           IconButton(
             icon: const Icon(Icons.folder_open_outlined),

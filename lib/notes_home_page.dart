@@ -8,6 +8,7 @@ import 'cherrytree/cherrytree_document_reader.dart';
 import 'l10n/app_localizations.dart';
 import 'models/note_document.dart';
 import 'services/note_repository.dart';
+import 'settings_page.dart';
 import 'theme/app_spacing.dart';
 import 'theme/app_timing.dart';
 import 'widgets/ct_app_bar.dart';
@@ -15,10 +16,17 @@ import 'widgets/node_editor.dart';
 import 'widgets/tree_panel.dart';
 
 class NotesHomePage extends StatefulWidget {
-  const NotesHomePage({super.key, this.repository});
+  const NotesHomePage({
+    super.key,
+    this.repository,
+    this.onSetUseDarkTheme,
+  });
 
   /// Injected in tests; production uses app documents directory.
   final NoteRepository? repository;
+
+  /// Persists light/dark theme; used by [SettingsPage].
+  final Future<void> Function(bool useDarkTheme)? onSetUseDarkTheme;
 
   @override
   State<NotesHomePage> createState() => _NotesHomePageState();
@@ -177,6 +185,32 @@ class _NotesHomePageState extends State<NotesHomePage>
     _persistImmediately();
   }
 
+  /// Path from root to the selected note, e.g. `Parent / Child` (CherryTree-style).
+  String? _breadcrumbPath(
+    AppLocalizations l10n,
+    NoteDocument doc,
+    String? selectedId,
+  ) {
+    if (selectedId == null) return null;
+    final path = doc.pathFromRoot(selectedId);
+    if (path.isEmpty) return null;
+    return path
+        .map((n) => n.title.trim().isEmpty ? l10n.untitledNote : n.title)
+        .join(' / ');
+  }
+
+  void _openSettings() {
+    final setter = widget.onSetUseDarkTheme;
+    if (setter == null) return;
+    unawaited(
+      Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (ctx) => SettingsPage(onSetUseDarkTheme: setter),
+        ),
+      ),
+    );
+  }
+
   Future<void> _importCherryTree() async {
     final l10n = AppLocalizations.of(context)!;
     final picked = await FilePicker.platform.pickFiles(
@@ -267,6 +301,7 @@ class _NotesHomePageState extends State<NotesHomePage>
     }
     final doc = _doc!;
     final selected = _selectedId != null ? doc.find(_selectedId!) : null;
+    final breadcrumbPath = _breadcrumbPath(l10n, doc, _selectedId);
 
     // Use MediaQuery for the wide/narrow breakpoint — not LayoutBuilder. Nesting
     // LayoutBuilder around Scaffold + TreePanel (PopupMenuButton / Tooltip overlays)
@@ -276,6 +311,9 @@ class _NotesHomePageState extends State<NotesHomePage>
     if (wide) {
       return Scaffold(
         appBar: CTAppBar(
+          breadcrumbPath: breadcrumbPath,
+          onOpenSettings:
+              widget.onSetUseDarkTheme != null ? _openSettings : null,
           onAddRoot: () => _addRoot(l10n),
           saveState: _saveState,
           onImportCherryTree: () {
@@ -315,6 +353,9 @@ class _NotesHomePageState extends State<NotesHomePage>
 
     return Scaffold(
       appBar: CTAppBar(
+        breadcrumbPath: breadcrumbPath,
+        onOpenSettings:
+            widget.onSetUseDarkTheme != null ? _openSettings : null,
         onAddRoot: () => _addRoot(l10n),
         saveState: _saveState,
         onImportCherryTree: () {

@@ -87,4 +87,26 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get importWarningsOk => 'OK';
+
+  @override
+  String get themeUseLight => 'Helles Design';
+
+  @override
+  String get themeUseDark => 'Dunkles Design';
+
+  @override
+  String get settingsTitle => 'Einstellungen';
+
+  @override
+  String get settingsTooltip => 'Einstellungen';
+
+  @override
+  String get settingsAppearanceSection => 'Erscheinungsbild';
+
+  @override
+  String get settingsUseDarkTheme => 'Dunkles Design';
+
+  @override
+  String get settingsUseDarkThemeSubtitle =>
+      'Dunkles Blau wie die Desktop-Version von CherryTree';
 }

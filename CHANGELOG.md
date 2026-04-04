@@ -22,16 +22,21 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 - Added visual save status indicator (pulsing cloud) to the AppBar with resilient concurrent save handling.
 - **Dependency policy:** [`DEVELOPMENT_GUIDELINES.md`](DEVELOPMENT_GUIDELINES.md) § Dependencies and [`AGENTS.md`](AGENTS.md) now describe using **stable**, SDK-compatible SemVer constraints, committing `pubspec.lock`, and upgrades via Dependabot or reviewed PRs rather than ad-hoc “always latest” bumps.
 - **Notes tree:** expand/collapse branches in the tree panel (chevron); imported documents still start fully expanded; adding a child from the ⋮ menu keeps that parent expanded.
+- **Breadcrumbs:** AppBar shows the path from the root to the selected note (e.g. `Parent / Child`), horizontally scrollable on narrow screens; `NoteDocument.pathFromRoot` builds the chain.
+- **Dark theme:** optional CherryTree-style navy dark scaffold (`AppTheme.dark`, `AppColors.darkScaffold`); choice persisted with **`shared_preferences`** (`use_dark_theme`). **Settings** screen (`lib/settings_page.dart`) holds the light/dark switch (room for more CherryTree-like categories later); AppBar uses a **settings** icon instead of a separate theme icon.
+- **Note body editor:** monospace body field with consistent line height and subtle filled background for a “notes / commands” feel; line breaks preserved as before.
 
 ### Fixed
 
 - **Android — import file picker:** `AndroidManifest.xml` declares a `<queries>` intent for `ACTION_OPEN_DOCUMENT` (plus `OPENABLE` / `*/*`) so `resolveActivity` can see the system document UI on **Android 11+**; `MainActivity` extends **`FlutterFragmentActivity`**. Together this fixes the picker not opening on device ([issue #1](https://github.com/huubee/cherrytree-flutter/issues/1) closed).
 - **Notes home layout:** wide vs narrow breakpoint uses **`MediaQuery.sizeOf`** instead of a top-level **`LayoutBuilder`**, avoiding a **`RenderLayoutBuilder` / overlay** assertion when `PopupMenuButton`, `Tooltip`, or similar overlays attach during layout.
 - **Tree panel:** expansion state is pruned in **`didUpdateWidget`** instead of mutating the expansion set during **`build`**.
+- **AppBar title:** title + save indicator **`Row`** uses **`Expanded`** on the title text with **ellipsis** so narrow layouts no longer overflow when many action icons are present.
+- **Android `shared_preferences`:** load theme **after the first frame**; theme toggle applies **optimistically** then persists with **`try/catch`** to avoid Pigeon channel errors (`SharedPreferencesApi.getAll`) during early startup or flaky channels.
 
 ### Known issues
 
-- None specific to import or the notes tree; next UX work (breadcrumbs, theme, richer body) is listed in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md) under **Later** / Spike follow-ups.
+- None specific to import or the notes tree; further UX (e.g. rich-text body) is listed in [`PATH_OF_ATTACK.md`](PATH_OF_ATTACK.md).
 
 ## [0.1.0] — 2026-04-03
 

@@ -87,4 +87,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importWarningsOk => 'OK';
+
+  @override
+  String get themeUseLight => 'Use light theme';
+
+  @override
+  String get themeUseDark => 'Use dark theme';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsTooltip => 'Settings';
+
+  @override
+  String get settingsAppearanceSection => 'Appearance';
+
+  @override
+  String get settingsUseDarkTheme => 'Dark theme';
+
+  @override
+  String get settingsUseDarkThemeSubtitle =>
+      'Navy tones similar to desktop CherryTree';
 }

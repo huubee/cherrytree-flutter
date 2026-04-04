@@ -243,6 +243,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OK'**
   String get importWarningsOk;
+
+  /// No description provided for @themeUseLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Use light theme'**
+  String get themeUseLight;
+
+  /// No description provided for @themeUseDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Use dark theme'**
+  String get themeUseDark;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTooltip;
+
+  /// No description provided for @settingsAppearanceSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearanceSection;
+
+  /// No description provided for @settingsUseDarkTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark theme'**
+  String get settingsUseDarkTheme;
+
+  /// No description provided for @settingsUseDarkThemeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Navy tones similar to desktop CherryTree'**
+  String get settingsUseDarkThemeSubtitle;
 }
 
 class _AppLocalizationsDelegate

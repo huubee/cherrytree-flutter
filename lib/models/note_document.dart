@@ -52,6 +52,19 @@ class NoteDocument {
     return null;
   }
 
+  /// Nodes from the root down to [id] inclusive. Empty if [id] is missing.
+  List<NoteNode> pathFromRoot(String id) {
+    final upwards = <NoteNode>[];
+    String? cur = id;
+    while (cur != null) {
+      final n = find(cur);
+      if (n == null) return [];
+      upwards.add(n);
+      cur = n.parentId;
+    }
+    return upwards.reversed.toList();
+  }
+
   void removeSubtree(String id) {
     final toRemove = _collectDescendantIds(id);
     nodes.removeWhere((n) => toRemove.contains(n.id));

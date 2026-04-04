@@ -22,6 +22,9 @@ class _NodeEditorState extends State<NodeEditor> {
   late TextEditingController _title;
   late TextEditingController _body;
 
+  static const double _bodyFontSize = 14;
+  static const double _bodyLineHeight = 1.5;
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +59,20 @@ class _NodeEditorState extends State<NodeEditor> {
       return Center(child: Text(l10n.emptyEditorHint));
     }
     final bottomSafe = MediaQuery.paddingOf(context).bottom;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    final bodyStyle = theme.textTheme.bodyMedium?.copyWith(
+      fontFamily: 'monospace',
+      fontSize: _bodyFontSize,
+      height: _bodyLineHeight,
+    );
+
+    final bodyFill = isDark
+        ? scheme.surfaceContainerHighest.withValues(alpha: 0.45)
+        : scheme.surfaceContainerHighest.withValues(alpha: 0.35);
+
     return Padding(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.editorPadding,
@@ -81,10 +98,19 @@ class _NodeEditorState extends State<NodeEditor> {
           Expanded(
             child: TextField(
               controller: _body,
+              style: bodyStyle,
+              strutStyle: StrutStyle(
+                fontFamily: 'monospace',
+                fontSize: _bodyFontSize,
+                height: _bodyLineHeight,
+                leadingDistribution: TextLeadingDistribution.even,
+              ),
               decoration: InputDecoration(
                 labelText: l10n.fieldBody,
                 alignLabelWithHint: true,
                 border: const OutlineInputBorder(),
+                filled: true,
+                fillColor: bodyFill,
               ),
               maxLines: null,
               expands: true,

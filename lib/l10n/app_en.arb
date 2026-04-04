@@ -37,5 +37,12 @@
     }
   },
   "importWarningsTitle": "Import notes",
-  "importWarningsOk": "OK"
+  "importWarningsOk": "OK",
+  "themeUseLight": "Use light theme",
+  "themeUseDark": "Use dark theme",
+  "settingsTitle": "Settings",
+  "settingsTooltip": "Settings",
+  "settingsAppearanceSection": "Appearance",
+  "settingsUseDarkTheme": "Dark theme",
+  "settingsUseDarkThemeSubtitle": "Navy tones similar to desktop CherryTree"
 }

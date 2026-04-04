@@ -37,5 +37,12 @@
     }
   },
   "importWarningsTitle": "Opmerkingen bij import",
-  "importWarningsOk": "OK"
+  "importWarningsOk": "OK",
+  "themeUseLight": "Licht thema",
+  "themeUseDark": "Donker thema",
+  "settingsTitle": "Instellingen",
+  "settingsTooltip": "Instellingen",
+  "settingsAppearanceSection": "Weergave",
+  "settingsUseDarkTheme": "Donker thema",
+  "settingsUseDarkThemeSubtitle": "Donkerblauw, vergelijkbaar met desktop CherryTree"
 }

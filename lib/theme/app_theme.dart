@@ -24,6 +24,37 @@ abstract final class AppTheme {
 
     return base.copyWith(
       textTheme: textTheme,
+      scaffoldBackgroundColor: colorScheme.surface,
+      appBarTheme: AppBarTheme(
+        centerTitle: false,
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        foregroundColor: colorScheme.onSurface,
+      ),
+    );
+  }
+
+  /// Dark theme with a CherryTree-like navy scaffold (see [AppColors.darkScaffold]).
+  static ThemeData dark() {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: AppColors.seed,
+      brightness: Brightness.dark,
+      surface: AppColors.darkSurface,
+    );
+
+    final base = ThemeData(
+      colorScheme: colorScheme,
+      useMaterial3: true,
+    );
+
+    final textTheme = base.textTheme.copyWith(
+      titleLarge: base.textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+      ),
+    );
+
+    return base.copyWith(
+      textTheme: textTheme,
+      scaffoldBackgroundColor: AppColors.darkScaffold,
       appBarTheme: AppBarTheme(
         centerTitle: false,
         backgroundColor: colorScheme.surfaceContainerHighest,

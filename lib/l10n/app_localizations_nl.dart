@@ -87,4 +87,26 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get importWarningsOk => 'OK';
+
+  @override
+  String get themeUseLight => 'Licht thema';
+
+  @override
+  String get themeUseDark => 'Donker thema';
+
+  @override
+  String get settingsTitle => 'Instellingen';
+
+  @override
+  String get settingsTooltip => 'Instellingen';
+
+  @override
+  String get settingsAppearanceSection => 'Weergave';
+
+  @override
+  String get settingsUseDarkTheme => 'Donker thema';
+
+  @override
+  String get settingsUseDarkThemeSubtitle =>
+      'Donkerblauw, vergelijkbaar met desktop CherryTree';
 }

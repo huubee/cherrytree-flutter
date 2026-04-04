@@ -63,9 +63,10 @@ Goal: trustworthy tree + editor + persistence on device, without CherryTree file
 
 ### Later UX (not scheduled — desktop parity)
 
-- [ ] Path **breadcrumbs** (or subtitle) for the selected node
-- [ ] Optional **dark** theme closer to desktop CherryTree
-- [ ] **Richer body** presentation (e.g. monospace, line-preserving layout; later: checklist / rich text)
+- [x] Path **breadcrumbs** (or subtitle) for the selected node — AppBar `bottom` strip, `NoteDocument.pathFromRoot`, ` / ` join (see `CTAppBar.breadcrumbPath`).
+- [x] Optional **dark** theme — `AppTheme.dark()` (navy scaffold via `AppColors.darkScaffold`), **`SettingsPage`** switch, preference `use_dark_theme` in **`shared_preferences`** (`lib/main.dart`). Further CherryTree-like prefs can use the same screen (categories later).
+- [x] **Richer body** (phase 1) — body `TextField` uses **monospace**, stable line height (`StrutStyle`), filled outline field; title stays proportional (see `NodeEditor`).
+- [ ] **Richer body** (phase 2): checklist widgets, syntax / rich text — after Spike C or as a dedicated spike.
 
 ---
 

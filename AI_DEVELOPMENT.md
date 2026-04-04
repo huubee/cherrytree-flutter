@@ -42,7 +42,7 @@ Short, **task-oriented** context for automated and assistant-driven work. Humans
 | CherryTree import (read-only) | `lib/cherrytree/` (`.ctd` XML, `.ctb` SQLite) |
 | Main UI | `lib/notes_home_page.dart` |
 | Localization | `lib/l10n/*.arb`, generated `lib/l10n/app_localizations*.dart` |
-| Theme / spacing / debounce | `lib/theme/` |
+| Theme / spacing / debounce | `lib/theme/`; `shared_preferences` (`use_dark_theme`) and **`SettingsPage`** (`lib/settings_page.dart`) from **`NotesHomePage`** |
 
 ## Anti-patterns (see `AGENTS.md` for detail)
 
