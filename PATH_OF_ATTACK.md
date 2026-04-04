@@ -39,9 +39,9 @@ Goal: trustworthy tree + editor + persistence on device, without CherryTree file
 
 - [x] `flutter analyze` clean; unit tests for `NoteDocument` + `NoteRepository` (injected file path)
 - [x] gen-l10n (EN / NL / DE), theme tokens (spacing, colors, timing)
-- [ ] `integration_test` on Android (and iOS when feasible): load → edit → background → relaunch
-- [ ] Save/error feedback UX (e.g. subtle status or retry) beyond snackbar on hard failures
-- [ ] Split oversized widgets if any file grows past ~300 lines (see `AGENTS.md`)
+- [x] `integration_test` on Android (and iOS when feasible): load → edit → background → relaunch
+- [x] Save/error feedback UX (e.g. subtle status or retry) beyond snackbar on hard failures
+- [x] Split oversized widgets if any file grows past ~300 lines (see `AGENTS.md`)
 
 ### Deferred (explicitly not Spike A)
 

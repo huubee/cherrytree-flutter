@@ -8,6 +8,9 @@ import 'models/note_document.dart';
 import 'services/note_repository.dart';
 import 'theme/app_spacing.dart';
 import 'theme/app_timing.dart';
+import 'widgets/ct_app_bar.dart';
+import 'widgets/node_editor.dart';
+import 'widgets/tree_panel.dart';
 
 class NotesHomePage extends StatefulWidget {
   const NotesHomePage({super.key, this.repository});
@@ -29,6 +32,9 @@ class _NotesHomePageState extends State<NotesHomePage>
   bool _loading = true;
   Object? _loadError;
   Timer? _saveDebounce;
+  SaveState _saveState = SaveState.idle;
+  bool _isSaving = false;
+  bool _saveRequested = false;
 
   @override
   void initState() {
@@ -79,11 +85,40 @@ class _NotesHomePageState extends State<NotesHomePage>
   Future<void> _persist() async {
     final d = _doc;
     if (d == null) return;
+
+    if (_isSaving) {
+      _saveRequested = true;
+      return;
+    }
+    _isSaving = true;
+    _saveRequested = false;
+
+    if (mounted) {
+      setState(() => _saveState = SaveState.saving);
+    }
+
     final ok = await _repo.save(d);
-    if (!ok && mounted) {
-      final messenger = ScaffoldMessenger.maybeOf(context);
-      final l10n = AppLocalizations.of(context)!;
-      messenger?.showSnackBar(SnackBar(content: Text(l10n.saveFailed)));
+
+    if (mounted) {
+      setState(() => _saveState = ok ? SaveState.saved : SaveState.error);
+      
+      if (ok) {
+        Timer(const Duration(seconds: 2), () {
+          if (mounted && _saveState == SaveState.saved) {
+             setState(() => _saveState = SaveState.idle);
+          }
+        });
+      } else {
+        final messenger = ScaffoldMessenger.maybeOf(context);
+        final l10n = AppLocalizations.of(context)!;
+        messenger?.showSnackBar(SnackBar(content: Text(l10n.saveFailed)));
+      }
+    }
+    _isSaving = false;
+    
+    // If another save was requested while we were saving, trigger it now.
+    if (_saveRequested) {
+      unawaited(_persist());
     }
   }
 
@@ -165,15 +200,9 @@ class _NotesHomePageState extends State<NotesHomePage>
             constraints.maxWidth >= AppSpacing.wideLayoutBreakpoint;
         if (wide) {
           return Scaffold(
-            appBar: AppBar(
-              title: Text(l10n.appTitle),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.note_add_outlined),
-                  tooltip: l10n.addRootNoteTooltip,
-                  onPressed: () => _addRoot(l10n),
-                ),
-              ],
+            appBar: CTAppBar(
+              onAddRoot: () => _addRoot(l10n),
+              saveState: _saveState,
             ),
             body: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -182,7 +211,7 @@ class _NotesHomePageState extends State<NotesHomePage>
                   width: AppSpacing.sidebarWidth,
                   child: Material(
                     elevation: 1,
-                    child: _TreePanel(
+                    child: TreePanel(
                       doc: doc,
                       selectedId: _selectedId,
                       onSelect: (id) => setState(() => _selectedId = id),
@@ -207,21 +236,15 @@ class _NotesHomePageState extends State<NotesHomePage>
         }
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text(l10n.appTitle),
+          appBar: CTAppBar(
+            onAddRoot: () => _addRoot(l10n),
+            saveState: _saveState,
             leading: Builder(
               builder: (ctx) => IconButton(
                 icon: const Icon(Icons.menu),
                 onPressed: () => Scaffold.of(ctx).openDrawer(),
               ),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.note_add_outlined),
-                tooltip: l10n.addRootNoteTooltip,
-                onPressed: () => _addRoot(l10n),
-              ),
-            ],
           ),
           drawer: Drawer(
             child: SafeArea(
@@ -232,7 +255,7 @@ class _NotesHomePageState extends State<NotesHomePage>
                     child: Text(l10n.drawerNotesTitle),
                   ),
                   Expanded(
-                    child: _TreePanel(
+                    child: TreePanel(
                       doc: doc,
                       selectedId: _selectedId,
                       onSelect: (id) {
@@ -257,173 +280,6 @@ class _NotesHomePageState extends State<NotesHomePage>
           ),
         );
       },
-    );
-  }
-}
-
-class _TreePanel extends StatelessWidget {
-  const _TreePanel({
-    required this.doc,
-    required this.selectedId,
-    required this.onSelect,
-    required this.onAddChild,
-    required this.onDelete,
-  });
-
-  final NoteDocument doc;
-  final String? selectedId;
-  final void Function(String id) onSelect;
-  final void Function(String parentId) onAddChild;
-  final void Function(String id) onDelete;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: _buildLevel(context, l10n, null, 0),
-    );
-  }
-
-  List<Widget> _buildLevel(
-    BuildContext context,
-    AppLocalizations l10n,
-    String? parentId,
-    int depth,
-  ) {
-    final out = <Widget>[];
-    for (final n in doc.childrenOf(parentId)) {
-      final isSel = n.id == selectedId;
-      out.add(
-        Padding(
-          padding: EdgeInsets.only(
-            left: depth * AppSpacing.treeIndentStep,
-          ),
-          child: ListTile(
-            dense: true,
-            selected: isSel,
-            title: Text(
-              n.title.trim().isEmpty ? l10n.untitledNote : n.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            onTap: () => onSelect(n.id),
-            trailing: PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'add') onAddChild(n.id);
-                if (value == 'del') onDelete(n.id);
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'add',
-                  child: Text(l10n.menuAddChild),
-                ),
-                PopupMenuItem(
-                  value: 'del',
-                  child: Text(l10n.menuDeleteSubtree),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-      out.addAll(_buildLevel(context, l10n, n.id, depth + 1));
-    }
-    return out;
-  }
-}
-
-class NodeEditor extends StatefulWidget {
-  const NodeEditor({
-    super.key,
-    required this.node,
-    required this.onChanged,
-  });
-
-  final NoteNode? node;
-  final VoidCallback onChanged;
-
-  @override
-  State<NodeEditor> createState() => _NodeEditorState();
-}
-
-class _NodeEditorState extends State<NodeEditor> {
-  late TextEditingController _title;
-  late TextEditingController _body;
-
-  @override
-  void initState() {
-    super.initState();
-    final n = widget.node;
-    _title = TextEditingController(text: n?.title ?? '');
-    _body = TextEditingController(text: n?.body ?? '');
-  }
-
-  @override
-  void didUpdateWidget(covariant NodeEditor oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.node?.id != widget.node?.id) {
-      _title.text = widget.node?.title ?? '';
-      _body.text = widget.node?.body ?? '';
-    }
-  }
-
-  @override
-  void dispose() {
-    _title.dispose();
-    _body.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final n = widget.node;
-    if (n == null) {
-      return Center(child: Text(l10n.emptyEditorHint));
-    }
-    final bottomSafe = MediaQuery.paddingOf(context).bottom;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.editorPadding,
-        AppSpacing.editorPadding,
-        AppSpacing.editorPadding,
-        AppSpacing.editorPadding + bottomSafe,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextField(
-            controller: _title,
-            decoration: InputDecoration(
-              labelText: l10n.fieldTitle,
-              border: const OutlineInputBorder(),
-            ),
-            onChanged: (v) {
-              n.title = v;
-              widget.onChanged();
-            },
-          ),
-          const SizedBox(height: AppSpacing.editorFieldGap),
-          Expanded(
-            child: TextField(
-              controller: _body,
-              decoration: InputDecoration(
-                labelText: l10n.fieldBody,
-                alignLabelWithHint: true,
-                border: const OutlineInputBorder(),
-              ),
-              maxLines: null,
-              expands: true,
-              textAlignVertical: TextAlignVertical.top,
-              onChanged: (v) {
-                n.body = v;
-                widget.onChanged();
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

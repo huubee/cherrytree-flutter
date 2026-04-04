@@ -14,19 +14,10 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 
 ## [Unreleased]
 
-### Added
+### Added <!-- omit in toc -->
 
-- (Add bullet points here as you merge work; move them into a dated release when you tag.)
-
-### Changed
-
-- (Same pattern.)
-
-### Fixed
-
-- (Same pattern.)
-
----
+- Integration tests for Android/iOS simulating load, edit, background, and relaunch sequences.
+- Added visual save status indicator (pulsing cloud) to the AppBar with resilient concurrent save handling.
 
 ## [0.1.0] — 2026-04-03
 
