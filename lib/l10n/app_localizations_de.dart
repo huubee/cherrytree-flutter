@@ -18,7 +18,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noOpenDocuments => 'Keine geöffneten Dokumente.';
 
   @override
-  String get saveFailed => 'Notizen konnten nicht gespeichert werden. Speicher prüfen.';
+  String get saveFailed =>
+      'Notizen konnten nicht gespeichert werden. Speicher prüfen.';
 
   @override
   String errorWithMessage(String error) {
@@ -56,7 +57,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get seedWelcomeTitle => 'Willkommen';
 
   @override
-  String get seedWelcomeBody => 'Spike B: lokale Notizen mit schreibgeschütztem Import unverschlüsselter CherryTree-.ctd- (XML) und .ctb-Dateien (SQLite). Rich-Text wird als Klartext angezeigt; Bilder und Tabellen werden ausgelassen.';
+  String get seedWelcomeBody =>
+      'Spike B: lokale Notizen mit schreibgeschütztem Import unverschlüsselter CherryTree-.ctd- (XML) und .ctb-Dateien (SQLite). Rich-Text wird als Klartext angezeigt; Bilder und Tabellen werden ausgelassen.';
 
   @override
   String get exportCherryTreeTooltip => 'Als CherryTree-Datei exportieren';
@@ -68,13 +70,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get exportAsCtdTitle => 'XML (.ctd)';
 
   @override
-  String get exportAsCtdSubtitle => 'Einzeldatei; gut für kleine Bäume und Diff.';
+  String get exportAsCtdSubtitle =>
+      'Einzeldatei; gut für kleine Bäume und Diff.';
 
   @override
   String get exportAsCtbTitle => 'SQLite (.ctb)';
 
   @override
-  String get exportAsCtbSubtitle => 'Datenbankdatei; besser für große Dokumente.';
+  String get exportAsCtbSubtitle =>
+      'Datenbankdatei; besser für große Dokumente.';
 
   @override
   String get exportCherryTreeDialogTitle => 'CherryTree-Export speichern';
@@ -121,7 +125,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get importReplaceTitle => 'Lokale Notizen ersetzen?';
 
   @override
-  String get importReplaceMessage => 'Damit werden alle in dieser App gespeicherten Notizen durch das importierte CherryTree-Dokument ersetzt. Fortfahren?';
+  String get importReplaceMessage =>
+      'Damit werden alle in dieser App gespeicherten Notizen durch das importierte CherryTree-Dokument ersetzt. Fortfahren?';
 
   @override
   String get importCancel => 'Abbrechen';
@@ -133,7 +138,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get importTabTargetTitle => 'Importziel';
 
   @override
-  String get importTabTargetMessage => 'Aktuellen Tab ersetzen oder den Import in einem neuen Tab öffnen?';
+  String get importTabTargetMessage =>
+      'Aktuellen Tab ersetzen oder den Import in einem neuen Tab öffnen?';
 
   @override
   String get importTabReplaceCurrent => 'Aktuellen Tab ersetzen';
@@ -157,16 +163,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get renameTabFieldLabel => 'Tab-Name';
 
   @override
-  String get renameTabDescription => 'Leer lassen, um den Titel der ersten Hauptnotiz zu verwenden.';
+  String get renameTabDescription =>
+      'Leer lassen, um den Titel der ersten Hauptnotiz zu verwenden.';
 
   @override
   String get renameTabSave => 'Speichern';
 
   @override
-  String get importEncryptedError => 'Verschlüsselte CherryTree-Dokumente (.ctz / .ctx) werden noch nicht unterstützt.';
+  String get importEncryptedError =>
+      'Verschlüsselte CherryTree-Dokumente (.ctz / .ctx) werden noch nicht unterstützt.';
 
   @override
-  String get importUnsupportedFileType => 'Bitte wählen Sie eine CherryTree-.ctd- oder .ctb-Datei.';
+  String get importUnsupportedFileType =>
+      'Bitte wählen Sie eine CherryTree-.ctd- oder .ctb-Datei.';
 
   @override
   String importFailedMessage(String error) {
@@ -198,5 +207,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsUseDarkTheme => 'Dunkles Design';
 
   @override
-  String get settingsUseDarkThemeSubtitle => 'Dunkles Blau wie die Desktop-Version von CherryTree';
+  String get settingsUseDarkThemeSubtitle =>
+      'Dunkles Blau wie die Desktop-Version von CherryTree';
+
+  @override
+  String get settingsLayoutSection => 'Layout';
+
+  @override
+  String get settingsUseSplitLayout => 'Geteiltes Layout';
+
+  @override
+  String get settingsUseSplitLayoutSubtitle =>
+      'Baum neben oder über dem Editor mit verschiebbarem Teiler statt fester Seitenleiste oder Schublade';
+
+  @override
+  String get splitLayoutToggleTooltip => 'Geteiltes Layout umschalten';
+
+  @override
+  String get settingsLanguageSection => 'Sprache';
+
+  @override
+  String get settingsLanguageDefault => 'Systemstandard';
 }

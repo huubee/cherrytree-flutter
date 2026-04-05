@@ -46,7 +46,32 @@ Import limitations (same general class as desktop CherryTree “plain” viewing
 
 ## Settings
 
-- **Settings** (gear icon): appearance options such as light/dark theme when available.
+Open **Settings** from the **gear** icon in the app bar (when the app provides it). Choices are grouped into sections; your preferences are saved on the device.
+
+### Appearance
+
+- **Dark theme** — Switch between light and dark appearance. The dark palette uses navy-style surfaces similar in spirit to desktop CherryTree.
+
+### Layout
+
+- **Split layout** — When this is **on**, the tree stays **beside or above** the editor with a **draggable divider** (drag the narrow handle to change how much space the tree uses). **Narrow screens (typical phone portrait):** tree on top, editor below. **Wide screens (e.g. phone landscape above ~720 dp width):** tree on the **left**, editor on the right. The **menu** icon for the drawer is hidden whenever split layout is on, because the tree is always visible.
+- When split layout is **off** on a **narrow** screen, the tree opens from the **menu** icon in a **drawer**, and the editor uses the full width below the app bar.
+- When split layout is **off** on a **wide** screen, the tree uses a **fixed-width sidebar** (unchanged from classic wide layout).
+- **App bar:** the **sidebar** icon next to Settings toggles split layout on or off (same as this setting); each orientation remembers its own divider position.
+- **Android:** With **on-screen navigation** (buttons or gestures), the app keeps controls and the editor **clear of the system bar** — including in **landscape**, where the bar often sits along a short edge of the screen.
+
+Tree rows use **compact** spacing so more of each title is visible when the tree column is narrow.
+
+### Language
+
+- Tap **Language** to choose **System default** (follow the device language when supported) or force **English**, **Nederlands**, or **Deutsch** for the app’s translated strings.
+
+---
+
+## Notes editor
+
+- Each note has a **title** field and a **body** area.
+- The body uses a **rich text editor** with a small **toolbar** (e.g. checklist toggles where supported). Content is shown on a **subtle shaded background** with a border so the editing area is easy to see.
 
 ---
 
@@ -62,5 +87,7 @@ Import limitations (same general class as desktop CherryTree “plain” viewing
 | Approx. date | Change |
 |--------------|--------|
 | 2026-04      | Multi-document **tabs**, per-tab CherryTree paths, **long-press tab rename**, import target (replace vs new tab). |
+| 2026-04      | **Settings:** dark theme, **split layout** (tree beside or above editor + draggable ratio per orientation), **language** override. **Editor:** rich body + toolbar. |
+| 2026-04      | **Android layout:** system navigation area respected in **landscape** and other edge-to-edge cases so app bar and editor are not hidden behind on-screen buttons. |
 
 _Add new rows when you add notable features._

@@ -14,13 +14,34 @@ import 'widgets/ct_app_bar.dart';
 import 'widgets/notes_home_scaffold.dart';
 
 class NotesHomePage extends StatefulWidget {
-  const NotesHomePage({super.key, this.repository, this.onSetUseDarkTheme});
+  const NotesHomePage({
+    super.key,
+    this.repository,
+    this.onSetUseDarkTheme,
+    this.useSplitLayout = false,
+    this.splitLayoutRatioVertical = 0.33,
+    this.splitLayoutRatioHorizontal = 0.4,
+    this.onSetUseSplitLayout,
+    this.onSetSplitLayoutRatioVertical,
+    this.onSetSplitLayoutRatioHorizontal,
+    this.appLocaleCode,
+    this.onSetAppLocale,
+  });
 
   /// Injected in tests; production uses app documents directory.
   final NoteRepository? repository;
 
   /// Persists light/dark theme; used by [SettingsPage].
   final Future<void> Function(bool useDarkTheme)? onSetUseDarkTheme;
+
+  final bool useSplitLayout;
+  final double splitLayoutRatioVertical;
+  final double splitLayoutRatioHorizontal;
+  final Future<void> Function(bool useSplitLayout)? onSetUseSplitLayout;
+  final Future<void> Function(double ratio)? onSetSplitLayoutRatioVertical;
+  final Future<void> Function(double ratio)? onSetSplitLayoutRatioHorizontal;
+  final String? appLocaleCode;
+  final Future<void> Function(String? code)? onSetAppLocale;
 
   @override
   State<NotesHomePage> createState() => _NotesHomePageState();
@@ -56,8 +77,22 @@ class _NotesHomePageState extends State<NotesHomePage>
     _tabController?.removeListener(_onTabChanged);
     _tabController?.dispose();
     WidgetsBinding.instance.removeObserver(this);
-    unawaited(_persist());
+    // Do not call [_persist] here: it uses [setState], which is invalid while the
+    // element is unmounting (assertion: ElementLifecycle.defunct).
+    unawaited(_flushSaveToDisk());
     super.dispose();
+  }
+
+  /// Best-effort save without UI updates. Used from [dispose] only.
+  Future<void> _flushSaveToDisk() async {
+    if (_tabs.isEmpty) return;
+    try {
+      final t = _activeTab;
+      await _repo.saveTab(t);
+      await _repo.saveSession(_tabs, t.id);
+    } on Object {
+      // ignore
+    }
   }
 
   @override
@@ -300,7 +335,13 @@ class _NotesHomePageState extends State<NotesHomePage>
     unawaited(
       Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
-          builder: (ctx) => SettingsPage(onSetUseDarkTheme: setter),
+          builder: (ctx) => SettingsPage(
+            onSetUseDarkTheme: setter,
+            useSplitLayout: widget.useSplitLayout,
+            onSetUseSplitLayout: widget.onSetUseSplitLayout,
+            appLocaleCode: widget.appLocaleCode,
+            onSetAppLocale: widget.onSetAppLocale,
+          ),
         ),
       ),
     );
@@ -452,6 +493,24 @@ class _NotesHomePageState extends State<NotesHomePage>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // Scrollable [TabBar] has no built-in tab separators; thin rules
+                        // between tabs improve scanability. Skip before the first tab so the
+                        // strip does not start with a stray line at the scroll edge.
+                        if (i > 0)
+                          Padding(
+                            padding:
+                                const EdgeInsetsDirectional.only(end: 8),
+                            child: SizedBox(
+                              height: 22,
+                              child: VerticalDivider(
+                                width: 1,
+                                thickness: 1,
+                                indent: 2,
+                                endIndent: 2,
+                                color: theme.colorScheme.outlineVariant,
+                              ),
+                            ),
+                          ),
                         Flexible(
                           child: Tooltip(
                             message: l10n.renameTabTooltip,
@@ -505,6 +564,16 @@ class _NotesHomePageState extends State<NotesHomePage>
       tabStrip: tabStrip,
       saveState: _saveState,
       onOpenSettings: widget.onSetUseDarkTheme != null ? _openSettings : null,
+      useSplitLayout: widget.useSplitLayout,
+      splitLayoutRatioVertical: widget.splitLayoutRatioVertical,
+      splitLayoutRatioHorizontal: widget.splitLayoutRatioHorizontal,
+      onSetSplitLayoutRatioVertical: widget.onSetSplitLayoutRatioVertical,
+      onSetSplitLayoutRatioHorizontal: widget.onSetSplitLayoutRatioHorizontal,
+      onToggleSplitLayout: widget.onSetUseSplitLayout != null
+          ? () => unawaited(
+                widget.onSetUseSplitLayout!(!widget.useSplitLayout),
+              )
+          : null,
       onAddRoot: _addRoot,
       onImportCherryTree: () {
         unawaited(_importCherryTree());

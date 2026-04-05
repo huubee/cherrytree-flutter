@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../models/note_document.dart';
 import '../theme/app_spacing.dart';
 import 'ct_app_bar.dart';
+import 'draggable_split_view.dart';
 import 'node_editor.dart';
 import 'tree_panel.dart';
 
@@ -30,6 +31,12 @@ class NotesHomeScaffold extends StatelessWidget {
     required this.onDelete,
     required this.onEditorChanged,
     required this.l10n,
+    this.useSplitLayout = false,
+    this.splitLayoutRatioVertical = 0.33,
+    this.splitLayoutRatioHorizontal = 0.4,
+    this.onSetSplitLayoutRatioVertical,
+    this.onSetSplitLayoutRatioHorizontal,
+    this.onToggleSplitLayout,
   });
 
   final NoteDocument doc;
@@ -48,12 +55,20 @@ class NotesHomeScaffold extends StatelessWidget {
   final void Function(String id) onDelete;
   final VoidCallback onEditorChanged;
   final AppLocalizations l10n;
+  final bool useSplitLayout;
+  final double splitLayoutRatioVertical;
+  final double splitLayoutRatioHorizontal;
+  final void Function(double ratio)? onSetSplitLayoutRatioVertical;
+  final void Function(double ratio)? onSetSplitLayoutRatioHorizontal;
+  final VoidCallback? onToggleSplitLayout;
 
   @override
   Widget build(BuildContext context) {
     final selected = selectedId != null ? doc.find(selectedId!) : null;
     final wide =
         MediaQuery.sizeOf(context).width >= AppSpacing.wideLayoutBreakpoint;
+
+    final hideDrawerLeading = wide || useSplitLayout;
 
     final appBar = CTAppBar(
       breadcrumbSegments: breadcrumbSegments,
@@ -64,7 +79,7 @@ class NotesHomeScaffold extends StatelessWidget {
       saveState: saveState,
       onImportCherryTree: onImportCherryTree,
       onExportCherryTree: onExportCherryTree,
-      leading: wide
+      leading: hideDrawerLeading
           ? null
           : Builder(
               builder: (ctx) => IconButton(
@@ -72,6 +87,9 @@ class NotesHomeScaffold extends StatelessWidget {
                 onPressed: () => Scaffold.of(ctx).openDrawer(),
               ),
             ),
+      onToggleSplitLayout: onToggleSplitLayout,
+      splitLayoutEnabled: useSplitLayout,
+      splitLayoutToggleTooltip: l10n.splitLayoutToggleTooltip,
     );
 
     final editor = NodeEditor(
@@ -79,6 +97,38 @@ class NotesHomeScaffold extends StatelessWidget {
       node: selected,
       onChanged: onEditorChanged,
     );
+
+    final treeWide = Material(
+      elevation: 1,
+      child: TreePanel(
+        doc: doc,
+        selectedId: selectedId,
+        onSelect: onTreeSelectWide,
+        onAddChild: (id) => onAddChild(id, l10n),
+        onDelete: onDelete,
+      ),
+    );
+
+    final treeEmbedded = TreePanel(
+      doc: doc,
+      selectedId: selectedId,
+      onSelect: onTreeSelectWide,
+      onAddChild: (id) => onAddChild(id, l10n),
+      onDelete: onDelete,
+    );
+
+    if (wide && useSplitLayout) {
+      return Scaffold(
+        appBar: appBar,
+        body: DraggableSplitView(
+          axis: Axis.horizontal,
+          ratio: splitLayoutRatioHorizontal,
+          onRatioChanged: onSetSplitLayoutRatioHorizontal ?? (_) {},
+          firstChild: treeWide,
+          secondChild: editor,
+        ),
+      );
+    }
 
     if (wide) {
       return Scaffold(
@@ -88,19 +138,23 @@ class NotesHomeScaffold extends StatelessWidget {
           children: [
             SizedBox(
               width: AppSpacing.sidebarWidth,
-              child: Material(
-                elevation: 1,
-                child: TreePanel(
-                  doc: doc,
-                  selectedId: selectedId,
-                  onSelect: onTreeSelectWide,
-                  onAddChild: (id) => onAddChild(id, l10n),
-                  onDelete: onDelete,
-                ),
-              ),
+              child: treeWide,
             ),
             Expanded(child: editor),
           ],
+        ),
+      );
+    }
+
+    if (useSplitLayout) {
+      return Scaffold(
+        appBar: appBar,
+        body: DraggableSplitView(
+          axis: Axis.vertical,
+          ratio: splitLayoutRatioVertical,
+          onRatioChanged: onSetSplitLayoutRatioVertical ?? (_) {},
+          firstChild: treeEmbedded,
+          secondChild: editor,
         ),
       );
     }

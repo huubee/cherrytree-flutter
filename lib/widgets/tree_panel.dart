@@ -86,23 +86,29 @@ class _TreePanelState extends State<TreePanel> {
           ),
           child: ListTile(
             dense: true,
+            visualDensity: VisualDensity.compact,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 6),
+            horizontalTitleGap: 6,
+            minLeadingWidth: 48,
             selected: isSel,
             leading: SizedBox(
-              width: 64,
+              width: 50,
               height: 32,
               child: Row(
                 children: [
                   SizedBox(
-                    width: 28,
+                    width: 22,
                     height: 28,
-                    child: CherrytreeStockIcons.treeIconForNode(
-                      customIconId: n.customIconId,
-                      treeDepth: depth,
-                      size: 22,
-                      fallback: Icon(
-                        Icons.description_outlined,
+                    child: Center(
+                      child: CherrytreeStockIcons.treeIconForNode(
+                        customIconId: n.customIconId,
+                        treeDepth: depth,
                         size: 22,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fallback: Icon(
+                          Icons.description_outlined,
+                          size: 22,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   ),
@@ -111,7 +117,7 @@ class _TreePanelState extends State<TreePanel> {
                       padding: EdgeInsets.zero,
                       style: IconButton.styleFrom(
                         padding: EdgeInsets.zero,
-                        minimumSize: const Size(32, 32),
+                        minimumSize: const Size(28, 32),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         visualDensity: VisualDensity.compact,
                       ),
@@ -119,6 +125,7 @@ class _TreePanelState extends State<TreePanel> {
                         isExpanded
                             ? Icons.keyboard_arrow_down
                             : Icons.keyboard_arrow_right,
+                        size: 22,
                       ),
                       tooltip: isExpanded
                           ? MaterialLocalizations.of(context)
@@ -136,7 +143,7 @@ class _TreePanelState extends State<TreePanel> {
                       },
                     )
                   else
-                    const SizedBox(width: 32, height: 32),
+                    const SizedBox(width: 28, height: 32),
                 ],
               ),
             ),
@@ -151,6 +158,9 @@ class _TreePanelState extends State<TreePanel> {
             ),
             onTap: () => widget.onSelect(n.id),
             trailing: PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              iconSize: 20,
+              constraints: const BoxConstraints.tightFor(width: 40, height: 40),
               onSelected: (value) {
                 if (value == 'add') {
                   widget.onAddChild(n.id);

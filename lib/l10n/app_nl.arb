@@ -82,5 +82,11 @@
   "settingsTooltip": "Instellingen",
   "settingsAppearanceSection": "Weergave",
   "settingsUseDarkTheme": "Donker thema",
-  "settingsUseDarkThemeSubtitle": "Donkerblauw, vergelijkbaar met desktop CherryTree"
+  "settingsUseDarkThemeSubtitle": "Donkerblauw, vergelijkbaar met desktop CherryTree",
+  "settingsLayoutSection": "Indeling",
+  "settingsUseSplitLayout": "Gesplitste indeling",
+  "settingsUseSplitLayoutSubtitle": "Toon de boom naast of boven de editor met een versleepbare scheiding in plaats van een vaste zijbalk of lade",
+  "splitLayoutToggleTooltip": "Gesplitste indeling aan/uit",
+  "settingsLanguageSection": "Taal",
+  "settingsLanguageDefault": "Systeemstandaard"
 }

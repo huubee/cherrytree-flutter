@@ -6,7 +6,7 @@ Official project site: [giuspen.net/cherrytree](https://www.giuspen.net/cherrytr
 
 ---
 
-### 1. Core structure and hierarchy
+## 1. Core structure and hierarchy
 
 - **Tree navigation:** Hierarchical nodes with deep nesting.
 - **Node management:** Create, rename, delete, duplicate, move (including drag-and-drop on desktop).
@@ -67,6 +67,8 @@ Official project site: [giuspen.net/cherrytree](https://www.giuspen.net/cherrytr
 
 - **Themes:** Light/dark and custom palette options (tree + editor).
 - **Fonts:** Separate defaults for tree and editor (and code) on desktop.
+- **Layouts:** Persistent Split-Screen options on tall/portrait bounds instead of drawer.
+- **Localization:** System-responsive automatic language detection, alongside manual `Settings` dialog overrides.
 - **Toolbar:** Customizable actions/layout.
 - **Shortcuts:** Large shortcut set (relevant for tablets with hardware keyboards).
 - **Focus mode:** Hide tree or chrome for minimal UI (desktop).

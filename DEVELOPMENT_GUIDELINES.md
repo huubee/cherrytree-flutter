@@ -15,6 +15,7 @@ For a **generic, framework-wide** checklist (security, workflow, AI-assisted cod
 | Layer | Responsibility |
 | ----- | ---------------- |
 | **UI** (`lib/…`, widgets, screens) | Layout, navigation, user input. Keep widgets as dumb as practical. |
+| **App shell** (`lib/main.dart`, `lib/app/`) | Process entry (`main`, `runApp`), root `MaterialApp` ([`cherrytree_flutter_app.dart`](lib/app/cherrytree_flutter_app.dart)), and device-persisted **app-wide** UI prefs ([`app_settings.dart`](lib/app/app_settings.dart)) — not document data. |
 | **Domain / models** (`lib/models/`) | Data structures (nodes, document graph). No Flutter imports if avoidable. |
 | **Persistence** (`lib/services/` or `lib/data/`) | Load/save; file paths; JSON or future formats. No UI. |
 
@@ -51,6 +52,7 @@ These ideas align with common practice and with the generic template in [`old_DE
 
 ### Refactoring hotspots (this repo)
 
+- **`lib/main.dart`** — keep as a **thin** entry: `WidgetsFlutterBinding`, `runApp`, and optionally `export` for tests. Put **`MaterialApp`** and startup state in [`lib/app/cherrytree_flutter_app.dart`](lib/app/cherrytree_flutter_app.dart); put **SharedPreferences** keys and read/write for theme / layout / locale in [`lib/app/app_settings.dart`](lib/app/app_settings.dart).
 - **`lib/notes_home_page.dart`** — owns document load, debounced save, and tree/edit actions. Keep it **under ~300 lines**; move new **import/export** or **dialogs** into `lib/notes/` (see [`cherrytree_file_actions.dart`](lib/notes/cherrytree_file_actions.dart)) and **layout shells** into `lib/widgets/` (see [`notes_home_scaffold.dart`](lib/widgets/notes_home_scaffold.dart)).
 - **Feature-adjacent helpers** can live under **`lib/notes/`** without pulling in Flutter where avoidable; keep **models** in `lib/models/` and **persistence** in `lib/services/`.
 
@@ -65,6 +67,7 @@ These ideas align with common practice and with the generic template in [`old_DE
 - Prefer comments that capture **intent**, **tradeoffs**, **invariants**, or **non-obvious bugs** (e.g. why a `FutureBuilder` must not overwrite mutable state every frame).
 - Avoid comments that only repeat the next line of code (`// increment i`).
 - Use `TODO(name, …)` or issue links for deliberate follow-ups.
+- **Reminder:** Fast feature work can skip the *why*; when you **finish a slice** or **touch a file anyway** (fix, refactor, review), glance for behavior that future readers (or you) will not infer—native lifecycle ordering, plugin timing, OEM quirks, one-off layout choices—and add a short note there. No need to comment every line or schedule whole-tree audits.
 
 ### User-facing strings and theming
 
@@ -88,6 +91,13 @@ These ideas align with common practice and with the generic template in [`old_DE
 - Follow [`analysis_options.yaml`](analysis_options.yaml) and `flutter_lints`.
 - Run `dart format` / IDE format on changed files before merge.
 - Prefer **`const`** constructors where possible; prefer **`StatelessWidget`** when there is no mutable state.
+
+### Deprecations and Modern Flutter Patterns
+
+Whenever you encounter `flutter analyze` deprecation warnings, migrate to the modern pattern rather than disabling the lint. Some common recent deprecations and their replacements:
+
+- **`Radio` groupValue / onChanged:** The `Radio` class's individual group value management is obsolete in Flutter v3.32+. Migrate to using a `RadioGroup` ancestor, or construct visually-identical dialog options using `Icon` when simple selection state suffices.
+- **`color.withOpacity(double)`:** This method is deprecated because it does not reliably operate across modern color spaces. Migrate to `color.withValue(alpha: double)` or `color.withAlpha(int)`.
 
 ## What not to do
 

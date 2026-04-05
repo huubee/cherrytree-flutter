@@ -16,6 +16,9 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 
 ### Changed
 
+- **App entrypoint:** [`lib/main.dart`](lib/main.dart) is limited to `main()` + `runApp` (and re-exports [`CherrytreeFlutterApp`](lib/app/cherrytree_flutter_app.dart) for tests). Root widget and `MaterialApp` live in [`lib/app/cherrytree_flutter_app.dart`](lib/app/cherrytree_flutter_app.dart); SharedPreferences keys and load/save for theme, split layout, ratios, and locale are in [`lib/app/app_settings.dart`](lib/app/app_settings.dart) (`AppSettings`, `AppSettingsStore`).
+- **Split layout** (formerly “portrait split”): the same setting now enables a **horizontal** draggable tree | editor split on **wide** layouts (e.g. phone landscape), with its own persisted ratio; narrow layouts keep the **vertical** split. Wide + split off still uses the fixed sidebar. SharedPreferences keys: `use_split_layout`, `split_layout_ratio_vertical`, `split_layout_ratio_horizontal` (legacy `use_split_layout_portrait` / `split_layout_ratio` are still read for migration).
+- **Tree panel:** denser list rows (narrower leading strip, compact padding) so more title text fits in split sidebars.
 - Refactored [`lib/notes_home_page.dart`](lib/notes_home_page.dart): CherryTree import/export moved to [`lib/notes/cherrytree_file_actions.dart`](lib/notes/cherrytree_file_actions.dart); wide/narrow layout to [`lib/widgets/notes_home_scaffold.dart`](lib/widgets/notes_home_scaffold.dart). [`DEVELOPMENT_GUIDELINES.md`](DEVELOPMENT_GUIDELINES.md) § Maintainability documents the pattern.
 
 ### Added <!-- omit in toc -->
@@ -28,10 +31,13 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 - **Notes tree:** expand/collapse branches in the tree panel (chevron); imported documents still start fully expanded; adding a child from the ⋮ menu keeps that parent expanded.
 - **Breadcrumbs:** AppBar shows the path from the root to the selected note (e.g. `Parent / Child`), horizontally scrollable on narrow screens; `NoteDocument.pathFromRoot` builds the chain.
 - **Dark theme:** optional CherryTree-style navy dark scaffold (`AppTheme.dark`, `AppColors.darkScaffold`); choice persisted with **`shared_preferences`** (`use_dark_theme`). **Settings** screen (`lib/settings_page.dart`) holds the light/dark switch (room for more CherryTree-like categories later); AppBar uses a **settings** icon instead of a separate theme icon.
+- **Split layout:** Optional tree + editor split via adjustable `DraggableSplitView` (vertical on narrow, horizontal on wide when enabled), managed from **Settings** and an **app bar** toggle.
+- **Language Selector:** Safely override the system native translation language string mappings manually via `Settings` and `SharedPreferences`.
 - **Note body editor:** monospace body field with consistent line height and subtle filled background for a “notes / commands” feel; line breaks preserved as before.
 
 ### Fixed
 
+- **Android — system bars (landscape / edge-to-edge):** On **Android 15+** (including **Android 16** and OEM skins such as **One UI**), mandatory edge-to-edge can leave **zero** navigation-bar insets in Flutter’s `MediaQuery`, so the UI drew under the **three-button** strip (often on the **right** in landscape). [`MainActivity`](android/app/src/main/kotlin/nl/bytesnbits/cherrytree_flutter/MainActivity.kt) applies **`WindowInsetsCompat`** for **system bars** and **display cutout** as **`View` padding** on `android.R.id.content`, then clears those inset types for descendants so Flutter does not double-apply them.
 - **Android — import file picker:** `AndroidManifest.xml` declares a `<queries>` intent for `ACTION_OPEN_DOCUMENT` (plus `OPENABLE` / `*/*`) so `resolveActivity` can see the system document UI on **Android 11+**; `MainActivity` extends **`FlutterFragmentActivity`**. Together this fixes the picker not opening on device ([issue #1](https://github.com/huubee/cherrytree-flutter/issues/1) closed).
 - **Notes home layout:** wide vs narrow breakpoint uses **`MediaQuery.sizeOf`** instead of a top-level **`LayoutBuilder`**, avoiding a **`RenderLayoutBuilder` / overlay** assertion when `PopupMenuButton`, `Tooltip`, or similar overlays attach during layout.
 - **Tree panel:** expansion state is pruned in **`didUpdateWidget`** instead of mutating the expansion set during **`build`**.
@@ -53,7 +59,7 @@ When you prepare a public store release, move to **1.0.0** and continue SemVer f
 
 First changelog entry for the **Spike A foundation** line of work: local hierarchical notes, JSON persistence, localization, theming, debounced saves, and unit tests for core models/repository. Version **0.1.0** reflects **pre–store** development (see **0.x policy** above).
 
-### Added
+### Added-02
 
 - Tree of notes + title/body editor (Android & iOS).
 - JSON document storage via `NoteRepository` (`spike_a_notes.json` in app documents).
@@ -62,7 +68,7 @@ First changelog entry for the **Spike A foundation** line of work: local hierarc
 - Injectable `NoteRepository` file path for tests; unit tests for `NoteDocument` and `NoteRepository`.
 - Agent-oriented docs: `AGENTS.md`, this changelog, `PATH_OF_ATTACK.md`, `AI_DEVELOPMENT.md`.
 
-### Fixed
+### Fixed-02
 
 - Drawer tree visibility (avoid nested `ListView` layout issues).
 - Editor bottom inset so the body field is not covered by system navigation when the keyboard is hidden.

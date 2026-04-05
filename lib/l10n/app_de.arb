@@ -82,5 +82,11 @@
   "settingsTooltip": "Einstellungen",
   "settingsAppearanceSection": "Erscheinungsbild",
   "settingsUseDarkTheme": "Dunkles Design",
-  "settingsUseDarkThemeSubtitle": "Dunkles Blau wie die Desktop-Version von CherryTree"
+  "settingsUseDarkThemeSubtitle": "Dunkles Blau wie die Desktop-Version von CherryTree",
+  "settingsLayoutSection": "Layout",
+  "settingsUseSplitLayout": "Geteiltes Layout",
+  "settingsUseSplitLayoutSubtitle": "Baum neben oder über dem Editor mit verschiebbarem Teiler statt fester Seitenleiste oder Schublade",
+  "splitLayoutToggleTooltip": "Geteiltes Layout umschalten",
+  "settingsLanguageSection": "Sprache",
+  "settingsLanguageDefault": "Systemstandard"
 }

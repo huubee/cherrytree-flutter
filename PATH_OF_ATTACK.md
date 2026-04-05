@@ -34,6 +34,7 @@ Goal: trustworthy tree + editor + persistence on device, without CherryTree file
 - [x] First-run seed note (localized via device locale where applicable)
 - [x] Debounced save for typing; immediate save for structural changes; flush on app pause / dispose
 - [x] Drawer + wide layout; fix nested scroll / safe-area issues on phones
+- [x] **Android edge-to-edge / system bars:** landscape (and similar) layouts must not draw under the on-screen **Back / Home / Recents** strip when the OS reports weak or zero nav insets to Flutter — handled in native [`MainActivity`](android/app/src/main/kotlin/nl/bytesnbits/cherrytree_flutter/MainActivity.kt) via `WindowInsetsCompat` on the content root (see [`CHANGELOG.md`](CHANGELOG.md)).
 
 ### Quality & maintainability
 
@@ -64,7 +65,9 @@ Goal: trustworthy tree + editor + persistence on device, without CherryTree file
 ### Later UX (not scheduled — desktop parity)
 
 - [x] Path **breadcrumbs** (or subtitle) for the selected node — AppBar `bottom` strip, `NoteDocument.pathFromRoot`, ` / ` join (see `CTAppBar.breadcrumbPath`).
-- [x] Optional **dark** theme — `AppTheme.dark()` (navy scaffold via `AppColors.darkScaffold`), **`SettingsPage`** switch, preference `use_dark_theme` in **`shared_preferences`** (`lib/main.dart`). Further CherryTree-like prefs can use the same screen (categories later).
+- [x] Optional **dark** theme — `AppTheme.dark()` (navy scaffold via `AppColors.darkScaffold`), **`SettingsPage`** switch, preference `use_dark_theme` in **`shared_preferences`** ([`lib/app/app_settings.dart`](lib/app/app_settings.dart)). Further CherryTree-like prefs can use the same screen (categories later).
+- [x] **Split Screen Portrait Layout** — `SettingsPage` toggle to render the note tree above the bottom editor explicitly globally on portrait screens.
+- [x] **Language Selector** — Settings feature overriding standard app locale (EN, NL, DE, or System overrides) gracefully through `SharedPreferences`.
 - [x] **Richer body** (phase 1) — body `TextField` uses **monospace**, stable line height (`StrutStyle`), filled outline field; title stays proportional (see `NodeEditor`).
 - [ ] **Richer body** (phase 2): checklist widgets, syntax / rich text — after Spike C or as a dedicated spike.
 

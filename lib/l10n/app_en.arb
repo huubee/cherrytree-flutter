@@ -82,5 +82,11 @@
   "settingsTooltip": "Settings",
   "settingsAppearanceSection": "Appearance",
   "settingsUseDarkTheme": "Dark theme",
-  "settingsUseDarkThemeSubtitle": "Navy tones similar to desktop CherryTree"
+  "settingsUseDarkThemeSubtitle": "Navy tones similar to desktop CherryTree",
+  "settingsLayoutSection": "Layout",
+  "settingsUseSplitLayout": "Split layout",
+  "settingsUseSplitLayoutSubtitle": "Show the tree beside or above the editor with a draggable divider instead of a fixed sidebar or drawer",
+  "splitLayoutToggleTooltip": "Toggle split layout",
+  "settingsLanguageSection": "Language",
+  "settingsLanguageDefault": "System Default"
 }

@@ -24,6 +24,9 @@ class CTAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.leading,
     this.onImportCherryTree,
     this.onExportCherryTree,
+    this.onToggleSplitLayout,
+    this.splitLayoutEnabled = false,
+    this.splitLayoutToggleTooltip,
   });
 
   final String? titleText;
@@ -42,6 +45,11 @@ class CTAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget? leading;
   final VoidCallback? onImportCherryTree;
   final VoidCallback? onExportCherryTree;
+
+  /// When non-null, shows a split-layout toggle (same persistence as Settings).
+  final VoidCallback? onToggleSplitLayout;
+  final bool splitLayoutEnabled;
+  final String? splitLayoutToggleTooltip;
 
   @override
   State<CTAppBar> createState() => _CTAppBarState();
@@ -224,6 +232,16 @@ class _CTAppBarState extends State<CTAppBar>
       bottom: bottomBar,
       leading: widget.leading,
       actions: [
+        if (widget.onToggleSplitLayout != null)
+          IconButton(
+            icon: Icon(
+              widget.splitLayoutEnabled
+                  ? Icons.view_sidebar
+                  : Icons.view_sidebar_outlined,
+            ),
+            tooltip: widget.splitLayoutToggleTooltip,
+            onPressed: widget.onToggleSplitLayout,
+          ),
         if (widget.onOpenSettings != null)
           IconButton(
             icon: const Icon(Icons.settings_outlined),

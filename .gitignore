@@ -1,4 +1,6 @@
 # Miscellaneous
+# Flutter tooling / local screenshots (e.g. flutter_01.png from IDE or device capture)
+flutter*.png
 *.class
 *.log
 *.pyc
