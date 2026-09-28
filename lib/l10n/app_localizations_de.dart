@@ -332,4 +332,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get searchTooltip => 'In Knoten suchen (Strg+F)';
+
+  @override
+  String get insertTimestampTooltip => 'Zeitstempel einfügen';
+
+  @override
+  String get insertHorizontalRuleTooltip => 'Horizontale Linie einfügen';
+
+  @override
+  String get insertSpecialCharTooltip => 'Sonderzeichen einfügen';
+
+  @override
+  String get specialCharsTitle => 'Sonderzeichen';
+
+  @override
+  String get specialCharsDone => 'Schließen';
 }

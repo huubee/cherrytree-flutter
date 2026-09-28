@@ -334,4 +334,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchTooltip => 'Find in nodes (Ctrl+F)';
+
+  @override
+  String get insertTimestampTooltip => 'Insert Timestamp';
+
+  @override
+  String get insertHorizontalRuleTooltip => 'Insert Horizontal Rule';
+
+  @override
+  String get insertSpecialCharTooltip => 'Insert Special Character';
+
+  @override
+  String get specialCharsTitle => 'Special Characters';
+
+  @override
+  String get specialCharsDone => 'Close';
 }

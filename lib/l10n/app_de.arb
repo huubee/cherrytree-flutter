@@ -120,5 +120,10 @@
   "bookmarksEmpty": "Noch keine Lesezeichen vorhanden.",
   "bookmarksRemoveTooltip": "Lesezeichen entfernen",
   "bookmarksTooltip": "Lesezeichen",
-  "searchTooltip": "In Knoten suchen (Strg+F)"
+  "searchTooltip": "In Knoten suchen (Strg+F)",
+  "insertTimestampTooltip": "Zeitstempel einfügen",
+  "insertHorizontalRuleTooltip": "Horizontale Linie einfügen",
+  "insertSpecialCharTooltip": "Sonderzeichen einfügen",
+  "specialCharsTitle": "Sonderzeichen",
+  "specialCharsDone": "Schließen"
 }

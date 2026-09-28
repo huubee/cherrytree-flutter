@@ -120,5 +120,10 @@
   "bookmarksEmpty": "Nog geen bladwijzers aanwezig.",
   "bookmarksRemoveTooltip": "Bladwijzer verwijderen",
   "bookmarksTooltip": "Bladwijzers",
-  "searchTooltip": "Zoeken in knopen (Ctrl+F)"
+  "searchTooltip": "Zoeken in knopen (Ctrl+F)",
+  "insertTimestampTooltip": "Tijdstempel invoegen",
+  "insertHorizontalRuleTooltip": "Horizontale lijn invoegen",
+  "insertSpecialCharTooltip": "Speciaal teken invoegen",
+  "specialCharsTitle": "Speciale tekens",
+  "specialCharsDone": "Sluiten"
 }

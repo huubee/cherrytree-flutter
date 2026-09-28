@@ -333,4 +333,19 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get searchTooltip => 'Zoeken in knopen (Ctrl+F)';
+
+  @override
+  String get insertTimestampTooltip => 'Tijdstempel invoegen';
+
+  @override
+  String get insertHorizontalRuleTooltip => 'Horizontale lijn invoegen';
+
+  @override
+  String get insertSpecialCharTooltip => 'Speciaal teken invoegen';
+
+  @override
+  String get specialCharsTitle => 'Speciale tekens';
+
+  @override
+  String get specialCharsDone => 'Sluiten';
 }

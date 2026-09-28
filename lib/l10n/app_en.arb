@@ -125,5 +125,10 @@
   "bookmarksEmpty": "No bookmarks yet. Right-click or use the node menu to bookmark notes for quick access.",
   "bookmarksRemoveTooltip": "Remove bookmark",
   "bookmarksTooltip": "Bookmarks",
-  "searchTooltip": "Find in nodes (Ctrl+F)"
+  "searchTooltip": "Find in nodes (Ctrl+F)",
+  "insertTimestampTooltip": "Insert Timestamp",
+  "insertHorizontalRuleTooltip": "Insert Horizontal Rule",
+  "insertSpecialCharTooltip": "Insert Special Character",
+  "specialCharsTitle": "Special Characters",
+  "specialCharsDone": "Close"
 }

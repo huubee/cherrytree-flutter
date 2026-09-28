@@ -283,7 +283,7 @@ class _FindInNodesDialogState extends State<FindInNodesDialog> {
                           )
                         : ListView.separated(
                             itemCount: _results.length,
-                            separatorBuilder: (_, __) =>
+                            separatorBuilder: (_, index) =>
                                 const Divider(height: 1),
                             itemBuilder: (ctx, index) {
                               final res = _results[index];

@@ -121,7 +121,7 @@ class _BookmarksDialogState extends State<BookmarksDialog> {
                       )
                     : ListView.separated(
                         itemCount: bookmarks.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        separatorBuilder: (_, index) => const Divider(height: 1),
                         itemBuilder: (ctx, index) {
                           final id = bookmarks[index];
                           final node = doc.find(id);

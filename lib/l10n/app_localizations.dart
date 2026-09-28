@@ -699,6 +699,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Find in nodes (Ctrl+F)'**
   String get searchTooltip;
+
+  /// No description provided for @insertTimestampTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert Timestamp'**
+  String get insertTimestampTooltip;
+
+  /// No description provided for @insertHorizontalRuleTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert Horizontal Rule'**
+  String get insertHorizontalRuleTooltip;
+
+  /// No description provided for @insertSpecialCharTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert Special Character'**
+  String get insertSpecialCharTooltip;
+
+  /// No description provided for @specialCharsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Special Characters'**
+  String get specialCharsTitle;
+
+  /// No description provided for @specialCharsDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get specialCharsDone;
 }
 
 class _AppLocalizationsDelegate

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
@@ -6,6 +8,7 @@ import '../models/note_document.dart';
 import '../rich/cherrytree_checkbox_toggle.dart';
 import '../rich/note_body_codec.dart';
 import '../theme/app_spacing.dart';
+import 'special_characters_dialog.dart';
 
 class NodeEditor extends StatefulWidget {
   const NodeEditor({
@@ -47,6 +50,40 @@ class _NodeEditorState extends State<NodeEditor> {
     if (n == null || n.isReadOnly) return;
     n.body = NoteBodyCodec.documentToStorage(_quill.document);
     widget.onChanged();
+  }
+
+  void _insertText(String text) {
+    final sel = _quill.selection;
+    final index = sel.baseOffset >= 0 ? sel.baseOffset : _quill.document.length - 1;
+    final len = sel.extentOffset > index ? sel.extentOffset - index : 0;
+    _quill.replaceText(index, len, text, null);
+    _quill.updateSelection(
+      TextSelection.collapsed(offset: index + text.length),
+      ChangeSource.local,
+    );
+  }
+
+  void _insertTimestamp() {
+    final now = DateTime.now();
+    final y = now.year.toString().padLeft(4, '0');
+    final m = now.month.toString().padLeft(2, '0');
+    final d = now.day.toString().padLeft(2, '0');
+    final h = now.hour.toString().padLeft(2, '0');
+    final min = now.minute.toString().padLeft(2, '0');
+    _insertText('$y/$m/$d - $h:$min');
+  }
+
+  void _insertHorizontalRule() {
+    _insertText('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
+  }
+
+  void _openSpecialCharacters() {
+    unawaited(
+      SpecialCharactersDialog.show(
+        context,
+        onSelectCharacter: (char) => _insertText(char),
+      ),
+    );
   }
 
   @override
@@ -120,24 +157,46 @@ class _NodeEditorState extends State<NodeEditor> {
             const SizedBox(height: AppSpacing.editorFieldGap),
             QuillSimpleToolbar(
               controller: _quill,
-              config: const QuillSimpleToolbarConfig(
+              config: QuillSimpleToolbarConfig(
                 showFontFamily: false,
                 showFontSize: false,
                 multiRowsDisplay: false,
                 showSearchButton: false,
-                showLink: false,
-                showCodeBlock: false,
-                showQuote: false,
-                showIndent: false,
-                showListNumbers: false,
-                showListBullets: false,
+                showLink: true,
+                showCodeBlock: true,
+                showQuote: true,
+                showIndent: true,
+                showListNumbers: true,
+                showListBullets: true,
                 showListCheck: true,
-                showSubscript: false,
-                showSuperscript: false,
-                showHeaderStyle: false,
+                showSubscript: true,
+                showSuperscript: true,
+                showHeaderStyle: true,
                 showLineHeightButton: false,
-                showInlineCode: false,
-                showAlignmentButtons: false,
+                showInlineCode: true,
+                showAlignmentButtons: true,
+                showColorButton: true,
+                showBackgroundColorButton: true,
+                showStrikeThrough: true,
+                showUnderLineButton: true,
+                showClearFormat: true,
+                customButtons: [
+                  QuillToolbarCustomButtonOptions(
+                    icon: const Icon(Icons.access_time_outlined, size: 20),
+                    tooltip: l10n.insertTimestampTooltip,
+                    onPressed: _insertTimestamp,
+                  ),
+                  QuillToolbarCustomButtonOptions(
+                    icon: const Icon(Icons.horizontal_rule_outlined, size: 20),
+                    tooltip: l10n.insertHorizontalRuleTooltip,
+                    onPressed: _insertHorizontalRule,
+                  ),
+                  QuillToolbarCustomButtonOptions(
+                    icon: const Icon(Icons.emoji_symbols_outlined, size: 20),
+                    tooltip: l10n.insertSpecialCharTooltip,
+                    onPressed: _openSpecialCharacters,
+                  ),
+                ],
               ),
             ),
           ],
