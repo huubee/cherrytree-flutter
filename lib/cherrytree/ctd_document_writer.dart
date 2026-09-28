@@ -26,6 +26,16 @@ class CtdDocumentWriter {
     b.element(
       kCherrytreeXmlRootElement,
       nest: () {
+        if (doc.bookmarks.isNotEmpty) {
+          final bmIds = <int>[];
+          for (final bId in doc.bookmarks) {
+            final mapped = idMap[bId];
+            bmIds.add(mapped);
+          }
+          if (bmIds.isNotEmpty) {
+            b.element('bookmarks', attributes: {'list': bmIds.join(',')});
+          }
+        }
         for (final root in doc.childrenOf(null)) {
           _writeNode(b, doc, idMap, root);
         }
@@ -63,26 +73,31 @@ class CtdDocumentWriter {
     );
   }
 
-  /// Defaults mirror typical CherryTree exports (see [CtdDocumentReader] tests).
-  static Map<String, String> _nodeAttributes(int uniqueId, NoteNode n) => {
-        'unique_id': '$uniqueId',
-        'master_id': '0',
-        'name': n.title,
-        'prog_lang': _progLangForBody(n.body),
-        'tags': '',
-        'readonly': '0',
-        'nosearch_me': '0',
-        'nosearch_ch': '0',
-        'custom_icon_id': '${n.customIconId}',
-        'is_bold': '0',
-        'foreground': '',
-        'ts_creation': '0',
-        'ts_lastsave': '0',
-      };
+  /// Serializes node attributes aligning with upstream CherryTree XML format.
+  static Map<String, String> _nodeAttributes(int uniqueId, NoteNode n) {
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    final syntax = n.syntax.isNotEmpty
+        ? n.syntax
+        : (NoteBodyCodec.looksLikeQuillDeltaJson(n.body)
+            ? kCherrytreeRichTextSyntaxId
+            : 'plain-text');
+    final tsCreation = n.tsCreation > 0 ? n.tsCreation : now;
+    final tsLastSave = n.tsLastSave > 0 ? n.tsLastSave : now;
 
-  static String _progLangForBody(String body) {
-    return NoteBodyCodec.looksLikeQuillDeltaJson(body)
-        ? kCherrytreeRichTextSyntaxId
-        : 'plain-text';
+    return {
+      'unique_id': '$uniqueId',
+      'master_id': '${n.masterId}',
+      'name': n.title,
+      'prog_lang': syntax,
+      'tags': n.tags,
+      'readonly': n.isReadOnly ? '1' : '0',
+      'nosearch_me': n.excludeMeFromSearch ? '1' : '0',
+      'nosearch_ch': n.excludeChildrenFromSearch ? '1' : '0',
+      'custom_icon_id': '${n.customIconId}',
+      'is_bold': n.isBold ? '1' : '0',
+      'foreground': n.foregroundColor ?? '',
+      'ts_creation': '$tsCreation',
+      'ts_lastsave': '$tsLastSave',
+    };
   }
 }

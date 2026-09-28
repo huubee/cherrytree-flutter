@@ -12,14 +12,32 @@ class TreePanel extends StatefulWidget {
     required this.selectedId,
     required this.onSelect,
     required this.onAddChild,
+    this.onAddSibling,
     required this.onDelete,
+    this.onMoveUp,
+    this.onMoveDown,
+    this.onIndent,
+    this.onUnindent,
+    this.onSort,
+    this.onToggleBookmark,
+    this.onDuplicate,
+    this.onNodeProperties,
   });
 
   final NoteDocument doc;
   final String? selectedId;
   final void Function(String id) onSelect;
   final void Function(String parentId) onAddChild;
+  final void Function(String targetId)? onAddSibling;
   final void Function(String id) onDelete;
+  final void Function(String id)? onMoveUp;
+  final void Function(String id)? onMoveDown;
+  final void Function(String id)? onIndent;
+  final void Function(String id)? onUnindent;
+  final void Function(String? parentId, bool ascending)? onSort;
+  final void Function(String id)? onToggleBookmark;
+  final void Function(String id)? onDuplicate;
+  final void Function(String id)? onNodeProperties;
 
   @override
   State<TreePanel> createState() => _TreePanelState();
@@ -57,12 +75,72 @@ class _TreePanelState extends State<TreePanel> {
     return ids;
   }
 
+  void expandAll() {
+    setState(() {
+      _expanded.addAll(_parentIdsWithChildren(widget.doc));
+    });
+  }
+
+  void collapseAll() {
+    setState(() {
+      _expanded.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: _buildLevel(context, l10n, null, 0),
+    final theme = Theme.of(context);
+
+    final toolbar = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        border: Border(bottom: BorderSide(color: theme.dividerColor)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              l10n.drawerNotesTitle,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.unfold_more, size: 18),
+            tooltip: l10n.treeExpandAll,
+            visualDensity: VisualDensity.compact,
+            onPressed: expandAll,
+          ),
+          IconButton(
+            icon: const Icon(Icons.unfold_less, size: 18),
+            tooltip: l10n.treeCollapseAll,
+            visualDensity: VisualDensity.compact,
+            onPressed: collapseAll,
+          ),
+          if (widget.onSort != null)
+            IconButton(
+              icon: const Icon(Icons.sort_by_alpha, size: 18),
+              tooltip: l10n.menuSortAsc,
+              visualDensity: VisualDensity.compact,
+              onPressed: () => widget.onSort!(null, true),
+            ),
+        ],
+      ),
+    );
+
+    return Column(
+      children: [
+        toolbar,
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: _buildLevel(context, l10n, null, 0),
+          ),
+        ),
+      ],
     );
   }
 
@@ -78,6 +156,17 @@ class _TreePanelState extends State<TreePanel> {
       final children = widget.doc.childrenOf(n.id);
       final hasChildren = children.isNotEmpty;
       final isExpanded = hasChildren && _expanded.contains(n.id);
+
+      final isBookmarked = widget.doc.isBookmarked(n.id);
+      Color? customTextColor;
+      if (n.foregroundColor != null && n.foregroundColor!.isNotEmpty) {
+        var c = n.foregroundColor!.trim();
+        if (c.startsWith('#')) c = c.substring(1);
+        final rgb = int.tryParse(c, radix: 16);
+        if (rgb != null) {
+          customTextColor = Color(0xff000000 | rgb);
+        }
+      }
 
       out.add(
         Padding(
@@ -150,40 +239,231 @@ class _TreePanelState extends State<TreePanel> {
             title: Tooltip(
               message:
                   n.title.trim().isEmpty ? l10n.untitledNote : n.title.trim(),
-              child: Text(
-                n.title.trim().isEmpty ? l10n.untitledNote : n.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      n.title.trim().isEmpty ? l10n.untitledNote : n.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight:
+                            n.isBold ? FontWeight.bold : FontWeight.normal,
+                        color: customTextColor,
+                      ),
+                    ),
+                  ),
+                  if (n.isReadOnly) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.lock_outline,
+                      size: 14,
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                  ],
+                  if (isBookmarked) ...[
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.bookmark,
+                      size: 14,
+                      color: Colors.amber,
+                    ),
+                  ],
+                ],
               ),
             ),
             onTap: () => widget.onSelect(n.id),
-            trailing: PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              iconSize: 20,
-              constraints: const BoxConstraints.tightFor(width: 40, height: 40),
-              onSelected: (value) {
-                if (value == 'add') {
-                  widget.onAddChild(n.id);
-                  setState(() => _expanded.add(n.id));
-                }
-                if (value == 'del') {
-                  widget.onDelete(n.id);
+            trailing: SizedBox(
+              width: 28,
+              height: 28,
+              child: PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                iconSize: 20,
+                onSelected: (value) {
+                switch (value) {
+                  case 'add':
+                    widget.onAddChild(n.id);
+                    setState(() => _expanded.add(n.id));
+                    break;
+                  case 'add_sibling':
+                    widget.onAddSibling?.call(n.id);
+                    break;
+                  case 'move_up':
+                    widget.onMoveUp?.call(n.id);
+                    break;
+                  case 'move_down':
+                    widget.onMoveDown?.call(n.id);
+                    break;
+                  case 'indent':
+                    widget.onIndent?.call(n.id);
+                    break;
+                  case 'unindent':
+                    widget.onUnindent?.call(n.id);
+                    break;
+                  case 'sort_asc':
+                    widget.onSort?.call(n.id, true);
+                    break;
+                  case 'sort_desc':
+                    widget.onSort?.call(n.id, false);
+                    break;
+                  case 'bookmark':
+                    widget.onToggleBookmark?.call(n.id);
+                    break;
+                  case 'duplicate':
+                    widget.onDuplicate?.call(n.id);
+                    break;
+                  case 'properties':
+                    widget.onNodeProperties?.call(n.id);
+                    break;
+                  case 'del':
+                    widget.onDelete(n.id);
+                    break;
                 }
               },
               itemBuilder: (context) => [
                 PopupMenuItem(
                   value: 'add',
-                  child: Text(l10n.menuAddChild),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.subdirectory_arrow_right, size: 18),
+                      const SizedBox(width: 8),
+                      Text(l10n.menuAddChild),
+                    ],
+                  ),
                 ),
+                if (widget.onAddSibling != null)
+                  PopupMenuItem(
+                    value: 'add_sibling',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.add, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l10n.menuAddSibling),
+                      ],
+                    ),
+                  ),
+                const PopupMenuDivider(),
+                if (widget.onMoveUp != null)
+                  PopupMenuItem(
+                    value: 'move_up',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.arrow_upward, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l10n.menuMoveUp),
+                      ],
+                    ),
+                  ),
+                if (widget.onMoveDown != null)
+                  PopupMenuItem(
+                    value: 'move_down',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.arrow_downward, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l10n.menuMoveDown),
+                      ],
+                    ),
+                  ),
+                if (widget.onIndent != null)
+                  PopupMenuItem(
+                    value: 'indent',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.format_indent_increase, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l10n.menuIndent),
+                      ],
+                    ),
+                  ),
+                if (widget.onUnindent != null)
+                  PopupMenuItem(
+                    value: 'unindent',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.format_indent_decrease, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l10n.menuUnindent),
+                      ],
+                    ),
+                  ),
+                if (widget.onSort != null && hasChildren) ...[
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'sort_asc',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.sort_by_alpha, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l10n.menuSortAsc),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'sort_desc',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.sort_by_alpha, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l10n.menuSortDesc),
+                      ],
+                    ),
+                  ),
+                ],
+                const PopupMenuDivider(),
+                if (widget.onToggleBookmark != null)
+                  PopupMenuItem(
+                    value: 'bookmark',
+                    child: Row(
+                      children: [
+                        Icon(
+                          isBookmarked ? Icons.bookmark_remove : Icons.bookmark_add,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(l10n.menuToggleBookmark),
+                      ],
+                    ),
+                  ),
+                if (widget.onDuplicate != null)
+                  PopupMenuItem(
+                    value: 'duplicate',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.copy, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l10n.menuDuplicate),
+                      ],
+                    ),
+                  ),
+                if (widget.onNodeProperties != null)
+                  PopupMenuItem(
+                    value: 'properties',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.tune, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l10n.menuNodeProperties),
+                      ],
+                    ),
+                  ),
+                const PopupMenuDivider(),
                 PopupMenuItem(
                   value: 'del',
-                  child: Text(l10n.menuDeleteSubtree),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.delete_outline, size: 18),
+                      const SizedBox(width: 8),
+                      Text(l10n.menuDeleteSubtree),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         ),
-      );
+      ),
+    );
       if (hasChildren && isExpanded) {
         out.addAll(_buildLevel(context, l10n, n.id, depth + 1));
       }

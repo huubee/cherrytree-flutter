@@ -11,6 +11,7 @@ import 'services/note_repository.dart';
 import 'settings_page.dart';
 import 'theme/app_timing.dart';
 import 'widgets/ct_app_bar.dart';
+import 'widgets/node_properties_dialog.dart';
 import 'widgets/notes_home_scaffold.dart';
 
 class NotesHomePage extends StatefulWidget {
@@ -218,6 +219,7 @@ class _NotesHomePageState extends State<NotesHomePage>
     await _repo.saveTab(_tabs[_activeTabIndex]);
     if (!mounted) return;
     final id = _uuid.v4();
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final doc = NoteDocument(
       nodes: [
         NoteNode(
@@ -226,6 +228,8 @@ class _NotesHomePageState extends State<NotesHomePage>
           title: l10n.newNoteTitle,
           body: '',
           sortIndex: 0,
+          tsCreation: now,
+          tsLastSave: now,
         ),
       ],
     );
@@ -269,6 +273,7 @@ class _NotesHomePageState extends State<NotesHomePage>
   void _addRoot(AppLocalizations l10n) {
     final d = _doc;
     final id = _uuid.v4();
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     d.nodes.add(
       NoteNode(
         id: id,
@@ -276,6 +281,8 @@ class _NotesHomePageState extends State<NotesHomePage>
         title: l10n.newNoteTitle,
         body: '',
         sortIndex: d.nextSortIndex(null),
+        tsCreation: now,
+        tsLastSave: now,
       ),
     );
     setState(() => _activeTab.selectedNodeId = id);
@@ -285,6 +292,7 @@ class _NotesHomePageState extends State<NotesHomePage>
   void _addChild(String parentId, AppLocalizations l10n) {
     final d = _doc;
     final id = _uuid.v4();
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     d.nodes.add(
       NoteNode(
         id: id,
@@ -292,6 +300,8 @@ class _NotesHomePageState extends State<NotesHomePage>
         title: l10n.newNoteTitle,
         body: '',
         sortIndex: d.nextSortIndex(parentId),
+        tsCreation: now,
+        tsLastSave: now,
       ),
     );
     setState(() => _activeTab.selectedNodeId = id);
@@ -309,6 +319,85 @@ class _NotesHomePageState extends State<NotesHomePage>
     }
     setState(() {});
     _persistImmediately();
+  }
+
+  void _addSibling(String targetId, AppLocalizations l10n) {
+    final d = _doc;
+    final target = d.find(targetId);
+    if (target == null) return;
+    final id = _uuid.v4();
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    final newNode = NoteNode(
+      id: id,
+      parentId: target.parentId,
+      title: l10n.newNoteTitle,
+      body: '',
+      sortIndex: target.sortIndex + 1,
+      tsCreation: now,
+      tsLastSave: now,
+    );
+    d.insertSiblingAfter(targetId, newNode);
+    setState(() => _activeTab.selectedNodeId = id);
+    _persistImmediately();
+  }
+
+  void _moveUp(String id) {
+    if (_doc.moveNodeUp(id)) {
+      setState(() {});
+      _persistImmediately();
+    }
+  }
+
+  void _moveDown(String id) {
+    if (_doc.moveNodeDown(id)) {
+      setState(() {});
+      _persistImmediately();
+    }
+  }
+
+  void _indent(String id) {
+    if (_doc.indentNode(id)) {
+      setState(() {});
+      _persistImmediately();
+    }
+  }
+
+  void _unindent(String id) {
+    if (_doc.unindentNode(id)) {
+      setState(() {});
+      _persistImmediately();
+    }
+  }
+
+  void _sort(String? parentId, bool ascending) {
+    _doc.sortSiblings(parentId, ascending: ascending);
+    setState(() {});
+    _persistImmediately();
+  }
+
+  void _toggleBookmark(String id) {
+    setState(() {
+      _doc.toggleBookmark(id);
+    });
+    _persistImmediately();
+  }
+
+  void _duplicate(String id) {
+    final newId = _doc.duplicateNode(id, newIdGenerator: () => _uuid.v4());
+    if (newId != null) {
+      setState(() => _activeTab.selectedNodeId = newId);
+      _persistImmediately();
+    }
+  }
+
+  Future<void> _nodeProperties(String id) async {
+    final n = _doc.find(id);
+    if (n == null) return;
+    final saved = await NodePropertiesDialog.show(context, node: n);
+    if (saved == true && mounted) {
+      setState(() {});
+      _persistImmediately();
+    }
   }
 
   List<BreadcrumbSegment>? _breadcrumbSegments(
@@ -394,6 +483,11 @@ class _NotesHomePageState extends State<NotesHomePage>
   }
 
   void _onEditorChanged() {
+    final selId = _activeTab.selectedNodeId;
+    if (selId != null) {
+      _doc.find(selId)?.tsLastSave =
+          DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    }
     setState(() {});
     _schedulePersistAfterEdit();
   }
@@ -587,7 +681,16 @@ class _NotesHomePageState extends State<NotesHomePage>
         Navigator.of(context).pop();
       },
       onAddChild: _addChild,
+      onAddSibling: _addSibling,
       onDelete: _delete,
+      onMoveUp: _moveUp,
+      onMoveDown: _moveDown,
+      onIndent: _indent,
+      onUnindent: _unindent,
+      onSort: _sort,
+      onToggleBookmark: _toggleBookmark,
+      onDuplicate: _duplicate,
+      onNodeProperties: (id) => unawaited(_nodeProperties(id)),
       onEditorChanged: _onEditorChanged,
       l10n: l10n,
     );

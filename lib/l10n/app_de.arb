@@ -88,5 +88,17 @@
   "settingsUseSplitLayoutSubtitle": "Baum neben oder über dem Editor mit verschiebbarem Teiler statt fester Seitenleiste oder Schublade",
   "splitLayoutToggleTooltip": "Geteiltes Layout umschalten",
   "settingsLanguageSection": "Sprache",
-  "settingsLanguageDefault": "Systemstandard"
+  "settingsLanguageDefault": "Systemstandard",
+  "menuAddSibling": "Geschwisterknoten hinzufügen",
+  "menuMoveUp": "Nach oben",
+  "menuMoveDown": "Nach unten",
+  "menuIndent": "Einrücken (nach rechts)",
+  "menuUnindent": "Ausrücken (nach links)",
+  "menuSortAsc": "Unterknoten sortieren (A-Z)",
+  "menuSortDesc": "Unterknoten sortieren (Z-A)",
+  "menuToggleBookmark": "Lesezeichen umschalten",
+  "menuDuplicate": "Knoten duplizieren",
+  "menuNodeProperties": "Knoteneigenschaften",
+  "treeExpandAll": "Alle aufklappen",
+  "treeCollapseAll": "Alle zuklappen"
 }

@@ -88,5 +88,17 @@
   "settingsUseSplitLayoutSubtitle": "Toon de boom naast of boven de editor met een versleepbare scheiding in plaats van een vaste zijbalk of lade",
   "splitLayoutToggleTooltip": "Gesplitste indeling aan/uit",
   "settingsLanguageSection": "Taal",
-  "settingsLanguageDefault": "Systeemstandaard"
+  "settingsLanguageDefault": "Systeemstandaard",
+  "menuAddSibling": "Nevenknoop toevoegen",
+  "menuMoveUp": "Omhoog verplaatsen",
+  "menuMoveDown": "Omlaag verplaatsen",
+  "menuIndent": "Inspringen (naar rechts)",
+  "menuUnindent": "Uitspringen (naar links)",
+  "menuSortAsc": "Onderliggende sorteren (A-Z)",
+  "menuSortDesc": "Onderliggende sorteren (Z-A)",
+  "menuToggleBookmark": "Bladwijzer wisselen",
+  "menuDuplicate": "Knoop dupliceren",
+  "menuNodeProperties": "Knoopeigenschappen",
+  "treeExpandAll": "Alles uitvouwen",
+  "treeCollapseAll": "Alles samenvouwen"
 }

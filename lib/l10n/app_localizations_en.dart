@@ -229,4 +229,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLanguageDefault => 'System Default';
+
+  @override
+  String get menuAddSibling => 'Add sibling';
+
+  @override
+  String get menuMoveUp => 'Move up';
+
+  @override
+  String get menuMoveDown => 'Move down';
+
+  @override
+  String get menuIndent => 'Indent (move right)';
+
+  @override
+  String get menuUnindent => 'Unindent (move left)';
+
+  @override
+  String get menuSortAsc => 'Sort subnodes (A-Z)';
+
+  @override
+  String get menuSortDesc => 'Sort subnodes (Z-A)';
+
+  @override
+  String get menuToggleBookmark => 'Toggle bookmark';
+
+  @override
+  String get menuDuplicate => 'Duplicate node';
+
+  @override
+  String get menuNodeProperties => 'Node properties';
+
+  @override
+  String get treeExpandAll => 'Expand all';
+
+  @override
+  String get treeCollapseAll => 'Collapse all';
 }

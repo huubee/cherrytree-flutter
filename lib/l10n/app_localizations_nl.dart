@@ -229,4 +229,40 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settingsLanguageDefault => 'Systeemstandaard';
+
+  @override
+  String get menuAddSibling => 'Nevenknoop toevoegen';
+
+  @override
+  String get menuMoveUp => 'Omhoog verplaatsen';
+
+  @override
+  String get menuMoveDown => 'Omlaag verplaatsen';
+
+  @override
+  String get menuIndent => 'Inspringen (naar rechts)';
+
+  @override
+  String get menuUnindent => 'Uitspringen (naar links)';
+
+  @override
+  String get menuSortAsc => 'Onderliggende sorteren (A-Z)';
+
+  @override
+  String get menuSortDesc => 'Onderliggende sorteren (Z-A)';
+
+  @override
+  String get menuToggleBookmark => 'Bladwijzer wisselen';
+
+  @override
+  String get menuDuplicate => 'Knoop dupliceren';
+
+  @override
+  String get menuNodeProperties => 'Knoopeigenschappen';
+
+  @override
+  String get treeExpandAll => 'Alles uitvouwen';
+
+  @override
+  String get treeCollapseAll => 'Alles samenvouwen';
 }

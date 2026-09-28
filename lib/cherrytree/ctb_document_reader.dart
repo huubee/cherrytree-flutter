@@ -30,7 +30,27 @@ class CtbDocumentReader {
           'Some notes had embedded images, tables, or code boxes that are not shown in this import.',
         );
       }
-      return CherrytreeReadResult(document: NoteDocument(nodes: nodes), warnings: List<String>.from(w));
+
+      final bookmarks = <String>[];
+      final bmTables = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='bookmark'",
+      );
+      if (bmTables.isNotEmpty) {
+        final bmRows = await db.rawQuery(
+          'SELECT node_id FROM bookmark ORDER BY sequence ASC',
+        );
+        for (final row in bmRows) {
+          final bmNodeId = _asInt(row['node_id']);
+          if (bmNodeId != null) {
+            bookmarks.add('ct-$bmNodeId');
+          }
+        }
+      }
+
+      return CherrytreeReadResult(
+        document: NoteDocument(nodes: nodes, bookmarks: bookmarks),
+        warnings: List<String>.from(w),
+      );
     } finally {
       await db.close();
     }
@@ -82,8 +102,28 @@ class CtbDocumentReader {
 
       final name = nodeRow['name'] as String? ?? '';
       final txt = nodeRow['txt'] as String?;
-      final syntax = nodeRow['syntax'] as String?;
-      final customIconId = _customIconIdFromIsRo(nodeRow['is_ro']);
+      final syntax = nodeRow['syntax'] as String? ?? 'custom-colors';
+      final tags = nodeRow['tags'] as String? ?? '';
+
+      final isRoNum = _asInt(nodeRow['is_ro']) ?? 0;
+      final isReadOnly = (isRoNum & 0x01) != 0;
+      final customIconId = isRoNum >> 1;
+
+      final isRichNum = _asInt(nodeRow['is_richtxt']) ?? 0;
+      final isBold = ((isRichNum >> 1) & 0x01) != 0;
+      final hasFg = ((isRichNum >> 2) & 0x01) != 0;
+      String? foregroundColor;
+      if (hasFg) {
+        final rgb = (isRichNum >> 3) & 0xffffff;
+        foregroundColor = '#${rgb.toRadixString(16).padLeft(6, '0')}';
+      }
+
+      final levelNum = _asInt(nodeRow['level']) ?? 0;
+      final excludeMeFromSearch = (levelNum & 0x01) != 0;
+      final excludeChildrenFromSearch = (levelNum & 0x02) != 0;
+
+      final tsCreation = _asInt(nodeRow['ts_creation']) ?? 0;
+      final tsLastSave = _asInt(nodeRow['ts_lastsave']) ?? 0;
 
       final hasCode = _truthy(nodeRow['has_codebox']);
       final hasTbl = _truthy(nodeRow['has_table']);
@@ -104,6 +144,16 @@ class CtbDocumentReader {
           body: body,
           sortIndex: sortIndex++,
           customIconId: customIconId,
+          tags: tags,
+          syntax: syntax,
+          isBold: isBold,
+          foregroundColor: foregroundColor,
+          isReadOnly: isReadOnly,
+          excludeMeFromSearch: excludeMeFromSearch,
+          excludeChildrenFromSearch: excludeChildrenFromSearch,
+          tsCreation: tsCreation,
+          tsLastSave: tsLastSave,
+          masterId: masterId,
         ),
       );
 
@@ -136,12 +186,5 @@ class CtbDocumentReader {
     if (v is bool) return v;
     if (v is int) return v != 0;
     return v == 1;
-  }
-
-  /// CherryTree packs `custom_icon_id` in the high bits of `is_ro` (see upstream `ct_storage_sqlite.cc`).
-  static int _customIconIdFromIsRo(Object? isRo) {
-    if (isRo == null) return 0;
-    final v = isRo is int ? isRo : int.tryParse(isRo.toString()) ?? 0;
-    return v >> 1;
   }
 }

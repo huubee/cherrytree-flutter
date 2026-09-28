@@ -228,4 +228,40 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsLanguageDefault => 'Systemstandard';
+
+  @override
+  String get menuAddSibling => 'Geschwisterknoten hinzufügen';
+
+  @override
+  String get menuMoveUp => 'Nach oben';
+
+  @override
+  String get menuMoveDown => 'Nach unten';
+
+  @override
+  String get menuIndent => 'Einrücken (nach rechts)';
+
+  @override
+  String get menuUnindent => 'Ausrücken (nach links)';
+
+  @override
+  String get menuSortAsc => 'Unterknoten sortieren (A-Z)';
+
+  @override
+  String get menuSortDesc => 'Unterknoten sortieren (Z-A)';
+
+  @override
+  String get menuToggleBookmark => 'Lesezeichen umschalten';
+
+  @override
+  String get menuDuplicate => 'Knoten duplizieren';
+
+  @override
+  String get menuNodeProperties => 'Knoteneigenschaften';
+
+  @override
+  String get treeExpandAll => 'Alle aufklappen';
+
+  @override
+  String get treeCollapseAll => 'Alle zuklappen';
 }

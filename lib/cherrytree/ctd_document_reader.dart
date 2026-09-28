@@ -57,11 +57,31 @@ class CtdDocumentReader {
       late String title;
       late String body;
       var customIconId = 0;
+      var tags = '';
+      var syntax = kCherrytreeRichTextSyntaxId;
+      var isBold = false;
+      String? foregroundColor;
+      var isReadOnly = false;
+      var excludeMeFromSearch = false;
+      var excludeChildrenFromSearch = false;
+      var tsCreation = 0;
+      var tsLastSave = 0;
 
       if (masterId <= 0) {
         title = el.getAttribute('name') ?? '';
         final iconStr = el.getAttribute('custom_icon_id');
         customIconId = int.tryParse(iconStr ?? '') ?? 0;
+        tags = el.getAttribute('tags') ?? '';
+        syntax = el.getAttribute('prog_lang') ?? kCherrytreeRichTextSyntaxId;
+        isBold = el.getAttribute('is_bold') == '1';
+        final fg = el.getAttribute('foreground')?.trim();
+        foregroundColor = (fg != null && fg.isNotEmpty) ? fg : null;
+        isReadOnly = el.getAttribute('readonly') == '1';
+        excludeMeFromSearch = el.getAttribute('nosearch_me') == '1';
+        excludeChildrenFromSearch = el.getAttribute('nosearch_ch') == '1';
+        tsCreation = int.tryParse(el.getAttribute('ts_creation') ?? '0') ?? 0;
+        tsLastSave = int.tryParse(el.getAttribute('ts_lastsave') ?? '0') ?? 0;
+
         final parsed = CtBodyPlain.fromCtdNode(el, w);
         body = NoteBodyCodec.documentToStorage(
           CherrytreeQuillBridge.documentFromCtdNode(el),
@@ -88,6 +108,16 @@ class CtdDocumentReader {
           body: body,
           sortIndex: sortIndex,
           customIconId: customIconId,
+          tags: tags,
+          syntax: syntax,
+          isBold: isBold,
+          foregroundColor: foregroundColor,
+          isReadOnly: isReadOnly,
+          excludeMeFromSearch: excludeMeFromSearch,
+          excludeChildrenFromSearch: excludeChildrenFromSearch,
+          tsCreation: tsCreation,
+          tsLastSave: tsLastSave,
+          masterId: masterId,
         ),
       );
 
@@ -99,9 +129,20 @@ class CtdDocumentReader {
       }
     }
 
+    final bookmarks = <String>[];
     var rootSeq = 0;
     for (final child in root.childElements) {
-      if (child.name.local == 'node') {
+      if (child.name.local == 'bookmarks') {
+        final listAttr = child.getAttribute('list');
+        if (listAttr != null && listAttr.isNotEmpty) {
+          for (final part in listAttr.split(',')) {
+            final numId = int.tryParse(part.trim());
+            if (numId != null) {
+              bookmarks.add('ct-$numId');
+            }
+          }
+        }
+      } else if (child.name.local == 'node') {
         visit(child, null, rootSeq++);
       }
     }
@@ -112,7 +153,10 @@ class CtdDocumentReader {
       );
     }
 
-    return CherrytreeReadResult(document: NoteDocument(nodes: nodes), warnings: List<String>.from(w));
+    return CherrytreeReadResult(
+      document: NoteDocument(nodes: nodes, bookmarks: bookmarks),
+      warnings: List<String>.from(w),
+    );
   }
 }
 

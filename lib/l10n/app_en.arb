@@ -88,5 +88,17 @@
   "settingsUseSplitLayoutSubtitle": "Show the tree beside or above the editor with a draggable divider instead of a fixed sidebar or drawer",
   "splitLayoutToggleTooltip": "Toggle split layout",
   "settingsLanguageSection": "Language",
-  "settingsLanguageDefault": "System Default"
+  "settingsLanguageDefault": "System Default",
+  "menuAddSibling": "Add sibling",
+  "menuMoveUp": "Move up",
+  "menuMoveDown": "Move down",
+  "menuIndent": "Indent (move right)",
+  "menuUnindent": "Unindent (move left)",
+  "menuSortAsc": "Sort subnodes (A-Z)",
+  "menuSortDesc": "Sort subnodes (Z-A)",
+  "menuToggleBookmark": "Toggle bookmark",
+  "menuDuplicate": "Duplicate node",
+  "menuNodeProperties": "Node properties",
+  "treeExpandAll": "Expand all",
+  "treeCollapseAll": "Collapse all"
 }

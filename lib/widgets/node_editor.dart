@@ -37,13 +37,14 @@ class _NodeEditorState extends State<NodeEditor> {
     _quill = QuillController(
       document: NoteBodyCodec.documentFromStorage(n?.body ?? ''),
       selection: const TextSelection.collapsed(offset: 0),
+      readOnly: n?.isReadOnly ?? false,
     );
     _quill.addListener(_onQuillChanged);
   }
 
   void _onQuillChanged() {
     final n = widget.node;
-    if (n == null) return;
+    if (n == null || n.isReadOnly) return;
     n.body = NoteBodyCodec.documentToStorage(_quill.document);
     widget.onChanged();
   }
@@ -51,9 +52,12 @@ class _NodeEditorState extends State<NodeEditor> {
   @override
   void didUpdateWidget(covariant NodeEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.node?.id != widget.node?.id) {
+    if (oldWidget.node?.id != widget.node?.id ||
+        oldWidget.node?.isReadOnly != widget.node?.isReadOnly) {
       _title.text = widget.node?.title ?? '';
-      _quill.document = NoteBodyCodec.documentFromStorage(widget.node?.body ?? '');
+      _quill.document =
+          NoteBodyCodec.documentFromStorage(widget.node?.body ?? '');
+      _quill.readOnly = widget.node?.isReadOnly ?? false;
     }
   }
 
@@ -83,6 +87,8 @@ class _NodeEditorState extends State<NodeEditor> {
         ? scheme.surfaceContainerHighest.withValues(alpha: 0.45)
         : scheme.surfaceContainerHighest.withValues(alpha: 0.35);
 
+    final isReadOnly = n.isReadOnly;
+
     return Padding(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.editorPadding,
@@ -95,38 +101,46 @@ class _NodeEditorState extends State<NodeEditor> {
         children: [
           TextField(
             controller: _title,
+            readOnly: isReadOnly,
             decoration: InputDecoration(
               labelText: l10n.fieldTitle,
               border: const OutlineInputBorder(),
+              prefixIcon: isReadOnly
+                  ? const Icon(Icons.lock_outline, size: 20)
+                  : null,
             ),
-            onChanged: (v) {
-              n.title = v;
-              widget.onChanged();
-            },
+            onChanged: isReadOnly
+                ? null
+                : (v) {
+                    n.title = v;
+                    widget.onChanged();
+                  },
           ),
-          const SizedBox(height: AppSpacing.editorFieldGap),
-          QuillSimpleToolbar(
-            controller: _quill,
-            config: const QuillSimpleToolbarConfig(
-              showFontFamily: false,
-              showFontSize: false,
-              multiRowsDisplay: false,
-              showSearchButton: false,
-              showLink: false,
-              showCodeBlock: false,
-              showQuote: false,
-              showIndent: false,
-              showListNumbers: false,
-              showListBullets: false,
-              showListCheck: true,
-              showSubscript: false,
-              showSuperscript: false,
-              showHeaderStyle: false,
-              showLineHeightButton: false,
-              showInlineCode: false,
-              showAlignmentButtons: false,
+          if (!isReadOnly) ...[
+            const SizedBox(height: AppSpacing.editorFieldGap),
+            QuillSimpleToolbar(
+              controller: _quill,
+              config: const QuillSimpleToolbarConfig(
+                showFontFamily: false,
+                showFontSize: false,
+                multiRowsDisplay: false,
+                showSearchButton: false,
+                showLink: false,
+                showCodeBlock: false,
+                showQuote: false,
+                showIndent: false,
+                showListNumbers: false,
+                showListBullets: false,
+                showListCheck: true,
+                showSubscript: false,
+                showSuperscript: false,
+                showHeaderStyle: false,
+                showLineHeightButton: false,
+                showInlineCode: false,
+                showAlignmentButtons: false,
+              ),
             ),
-          ),
+          ],
           const SizedBox(height: AppSpacing.sm),
           Expanded(
             child: Material(
@@ -143,7 +157,9 @@ class _NodeEditorState extends State<NodeEditor> {
                 config: QuillEditorConfig(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   expands: true,
+                  checkBoxReadOnly: isReadOnly,
                   onTapUp: (details, getPosition) {
+                    if (isReadOnly) return false;
                     final pos = getPosition(details.globalPosition);
                     CherrytreeCheckboxToggle.tryToggleAtTapOffset(
                       _quill,

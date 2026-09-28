@@ -507,6 +507,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System Default'**
   String get settingsLanguageDefault;
+
+  /// No description provided for @menuAddSibling.
+  ///
+  /// In en, this message translates to:
+  /// **'Add sibling'**
+  String get menuAddSibling;
+
+  /// No description provided for @menuMoveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get menuMoveUp;
+
+  /// No description provided for @menuMoveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get menuMoveDown;
+
+  /// No description provided for @menuIndent.
+  ///
+  /// In en, this message translates to:
+  /// **'Indent (move right)'**
+  String get menuIndent;
+
+  /// No description provided for @menuUnindent.
+  ///
+  /// In en, this message translates to:
+  /// **'Unindent (move left)'**
+  String get menuUnindent;
+
+  /// No description provided for @menuSortAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort subnodes (A-Z)'**
+  String get menuSortAsc;
+
+  /// No description provided for @menuSortDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort subnodes (Z-A)'**
+  String get menuSortDesc;
+
+  /// No description provided for @menuToggleBookmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle bookmark'**
+  String get menuToggleBookmark;
+
+  /// No description provided for @menuDuplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate node'**
+  String get menuDuplicate;
+
+  /// No description provided for @menuNodeProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'Node properties'**
+  String get menuNodeProperties;
+
+  /// No description provided for @treeExpandAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand all'**
+  String get treeExpandAll;
+
+  /// No description provided for @treeCollapseAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse all'**
+  String get treeCollapseAll;
 }
 
 class _AppLocalizationsDelegate

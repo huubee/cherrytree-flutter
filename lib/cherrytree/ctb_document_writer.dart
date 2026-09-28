@@ -35,40 +35,64 @@ class CtbDocumentWriter {
       final batch = db.batch();
       for (final n in doc.nodes) {
         final nid = idMap[n.id];
-        if (NoteBodyCodec.looksLikeQuillDeltaJson(n.body)) {
+        final isQuill = NoteBodyCodec.looksLikeQuillDeltaJson(n.body);
+        final String txt;
+        final String syntax;
+        final bool isRich;
+
+        if (isQuill) {
           final qDoc = NoteBodyCodec.documentFromStorage(n.body);
-          batch.insert('node', {
-            'node_id': nid,
-            'name': n.title,
-            'txt': CherrytreeQuillBridge.sqliteTxtFromDocument(qDoc),
-            'syntax': kCherrytreeRichTextSyntaxId,
-            'tags': '',
-            'is_ro': n.customIconId << 1,
-            'is_richtxt': 1,
-            'has_codebox': 0,
-            'has_table': 0,
-            'has_image': 0,
-            'level': 0,
-            'ts_creation': now,
-            'ts_lastsave': now,
-          });
+          txt = CherrytreeQuillBridge.sqliteTxtFromDocument(qDoc);
+          syntax = n.syntax.isNotEmpty && n.syntax != kCherrytreePlainTextSyntaxId
+              ? n.syntax
+              : kCherrytreeRichTextSyntaxId;
+          isRich = true;
         } else {
-          batch.insert('node', {
-            'node_id': nid,
-            'name': n.title,
-            'txt': n.body,
-            'syntax': 'plain-text',
-            'tags': '',
-            'is_ro': n.customIconId << 1,
-            'is_richtxt': 0,
-            'has_codebox': 0,
-            'has_table': 0,
-            'has_image': 0,
-            'level': 0,
-            'ts_creation': now,
-            'ts_lastsave': now,
-          });
+          txt = n.body;
+          syntax = n.syntax == kCherrytreeRichTextSyntaxId
+              ? kCherrytreePlainTextSyntaxId
+              : (n.syntax.isNotEmpty ? n.syntax : kCherrytreePlainTextSyntaxId);
+          isRich = false;
         }
+
+        final isRoValue = (n.customIconId << 1) | (n.isReadOnly ? 1 : 0);
+
+        var isRichtxtValue = isRich ? 1 : 0;
+        if (n.isBold) {
+          isRichtxtValue |= (1 << 1);
+        }
+        final fgHex = n.foregroundColor?.trim();
+        if (fgHex != null && fgHex.isNotEmpty) {
+          final cleanHex = fgHex.startsWith('#') ? fgHex.substring(1) : fgHex;
+          final rgb = int.tryParse(cleanHex, radix: 16);
+          if (rgb != null) {
+            isRichtxtValue |= (1 << 2);
+            isRichtxtValue |= ((rgb & 0xffffff) << 3);
+          }
+        }
+
+        var levelValue = 0;
+        if (n.excludeMeFromSearch) levelValue |= 1;
+        if (n.excludeChildrenFromSearch) levelValue |= 2;
+
+        final tsCreation = n.tsCreation > 0 ? n.tsCreation : now;
+        final tsLastSave = n.tsLastSave > 0 ? n.tsLastSave : now;
+
+        batch.insert('node', {
+          'node_id': nid,
+          'name': n.title,
+          'txt': txt,
+          'syntax': syntax,
+          'tags': n.tags,
+          'is_ro': isRoValue,
+          'is_richtxt': isRichtxtValue,
+          'has_codebox': 0,
+          'has_table': 0,
+          'has_image': 0,
+          'level': levelValue,
+          'ts_creation': tsCreation,
+          'ts_lastsave': tsLastSave,
+        });
       }
       for (final n in doc.nodes) {
         final nid = idMap[n.id];
@@ -80,9 +104,19 @@ class CtbDocumentWriter {
           'node_id': nid,
           'father_id': pid,
           'sequence': seq,
-          'master_id': 0,
+          'master_id': n.masterId,
         });
       }
+
+      var bmSeq = 1;
+      for (final bId in doc.bookmarks) {
+        final nid = idMap[bId];
+        batch.insert('bookmark', {
+          'node_id': nid,
+          'sequence': bmSeq++,
+        });
+      }
+
       await batch.commit(noResult: true);
     } finally {
       await db.close();

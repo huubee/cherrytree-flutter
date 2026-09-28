@@ -87,7 +87,7 @@ class NoteRepository {
           );
         }
         if (tabs.isEmpty) {
-          return _migrateLegacyToTabs();
+          return await _migrateLegacyToTabs();
         }
         final aid = activeTabId != null &&
                 tabs.any((t) => t.id == activeTabId)
@@ -96,7 +96,7 @@ class NoteRepository {
         return TabLoadResult(tabs: tabs, activeTabId: aid);
       } on Object catch (e, st) {
         developer.log('sessions_v1.json load failed, migrating', error: e, stackTrace: st);
-        return _migrateLegacyToTabs();
+        return await _migrateLegacyToTabs();
       }
     }
     return _migrateLegacyToTabs();

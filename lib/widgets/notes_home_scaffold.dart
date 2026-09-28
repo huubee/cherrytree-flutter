@@ -28,7 +28,16 @@ class NotesHomeScaffold extends StatelessWidget {
     required this.onTreeSelectWide,
     required this.onTreeSelectDrawer,
     required this.onAddChild,
+    this.onAddSibling,
     required this.onDelete,
+    this.onMoveUp,
+    this.onMoveDown,
+    this.onIndent,
+    this.onUnindent,
+    this.onSort,
+    this.onToggleBookmark,
+    this.onDuplicate,
+    this.onNodeProperties,
     required this.onEditorChanged,
     required this.l10n,
     this.useSplitLayout = false,
@@ -52,7 +61,16 @@ class NotesHomeScaffold extends StatelessWidget {
   final void Function(String id) onTreeSelectWide;
   final void Function(String id) onTreeSelectDrawer;
   final void Function(String parentId, AppLocalizations l10n) onAddChild;
+  final void Function(String targetId, AppLocalizations l10n)? onAddSibling;
   final void Function(String id) onDelete;
+  final void Function(String id)? onMoveUp;
+  final void Function(String id)? onMoveDown;
+  final void Function(String id)? onIndent;
+  final void Function(String id)? onUnindent;
+  final void Function(String? parentId, bool ascending)? onSort;
+  final void Function(String id)? onToggleBookmark;
+  final void Function(String id)? onDuplicate;
+  final void Function(String id)? onNodeProperties;
   final VoidCallback onEditorChanged;
   final AppLocalizations l10n;
   final bool useSplitLayout;
@@ -105,7 +123,16 @@ class NotesHomeScaffold extends StatelessWidget {
         selectedId: selectedId,
         onSelect: onTreeSelectWide,
         onAddChild: (id) => onAddChild(id, l10n),
+        onAddSibling: onAddSibling != null ? (id) => onAddSibling!(id, l10n) : null,
         onDelete: onDelete,
+        onMoveUp: onMoveUp,
+        onMoveDown: onMoveDown,
+        onIndent: onIndent,
+        onUnindent: onUnindent,
+        onSort: onSort,
+        onToggleBookmark: onToggleBookmark,
+        onDuplicate: onDuplicate,
+        onNodeProperties: onNodeProperties,
       ),
     );
 
@@ -114,7 +141,16 @@ class NotesHomeScaffold extends StatelessWidget {
       selectedId: selectedId,
       onSelect: onTreeSelectWide,
       onAddChild: (id) => onAddChild(id, l10n),
+      onAddSibling: onAddSibling != null ? (id) => onAddSibling!(id, l10n) : null,
       onDelete: onDelete,
+      onMoveUp: onMoveUp,
+      onMoveDown: onMoveDown,
+      onIndent: onIndent,
+      onUnindent: onUnindent,
+      onSort: onSort,
+      onToggleBookmark: onToggleBookmark,
+      onDuplicate: onDuplicate,
+      onNodeProperties: onNodeProperties,
     );
 
     if (wide && useSplitLayout) {
@@ -173,7 +209,16 @@ class NotesHomeScaffold extends StatelessWidget {
                   selectedId: selectedId,
                   onSelect: onTreeSelectDrawer,
                   onAddChild: (id) => onAddChild(id, l10n),
+                  onAddSibling: onAddSibling != null ? (id) => onAddSibling!(id, l10n) : null,
                   onDelete: onDelete,
+                  onMoveUp: onMoveUp,
+                  onMoveDown: onMoveDown,
+                  onIndent: onIndent,
+                  onUnindent: onUnindent,
+                  onSort: onSort,
+                  onToggleBookmark: onToggleBookmark,
+                  onDuplicate: onDuplicate,
+                  onNodeProperties: onNodeProperties,
                 ),
               ),
             ],
