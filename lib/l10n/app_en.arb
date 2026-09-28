@@ -100,5 +100,30 @@
   "menuDuplicate": "Duplicate node",
   "menuNodeProperties": "Node properties",
   "treeExpandAll": "Expand all",
-  "treeCollapseAll": "Collapse all"
+  "treeCollapseAll": "Collapse all",
+  "searchTitle": "Find in Nodes",
+  "searchHint": "Search title, tags, or content...",
+  "searchMatchCase": "Match case",
+  "searchWholeWord": "Whole word",
+  "searchRegex": "Regular expression",
+  "searchInContent": "Content",
+  "searchInNameAndTags": "Names & tags",
+  "searchSubnodesOnly": "Only selected subnodes",
+  "searchOverrideExclusions": "Override exclusions",
+  "searchResultsCount": "{count, plural, =1{1 matching node} other{{count} matching nodes}}",
+  "@searchResultsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "searchNoResults": "No matching nodes found",
+  "searchEmptyPrompt": "Type to search notes in this document",
+  "searchBadgeTitle": "Title",
+  "searchBadgeTag": "Tag",
+  "searchBadgeContent": "Content",
+  "bookmarksTitle": "Bookmarks",
+  "bookmarksEmpty": "No bookmarks yet. Right-click or use the node menu to bookmark notes for quick access.",
+  "bookmarksRemoveTooltip": "Remove bookmark",
+  "bookmarksTooltip": "Bookmarks",
+  "searchTooltip": "Find in nodes (Ctrl+F)"
 }

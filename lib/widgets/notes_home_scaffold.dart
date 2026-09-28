@@ -25,6 +25,8 @@ class NotesHomeScaffold extends StatelessWidget {
     required this.onAddRoot,
     required this.onImportCherryTree,
     required this.onExportCherryTree,
+    this.onSearch,
+    this.onBookmarks,
     required this.onTreeSelectWide,
     required this.onTreeSelectDrawer,
     required this.onAddChild,
@@ -58,6 +60,8 @@ class NotesHomeScaffold extends StatelessWidget {
   final void Function(AppLocalizations l10n) onAddRoot;
   final VoidCallback onImportCherryTree;
   final VoidCallback onExportCherryTree;
+  final VoidCallback? onSearch;
+  final VoidCallback? onBookmarks;
   final void Function(String id) onTreeSelectWide;
   final void Function(String id) onTreeSelectDrawer;
   final void Function(String parentId, AppLocalizations l10n) onAddChild;
@@ -97,6 +101,8 @@ class NotesHomeScaffold extends StatelessWidget {
       saveState: saveState,
       onImportCherryTree: onImportCherryTree,
       onExportCherryTree: onExportCherryTree,
+      onSearch: onSearch,
+      onBookmarks: onBookmarks,
       leading: hideDrawerLeading
           ? null
           : Builder(

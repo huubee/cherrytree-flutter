@@ -579,6 +579,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Collapse all'**
   String get treeCollapseAll;
+
+  /// No description provided for @searchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find in Nodes'**
+  String get searchTitle;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search title, tags, or content...'**
+  String get searchHint;
+
+  /// No description provided for @searchMatchCase.
+  ///
+  /// In en, this message translates to:
+  /// **'Match case'**
+  String get searchMatchCase;
+
+  /// No description provided for @searchWholeWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole word'**
+  String get searchWholeWord;
+
+  /// No description provided for @searchRegex.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular expression'**
+  String get searchRegex;
+
+  /// No description provided for @searchInContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get searchInContent;
+
+  /// No description provided for @searchInNameAndTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Names & tags'**
+  String get searchInNameAndTags;
+
+  /// No description provided for @searchSubnodesOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only selected subnodes'**
+  String get searchSubnodesOnly;
+
+  /// No description provided for @searchOverrideExclusions.
+  ///
+  /// In en, this message translates to:
+  /// **'Override exclusions'**
+  String get searchOverrideExclusions;
+
+  /// No description provided for @searchResultsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 matching node} other{{count} matching nodes}}'**
+  String searchResultsCount(int count);
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching nodes found'**
+  String get searchNoResults;
+
+  /// No description provided for @searchEmptyPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Type to search notes in this document'**
+  String get searchEmptyPrompt;
+
+  /// No description provided for @searchBadgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get searchBadgeTitle;
+
+  /// No description provided for @searchBadgeTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get searchBadgeTag;
+
+  /// No description provided for @searchBadgeContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get searchBadgeContent;
+
+  /// No description provided for @bookmarksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks'**
+  String get bookmarksTitle;
+
+  /// No description provided for @bookmarksEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookmarks yet. Right-click or use the node menu to bookmark notes for quick access.'**
+  String get bookmarksEmpty;
+
+  /// No description provided for @bookmarksRemoveTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove bookmark'**
+  String get bookmarksRemoveTooltip;
+
+  /// No description provided for @bookmarksTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks'**
+  String get bookmarksTooltip;
+
+  /// No description provided for @searchTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Find in nodes (Ctrl+F)'**
+  String get searchTooltip;
 }
 
 class _AppLocalizationsDelegate

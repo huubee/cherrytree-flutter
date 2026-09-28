@@ -265,4 +265,72 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get treeCollapseAll => 'Alles samenvouwen';
+
+  @override
+  String get searchTitle => 'Zoeken in knopen';
+
+  @override
+  String get searchHint => 'Zoek titel, tags of inhoud...';
+
+  @override
+  String get searchMatchCase => 'Hoofdlettergevoelig';
+
+  @override
+  String get searchWholeWord => 'Heel woord';
+
+  @override
+  String get searchRegex => 'Reguliere expressie';
+
+  @override
+  String get searchInContent => 'Inhoud';
+
+  @override
+  String get searchInNameAndTags => 'Namen & tags';
+
+  @override
+  String get searchSubnodesOnly => 'Alleen subknopen';
+
+  @override
+  String get searchOverrideExclusions => 'Uitsluitingen negeren';
+
+  @override
+  String searchResultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count overeenkomende knopen',
+      one: '1 overeenkomende knoop',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchNoResults => 'Geen overeenkomende knopen gevonden';
+
+  @override
+  String get searchEmptyPrompt => 'Typ om in notities te zoeken';
+
+  @override
+  String get searchBadgeTitle => 'Titel';
+
+  @override
+  String get searchBadgeTag => 'Tag';
+
+  @override
+  String get searchBadgeContent => 'Inhoud';
+
+  @override
+  String get bookmarksTitle => 'Bladwijzers';
+
+  @override
+  String get bookmarksEmpty => 'Nog geen bladwijzers aanwezig.';
+
+  @override
+  String get bookmarksRemoveTooltip => 'Bladwijzer verwijderen';
+
+  @override
+  String get bookmarksTooltip => 'Bladwijzers';
+
+  @override
+  String get searchTooltip => 'Zoeken in knopen (Ctrl+F)';
 }

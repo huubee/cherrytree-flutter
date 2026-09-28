@@ -264,4 +264,72 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get treeCollapseAll => 'Alle zuklappen';
+
+  @override
+  String get searchTitle => 'In Knoten suchen';
+
+  @override
+  String get searchHint => 'Titel, Tags oder Inhalt suchen...';
+
+  @override
+  String get searchMatchCase => 'Groß-/Kleinschreibung';
+
+  @override
+  String get searchWholeWord => 'Ganzes Wort';
+
+  @override
+  String get searchRegex => 'Regulärer Ausdruck';
+
+  @override
+  String get searchInContent => 'Inhalt';
+
+  @override
+  String get searchInNameAndTags => 'Namen & Tags';
+
+  @override
+  String get searchSubnodesOnly => 'Nur Unterknoten';
+
+  @override
+  String get searchOverrideExclusions => 'Ausschlüsse ignorieren';
+
+  @override
+  String searchResultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count passende Knoten',
+      one: '1 passender Knoten',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchNoResults => 'Keine passenden Knoten gefunden';
+
+  @override
+  String get searchEmptyPrompt => 'Tippen Sie, um Notizen zu durchsuchen';
+
+  @override
+  String get searchBadgeTitle => 'Titel';
+
+  @override
+  String get searchBadgeTag => 'Tag';
+
+  @override
+  String get searchBadgeContent => 'Inhalt';
+
+  @override
+  String get bookmarksTitle => 'Lesezeichen';
+
+  @override
+  String get bookmarksEmpty => 'Noch keine Lesezeichen vorhanden.';
+
+  @override
+  String get bookmarksRemoveTooltip => 'Lesezeichen entfernen';
+
+  @override
+  String get bookmarksTooltip => 'Lesezeichen';
+
+  @override
+  String get searchTooltip => 'In Knoten suchen (Strg+F)';
 }

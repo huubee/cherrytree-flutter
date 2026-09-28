@@ -40,4 +40,23 @@ class NoteBodyCodec {
   static String documentToStorage(Document document) {
     return jsonEncode(document.toDelta().toJson());
   }
+
+  /// Extracts plain text from [body] storage (extracting strings from Quill ops or using plain text directly).
+  static String plainTextFromStorage(String body) {
+    if (looksLikeQuillDeltaJson(body)) {
+      try {
+        final list = jsonDecode(body) as List<dynamic>;
+        final buf = StringBuffer();
+        for (final item in list) {
+          if (item is Map && item['insert'] is String) {
+            buf.write(item['insert']);
+          }
+        }
+        return buf.toString();
+      } on Object {
+        return body;
+      }
+    }
+    return body;
+  }
 }

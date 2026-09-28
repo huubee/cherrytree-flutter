@@ -265,4 +265,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get treeCollapseAll => 'Collapse all';
+
+  @override
+  String get searchTitle => 'Find in Nodes';
+
+  @override
+  String get searchHint => 'Search title, tags, or content...';
+
+  @override
+  String get searchMatchCase => 'Match case';
+
+  @override
+  String get searchWholeWord => 'Whole word';
+
+  @override
+  String get searchRegex => 'Regular expression';
+
+  @override
+  String get searchInContent => 'Content';
+
+  @override
+  String get searchInNameAndTags => 'Names & tags';
+
+  @override
+  String get searchSubnodesOnly => 'Only selected subnodes';
+
+  @override
+  String get searchOverrideExclusions => 'Override exclusions';
+
+  @override
+  String searchResultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count matching nodes',
+      one: '1 matching node',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchNoResults => 'No matching nodes found';
+
+  @override
+  String get searchEmptyPrompt => 'Type to search notes in this document';
+
+  @override
+  String get searchBadgeTitle => 'Title';
+
+  @override
+  String get searchBadgeTag => 'Tag';
+
+  @override
+  String get searchBadgeContent => 'Content';
+
+  @override
+  String get bookmarksTitle => 'Bookmarks';
+
+  @override
+  String get bookmarksEmpty =>
+      'No bookmarks yet. Right-click or use the node menu to bookmark notes for quick access.';
+
+  @override
+  String get bookmarksRemoveTooltip => 'Remove bookmark';
+
+  @override
+  String get bookmarksTooltip => 'Bookmarks';
+
+  @override
+  String get searchTooltip => 'Find in nodes (Ctrl+F)';
 }

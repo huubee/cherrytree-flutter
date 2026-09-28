@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
 import 'l10n/app_localizations.dart';
@@ -10,7 +11,9 @@ import 'notes/cherrytree_file_actions.dart';
 import 'services/note_repository.dart';
 import 'settings_page.dart';
 import 'theme/app_timing.dart';
+import 'widgets/bookmarks_dialog.dart';
 import 'widgets/ct_app_bar.dart';
+import 'widgets/find_in_nodes_dialog.dart';
 import 'widgets/node_properties_dialog.dart';
 import 'widgets/notes_home_scaffold.dart';
 
@@ -400,6 +403,31 @@ class _NotesHomePageState extends State<NotesHomePage>
     }
   }
 
+  void _openSearch() {
+    unawaited(
+      FindInNodesDialog.show(
+        context,
+        doc: _doc,
+        selectedNodeId: _activeTab.selectedNodeId,
+        onSelectNode: (id) => setState(() => _activeTab.selectedNodeId = id),
+      ),
+    );
+  }
+
+  void _openBookmarks() {
+    unawaited(
+      BookmarksDialog.show(
+        context,
+        doc: _doc,
+        onSelectNode: (id) => setState(() => _activeTab.selectedNodeId = id),
+        onRemoveBookmark: (id) {
+          setState(() => _doc.removeBookmark(id));
+          _persistImmediately();
+        },
+      ),
+    );
+  }
+
   List<BreadcrumbSegment>? _breadcrumbSegments(
     AppLocalizations l10n,
     NoteDocument doc,
@@ -650,7 +678,7 @@ class _NotesHomePageState extends State<NotesHomePage>
       ),
     );
 
-    return NotesHomeScaffold(
+    final scaffold = NotesHomeScaffold(
       doc: doc,
       selectedId: selectedId,
       breadcrumbSegments: breadcrumbSegments,
@@ -675,6 +703,8 @@ class _NotesHomePageState extends State<NotesHomePage>
       onExportCherryTree: () {
         unawaited(_exportCherryTree());
       },
+      onSearch: _openSearch,
+      onBookmarks: _openBookmarks,
       onTreeSelectWide: (id) => setState(() => _activeTab.selectedNodeId = id),
       onTreeSelectDrawer: (id) {
         setState(() => _activeTab.selectedNodeId = id);
@@ -693,6 +723,18 @@ class _NotesHomePageState extends State<NotesHomePage>
       onNodeProperties: (id) => unawaited(_nodeProperties(id)),
       onEditorChanged: _onEditorChanged,
       l10n: l10n,
+    );
+
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.keyF, control: true):
+            _openSearch,
+        const SingleActivator(LogicalKeyboardKey.keyF, meta: true): _openSearch,
+      },
+      child: Focus(
+        autofocus: true,
+        child: scaffold,
+      ),
     );
   }
 }
