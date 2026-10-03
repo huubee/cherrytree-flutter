@@ -134,16 +134,30 @@ class _TreePanelState extends State<TreePanel> {
       ),
     );
 
-    return Column(
-      children: [
-        toolbar,
-        Expanded(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: _buildLevel(context, l10n, null, 0),
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.hasBoundedHeight && constraints.maxHeight < 56) {
+          return ClipRect(
+            child: OverflowBox(
+              alignment: Alignment.topLeft,
+              minHeight: 0,
+              maxHeight: 56,
+              child: toolbar,
+            ),
+          );
+        }
+        return Column(
+          children: [
+            toolbar,
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: _buildLevel(context, l10n, null, 0),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
