@@ -347,4 +347,47 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get specialCharsDone => 'Schließen';
+
+  @override
+  String get insertCodeboxTooltip => 'Codebox einfügen';
+
+  @override
+  String get insertTableTooltip => 'Tabelle einfügen';
+
+  @override
+  String get codeboxDialogTitle => 'Codebox einfügen';
+
+  @override
+  String get codeboxLanguageLabel => 'Sprache';
+
+  @override
+  String get codeboxCodeLabel => 'Code';
+
+  @override
+  String get exportActionTitle => 'Notizen exportieren';
+
+  @override
+  String get exportDialogTitle => 'Notizen exportieren';
+
+  @override
+  String get exportScopeEntireTree => 'Gesamter Baum';
+
+  @override
+  String get exportScopeSelectedWithSubnodes =>
+      'Aktueller Knoten & Unterknoten';
+
+  @override
+  String get exportScopeSelectedOnly => 'Nur aktueller Knoten';
+
+  @override
+  String get exportFormatLabel => 'Format';
+
+  @override
+  String get exportCopyToClipboard => 'In Zwischenablage kopieren';
+
+  @override
+  String get exportSaveToFile => 'In Datei speichern';
+
+  @override
+  String get exportCopiedToClipboard => 'Export in Zwischenablage kopiert';
 }

@@ -125,5 +125,19 @@
   "insertHorizontalRuleTooltip": "Horizontale Linie einfügen",
   "insertSpecialCharTooltip": "Sonderzeichen einfügen",
   "specialCharsTitle": "Sonderzeichen",
-  "specialCharsDone": "Schließen"
+  "specialCharsDone": "Schließen",
+  "insertCodeboxTooltip": "Codebox einfügen",
+  "insertTableTooltip": "Tabelle einfügen",
+  "codeboxDialogTitle": "Codebox einfügen",
+  "codeboxLanguageLabel": "Sprache",
+  "codeboxCodeLabel": "Code",
+  "exportActionTitle": "Notizen exportieren",
+  "exportDialogTitle": "Notizen exportieren",
+  "exportScopeEntireTree": "Gesamter Baum",
+  "exportScopeSelectedWithSubnodes": "Aktueller Knoten & Unterknoten",
+  "exportScopeSelectedOnly": "Nur aktueller Knoten",
+  "exportFormatLabel": "Format",
+  "exportCopyToClipboard": "In Zwischenablage kopieren",
+  "exportSaveToFile": "In Datei speichern",
+  "exportCopiedToClipboard": "Export in Zwischenablage kopiert"
 }

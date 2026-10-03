@@ -8,6 +8,8 @@ import '../models/note_document.dart';
 import '../rich/cherrytree_checkbox_toggle.dart';
 import '../rich/note_body_codec.dart';
 import '../theme/app_spacing.dart';
+import 'insert_codebox_dialog.dart';
+import 'insert_table_dialog.dart';
 import 'special_characters_dialog.dart';
 
 class NodeEditor extends StatefulWidget {
@@ -84,6 +86,23 @@ class _NodeEditorState extends State<NodeEditor> {
         onSelectCharacter: (char) => _insertText(char),
       ),
     );
+  }
+
+  Future<void> _insertCodebox() async {
+    final result = await InsertCodeboxDialog.show(context);
+    if (result == null || !mounted) return;
+    final buffer = StringBuffer('\n');
+    final lines = result.code.split('\n');
+    for (final line in lines) {
+      buffer.writeln(line);
+    }
+    _insertText(buffer.toString());
+  }
+
+  Future<void> _insertTable() async {
+    final result = await InsertTableDialog.show(context);
+    if (result == null || !mounted) return;
+    _insertText(result);
   }
 
   @override
@@ -195,6 +214,16 @@ class _NodeEditorState extends State<NodeEditor> {
                     icon: const Icon(Icons.emoji_symbols_outlined, size: 20),
                     tooltip: l10n.insertSpecialCharTooltip,
                     onPressed: _openSpecialCharacters,
+                  ),
+                  QuillToolbarCustomButtonOptions(
+                    icon: const Icon(Icons.terminal_outlined, size: 20),
+                    tooltip: l10n.insertCodeboxTooltip,
+                    onPressed: () => unawaited(_insertCodebox()),
+                  ),
+                  QuillToolbarCustomButtonOptions(
+                    icon: const Icon(Icons.table_chart_outlined, size: 20),
+                    tooltip: l10n.insertTableTooltip,
+                    onPressed: () => unawaited(_insertTable()),
                   ),
                 ],
               ),

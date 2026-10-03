@@ -130,5 +130,19 @@
   "insertHorizontalRuleTooltip": "Insert Horizontal Rule",
   "insertSpecialCharTooltip": "Insert Special Character",
   "specialCharsTitle": "Special Characters",
-  "specialCharsDone": "Close"
+  "specialCharsDone": "Close",
+  "insertCodeboxTooltip": "Insert Code Box",
+  "insertTableTooltip": "Insert Table",
+  "codeboxDialogTitle": "Insert Code Box",
+  "codeboxLanguageLabel": "Language",
+  "codeboxCodeLabel": "Code",
+  "exportActionTitle": "Export Notes",
+  "exportDialogTitle": "Export Notes",
+  "exportScopeEntireTree": "Entire Tree",
+  "exportScopeSelectedWithSubnodes": "Current Node & Subnodes",
+  "exportScopeSelectedOnly": "Current Node Only",
+  "exportFormatLabel": "Format",
+  "exportCopyToClipboard": "Copy to Clipboard",
+  "exportSaveToFile": "Save to File",
+  "exportCopiedToClipboard": "Export copied to clipboard"
 }

@@ -348,4 +348,46 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get specialCharsDone => 'Sluiten';
+
+  @override
+  String get insertCodeboxTooltip => 'Codebox invoegen';
+
+  @override
+  String get insertTableTooltip => 'Tabel invoegen';
+
+  @override
+  String get codeboxDialogTitle => 'Codebox invoegen';
+
+  @override
+  String get codeboxLanguageLabel => 'Taal';
+
+  @override
+  String get codeboxCodeLabel => 'Code';
+
+  @override
+  String get exportActionTitle => 'Notities exporteren';
+
+  @override
+  String get exportDialogTitle => 'Notities exporteren';
+
+  @override
+  String get exportScopeEntireTree => 'Volledige boom';
+
+  @override
+  String get exportScopeSelectedWithSubnodes => 'Huidige notitie & subnotities';
+
+  @override
+  String get exportScopeSelectedOnly => 'Alleen huidige notitie';
+
+  @override
+  String get exportFormatLabel => 'Formaat';
+
+  @override
+  String get exportCopyToClipboard => 'Kopiëren naar klembord';
+
+  @override
+  String get exportSaveToFile => 'Opslaan naar bestand';
+
+  @override
+  String get exportCopiedToClipboard => 'Export gekopieerd naar klembord';
 }

@@ -125,5 +125,19 @@
   "insertHorizontalRuleTooltip": "Horizontale lijn invoegen",
   "insertSpecialCharTooltip": "Speciaal teken invoegen",
   "specialCharsTitle": "Speciale tekens",
-  "specialCharsDone": "Sluiten"
+  "specialCharsDone": "Sluiten",
+  "insertCodeboxTooltip": "Codebox invoegen",
+  "insertTableTooltip": "Tabel invoegen",
+  "codeboxDialogTitle": "Codebox invoegen",
+  "codeboxLanguageLabel": "Taal",
+  "codeboxCodeLabel": "Code",
+  "exportActionTitle": "Notities exporteren",
+  "exportDialogTitle": "Notities exporteren",
+  "exportScopeEntireTree": "Volledige boom",
+  "exportScopeSelectedWithSubnodes": "Huidige notitie & subnotities",
+  "exportScopeSelectedOnly": "Alleen huidige notitie",
+  "exportFormatLabel": "Formaat",
+  "exportCopyToClipboard": "Kopiëren naar klembord",
+  "exportSaveToFile": "Opslaan naar bestand",
+  "exportCopiedToClipboard": "Export gekopieerd naar klembord"
 }

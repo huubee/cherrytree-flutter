@@ -349,4 +349,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get specialCharsDone => 'Close';
+
+  @override
+  String get insertCodeboxTooltip => 'Insert Code Box';
+
+  @override
+  String get insertTableTooltip => 'Insert Table';
+
+  @override
+  String get codeboxDialogTitle => 'Insert Code Box';
+
+  @override
+  String get codeboxLanguageLabel => 'Language';
+
+  @override
+  String get codeboxCodeLabel => 'Code';
+
+  @override
+  String get exportActionTitle => 'Export Notes';
+
+  @override
+  String get exportDialogTitle => 'Export Notes';
+
+  @override
+  String get exportScopeEntireTree => 'Entire Tree';
+
+  @override
+  String get exportScopeSelectedWithSubnodes => 'Current Node & Subnodes';
+
+  @override
+  String get exportScopeSelectedOnly => 'Current Node Only';
+
+  @override
+  String get exportFormatLabel => 'Format';
+
+  @override
+  String get exportCopyToClipboard => 'Copy to Clipboard';
+
+  @override
+  String get exportSaveToFile => 'Save to File';
+
+  @override
+  String get exportCopiedToClipboard => 'Export copied to clipboard';
 }

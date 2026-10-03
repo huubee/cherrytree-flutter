@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import '../models/note_document.dart';
 import 'ctb_document_writer.dart';
 import 'ctd_document_writer.dart';
+import 'document_exporter.dart';
 
 /// Builds file bytes for sharing or “save as” flows (see [CtdDocumentWriter], [CtbDocumentWriter]).
 class CherrytreeDocumentExport {
@@ -31,5 +32,49 @@ class CherrytreeDocumentExport {
         await f.delete();
       }
     }
+  }
+
+  /// UTF-8 Markdown representation.
+  static Uint8List markdownBytes(
+    NoteDocument doc, {
+    String? nodeId,
+    bool recursive = true,
+  }) {
+    final md = DocumentExporter.exportToMarkdown(
+      doc,
+      nodeId: nodeId,
+      recursive: recursive,
+    );
+    return Uint8List.fromList(utf8.encode(md));
+  }
+
+  /// UTF-8 HTML document.
+  static Uint8List htmlBytes(
+    NoteDocument doc, {
+    String? nodeId,
+    bool recursive = true,
+    String title = 'CherryTree Notes',
+  }) {
+    final html = DocumentExporter.exportToHtml(
+      doc,
+      nodeId: nodeId,
+      recursive: recursive,
+      title: title,
+    );
+    return Uint8List.fromList(utf8.encode(html));
+  }
+
+  /// UTF-8 Plain text representation.
+  static Uint8List plainTextBytes(
+    NoteDocument doc, {
+    String? nodeId,
+    bool recursive = true,
+  }) {
+    final txt = DocumentExporter.exportToPlainText(
+      doc,
+      nodeId: nodeId,
+      recursive: recursive,
+    );
+    return Uint8List.fromList(utf8.encode(txt));
   }
 }

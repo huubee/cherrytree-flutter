@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../cherrytree/cherrytree_stock_icons.dart';
 import '../l10n/app_localizations.dart';
 import '../models/note_document.dart';
 import '../theme/app_spacing.dart';
+import 'export_dialog.dart';
 
 class TreePanel extends StatefulWidget {
   const TreePanel({
@@ -315,6 +318,13 @@ class _TreePanelState extends State<TreePanel> {
                   case 'properties':
                     widget.onNodeProperties?.call(n.id);
                     break;
+                  case 'export':
+                    unawaited(ExportDialog.show(
+                      context,
+                      doc: widget.doc,
+                      selectedNodeId: n.id,
+                    ));
+                    break;
                   case 'del':
                     widget.onDelete(n.id);
                     break;
@@ -447,6 +457,16 @@ class _TreePanelState extends State<TreePanel> {
                       ],
                     ),
                   ),
+                PopupMenuItem(
+                  value: 'export',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.ios_share_outlined, size: 18),
+                      const SizedBox(width: 8),
+                      Text(l10n.exportActionTitle),
+                    ],
+                  ),
+                ),
                 const PopupMenuDivider(),
                 PopupMenuItem(
                   value: 'del',

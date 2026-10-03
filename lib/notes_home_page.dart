@@ -13,6 +13,7 @@ import 'settings_page.dart';
 import 'theme/app_timing.dart';
 import 'widgets/bookmarks_dialog.dart';
 import 'widgets/ct_app_bar.dart';
+import 'widgets/export_dialog.dart';
 import 'widgets/find_in_nodes_dialog.dart';
 import 'widgets/node_properties_dialog.dart';
 import 'widgets/notes_home_scaffold.dart';
@@ -507,7 +508,11 @@ class _NotesHomePageState extends State<NotesHomePage>
   }
 
   Future<void> _exportCherryTree() async {
-    await CherrytreeFileActions.exportDocument(context, _doc);
+    await ExportDialog.show(
+      context,
+      doc: _doc,
+      selectedNodeId: _activeTab.selectedNodeId,
+    );
   }
 
   void _onEditorChanged() {

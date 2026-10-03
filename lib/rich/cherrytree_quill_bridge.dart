@@ -20,20 +20,24 @@ class CherrytreeQuillBridge {
   static const _vHeavy = 'heavy';
   static const _vItalic = 'italic';
 
-  /// Builds a [Document] from direct `<rich_text>` children of a CTD `<node>`.
+  static const _kFamily = 'family';
+  static const _kScale = 'scale';
+  static const _kJustification = 'justification';
+
+  /// Builds a [Document] from children of a CTD `<node>` (`rich_text`, `codebox`, `table`, `encoded_png`).
   static Document documentFromCtdNode(XmlElement nodeEl) {
-    return _documentFromRichTextElements(
-      nodeEl.childElements.where((e) => e.name.local == 'rich_text'),
+    return _documentFromNodeChildElements(
+      nodeEl.childElements.where((e) => e.name.local != 'node'),
     );
   }
 
-  /// Builds a [Document] from SQLite [txt] column (`<node>` root with `<rich_text>` children).
+  /// Builds a [Document] from SQLite [txt] column (`<node>` root with child elements).
   static Document documentFromSqliteRichTxt(String txt) {
     try {
       final doc = XmlDocument.parse(txt);
       final root = doc.rootElement;
-      return _documentFromRichTextElements(
-        root.childElements.where((e) => e.name.local == 'rich_text'),
+      return _documentFromNodeChildElements(
+        root.childElements.where((e) => e.name.local != 'node'),
       );
     } on Object {
       return NoteBodyCodec.documentFromStorage(txt);
@@ -47,29 +51,82 @@ class CherrytreeQuillBridge {
         .join();
   }
 
-  static Document _documentFromRichTextElements(Iterable<XmlElement> richTexts) {
-    final list = richTexts.toList();
+  static Document _documentFromNodeChildElements(Iterable<XmlElement> elements) {
+    final list = elements.toList();
     if (list.isEmpty) {
       return Document();
     }
     final ops = <Map<String, dynamic>>[];
     for (final el in list) {
-      final text = _directXmlText(el);
-      if (text.isEmpty) continue;
-      final attrs = _quillInlineAttrsFromCtElement(el);
-      if (attrs.isEmpty) {
-        ops.add(<String, dynamic>{'insert': text});
-      } else {
-        ops.add(<String, dynamic>{'insert': text, 'attributes': attrs});
+      final name = el.name.local;
+      switch (name) {
+        case 'rich_text':
+          final text = _directXmlText(el);
+          if (text.isEmpty) continue;
+          final attrs = _quillInlineAttrsFromCtElement(el);
+          if (attrs.isEmpty) {
+            ops.add(<String, dynamic>{'insert': text});
+          } else {
+            ops.add(<String, dynamic>{'insert': text, 'attributes': attrs});
+          }
+          break;
+        case 'codebox':
+          final code = _directXmlText(el);
+          final syntax = el.getAttribute('syntax_highlighting') ?? '';
+          final lines = code.split('\n');
+          for (var i = 0; i < lines.length; i++) {
+            if (lines[i].isNotEmpty) {
+              ops.add({'insert': lines[i]});
+            }
+            final blockAttrs = <String, dynamic>{'code-block': true};
+            if (syntax.isNotEmpty) {
+              blockAttrs['code-block'] = syntax;
+            }
+            ops.add({
+              'insert': '\n',
+              'attributes': blockAttrs,
+            });
+          }
+          break;
+        case 'table':
+          final rows = el.childElements.where((e) => e.name.local == 'row').toList();
+          if (rows.isNotEmpty) {
+            final tableBuf = StringBuffer('\n');
+            for (var r = 0; r < rows.length; r++) {
+              final cells = rows[r].childElements.where((e) => e.name.local == 'cell').toList();
+              final rowStr = cells.map((c) => _directXmlText(c).replaceAll('|', '\\|').trim()).join(' | ');
+              tableBuf.writeln('| $rowStr |');
+              if (r == 0) {
+                final sep = cells.map((_) => '---').join(' | ');
+                tableBuf.writeln('| $sep |');
+              }
+            }
+            tableBuf.writeln();
+            ops.add({'insert': tableBuf.toString()});
+          }
+          break;
+        case 'encoded_png':
+          final b64 = _directXmlText(el).trim();
+          if (b64.isNotEmpty) {
+            ops.add({
+              'insert': {
+                'image': 'data:image/png;base64,$b64',
+              },
+            });
+            ops.add({'insert': '\n'});
+          }
+          break;
       }
     }
     if (ops.isEmpty) {
       return Document();
     }
     final last = ops.last;
-    final lastInsert = last['insert'] as String;
-    if (!lastInsert.endsWith('\n')) {
+    final lastInsert = last['insert'];
+    if (lastInsert is String && !lastInsert.endsWith('\n')) {
       last['insert'] = '$lastInsert\n';
+    } else if (lastInsert is! String) {
+      ops.add({'insert': '\n'});
     }
     return Document.fromJson(ops);
   }
@@ -101,6 +158,21 @@ class CherrytreeQuillBridge {
         case _kLink:
           if (value.isNotEmpty) attrs['link'] = value;
           break;
+        case _kFamily:
+          if (value == 'monospace') attrs['code'] = true;
+          break;
+        case _kScale:
+          if (value == 'h1') attrs['header'] = 1;
+          if (value == 'h2') attrs['header'] = 2;
+          if (value == 'h3') attrs['header'] = 3;
+          if (value == 'sub') attrs['script'] = 'sub';
+          if (value == 'sup') attrs['script'] = 'super';
+          break;
+        case _kJustification:
+          if (value == 'center') attrs['align'] = 'center';
+          if (value == 'right') attrs['align'] = 'right';
+          if (value == 'fill') attrs['align'] = 'justify';
+          break;
         default:
           break;
       }
@@ -108,12 +180,26 @@ class CherrytreeQuillBridge {
     return attrs;
   }
 
-  /// Appends `<rich_text>` children to [b] from [document] (CTD / CTB body payload).
+  /// Appends `<rich_text>` and `<encoded_png>` children to [b] from [document] (CTD / CTB body payload).
   static void writeRichTextChildren(XmlBuilder b, Document document) {
     final delta = document.toDelta();
     for (final op in delta.toList()) {
       if (!op.isInsert) continue;
       final data = op.data;
+      if (data is Map && data.containsKey('image')) {
+        final imgUrl = data['image'] as String? ?? '';
+        if (imgUrl.startsWith('data:image/png;base64,')) {
+          final b64 = imgUrl.substring('data:image/png;base64,'.length);
+          b.element(
+            'encoded_png',
+            attributes: {'char_offset': '0', 'justification': 'left'},
+            nest: () {
+              b.text(b64);
+            },
+          );
+        }
+        continue;
+      }
       if (data is! String) continue;
       if (data.isEmpty) continue;
       final ctAttrs = _ctAttrsFromQuill(op.attributes);
@@ -146,6 +232,17 @@ class CherrytreeQuillBridge {
     if (attrs['italic'] == true) m[_kStyle] = _vItalic;
     if (attrs['underline'] == true) m[_kUnderline] = 'true';
     if (attrs['strike'] == true) m[_kStrikethrough] = 'true';
+    if (attrs['code'] == true) m[_kFamily] = 'monospace';
+    final header = attrs['header'];
+    if (header == 1) m[_kScale] = 'h1';
+    if (header == 2) m[_kScale] = 'h2';
+    if (header == 3) m[_kScale] = 'h3';
+    if (attrs['script'] == 'sub') m[_kScale] = 'sub';
+    if (attrs['script'] == 'super') m[_kScale] = 'sup';
+    final align = attrs['align'];
+    if (align == 'center') m[_kJustification] = 'center';
+    if (align == 'right') m[_kJustification] = 'right';
+    if (align == 'justify') m[_kJustification] = 'fill';
     final fg = _ctRgb24FromQuillColor(attrs['color']?.toString());
     if (fg != null) m[_kForeground] = fg;
     final bg = _ctRgb24FromQuillColor(attrs['background']?.toString());

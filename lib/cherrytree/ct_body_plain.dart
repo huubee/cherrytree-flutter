@@ -66,9 +66,22 @@ class CtBodyPlain {
           out.write('\n');
           break;
         case 'codebox':
+          final code = richTextDirectText(child).trim();
+          if (code.isNotEmpty) {
+            out.write('\n$code\n');
+          }
+          break;
         case 'table':
+          final rows = child.childElements.where((e) => e.name.local == 'row');
+          for (final row in rows) {
+            final cells = row.childElements.where((e) => e.name.local == 'cell');
+            final cellTexts = cells.map(richTextDirectText).join(' | ');
+            if (cellTexts.isNotEmpty) {
+              out.write('| $cellTexts |\n');
+            }
+          }
+          break;
         case 'encoded_png':
-          unsupportedSlot = true;
           break;
         default:
           warnings.add('Unsupported slot: ${child.name.local}');
@@ -90,6 +103,14 @@ class CtBodyPlain {
       for (final child in root.childElements) {
         if (child.name.local == 'rich_text') {
           buffer.writeln(richTextDirectText(child));
+        } else if (child.name.local == 'codebox') {
+          buffer.writeln(richTextDirectText(child));
+        } else if (child.name.local == 'table') {
+          final rows = child.childElements.where((e) => e.name.local == 'row');
+          for (final row in rows) {
+            final cells = row.childElements.where((e) => e.name.local == 'cell');
+            buffer.writeln(cells.map(richTextDirectText).join(' | '));
+          }
         }
       }
       return normalizeSeparatedCheckboxLines(buffer.toString().trimRight());

@@ -729,6 +729,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get specialCharsDone;
+
+  /// No description provided for @insertCodeboxTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert Code Box'**
+  String get insertCodeboxTooltip;
+
+  /// No description provided for @insertTableTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert Table'**
+  String get insertTableTooltip;
+
+  /// No description provided for @codeboxDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert Code Box'**
+  String get codeboxDialogTitle;
+
+  /// No description provided for @codeboxLanguageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get codeboxLanguageLabel;
+
+  /// No description provided for @codeboxCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get codeboxCodeLabel;
+
+  /// No description provided for @exportActionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Notes'**
+  String get exportActionTitle;
+
+  /// No description provided for @exportDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Notes'**
+  String get exportDialogTitle;
+
+  /// No description provided for @exportScopeEntireTree.
+  ///
+  /// In en, this message translates to:
+  /// **'Entire Tree'**
+  String get exportScopeEntireTree;
+
+  /// No description provided for @exportScopeSelectedWithSubnodes.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Node & Subnodes'**
+  String get exportScopeSelectedWithSubnodes;
+
+  /// No description provided for @exportScopeSelectedOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Node Only'**
+  String get exportScopeSelectedOnly;
+
+  /// No description provided for @exportFormatLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get exportFormatLabel;
+
+  /// No description provided for @exportCopyToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy to Clipboard'**
+  String get exportCopyToClipboard;
+
+  /// No description provided for @exportSaveToFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to File'**
+  String get exportSaveToFile;
+
+  /// No description provided for @exportCopiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Export copied to clipboard'**
+  String get exportCopiedToClipboard;
 }
 
 class _AppLocalizationsDelegate
