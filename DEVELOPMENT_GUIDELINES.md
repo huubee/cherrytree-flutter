@@ -1,9 +1,9 @@
 # Flutter/Dart Enterprise Development Guidelines & AI Agent Directives
 
-> Synced from huubee/dev-guidelines v2.4.0 (commit f788d89). Do not edit here; change the master and re-sync.
+> Synced from huubee/dev-guidelines v2.7.0 (commit d4a6991). Do not edit here; change the master and re-sync.
 
-> **Version:** 2.4.0  
-> **Date:** 2026-10-16  
+> **Version:** 2.7.0  
+> **Date:** 2026-11-12  
 > **Target Ecosystem:** Flutter 3.47.x stable (3.47.7, bundled Dart 3.13.5) | Dart 3.13.x  
 > **Status:** Mandatory Architecture & Coding Standard  
 > **Usage:** To be provided to human developers and autonomous/assisted AI coding agents (alongside the Product Requirements Document - PRD) at the inception and throughout the lifecycle of any Flutter/Dart project.
@@ -35,10 +35,11 @@ Version history is in [CHANGELOG.md](https://github.com/huubee/dev-guidelines/bl
 ### 1.1 First Principles
 - **Uncompromising Maintainability:** Code is written once but read, modified, and debugged hundreds of times. Clarity always trumps cleverness.
 - **Single Responsibility Principle (SRP):** Every class, function, widget, and file must have one, and only one, reason to change.
-- **Atomic File Boundaries:** Files must remain compact, focused, and strictly bounded. **No single file shall exceed 200–250 lines of code.** If a file grows beyond this, extract sub-widgets, helper extensions, or domain models.
+- **Atomic File Boundaries:** Smaller files are better, and **200–250 lines of code is the target**, but there can be exceptions. Good maintainability is the key goal. A file over the target is fine when splitting it would hurt maintainability, and such an exception should be noted briefly in a code comment or in the project's `GUIDELINES_EXCEPTIONS.md`. This is a guideline with justified exceptions, not a hard cap. When splitting improves maintainability, extract sub-widgets, helper extensions, or domain models.
 - **Immutability by Default:** All domain models, state classes, and configuration objects must be immutable (`@immutable`, `freezed`, or records).
 - **Strict Separation of Concerns:** UI layers must never execute business logic, manage raw database connections, or format network payloads directly.
 - **Deterministic & Unidirectional Data Flow (UDF):** Data flows downward from state providers/stores; user actions (events/intents) flow upward to state mutators/blocs.
+- **Same structure, own look:** Design values share one structure across apps. The look belongs to each app. Widgets read colors, strings, dimensions, durations, and breakpoints from central theme, token, or l10n files. Palettes, fonts, sizes, spacing, breakpoints, and brand assets stay app-specific. Mix stylers, when an app uses them, follow the same rule. See sections 4, 4.6, and 4.7.
 
 ---
 
@@ -77,6 +78,8 @@ lib/
 │           └── widgets/            # Feature-specific sub-widgets (extracted)
 └── main.dart                       # Entry point (initialization only)
 ```
+
+`lib/app/theme/` and `lib/app/constants/` in the tree above are one valid home for design tokens. The app may use another central folder, for example `lib/core/tokens/` or `lib/theme/`. Section 4 is the rule. Record the chosen folder in the app's README or DESIGN doc.
 
 ### 2.1 Layer Boundaries & Dependency Inversion
 1. **Domain Layer:** Pure Dart. Zero Flutter UI dependencies. Contains pure entities and repository interfaces (`abstract class UserRepository`).
@@ -150,29 +153,41 @@ linter:
 
 **ZERO MAGIC NUMBERS OR HARD-CODED STRINGS IN UI CODE.**
 
-New screens import Material and Cupertino from the standalone packages, not from the framework libraries:
+**Same structure, own look.** Every app follows the same structure for design values. Each app owns the values.
+
+- **Structure.** No hard-coded colors, user-facing strings, dimensions, spacing, radii, durations, breakpoints, or other magic values in widgets. Those values live in central files the app owns, so a change is made in one place. Homes include design tokens, `ThemeData` / `ColorScheme` plus `ThemeExtension`, a constants or dimensions file, and gen-l10n ARB files (`flutter: generate: true`) for user-facing strings. Widgets read values from `Theme`, extensions, tokens, or l10n only.
+- **Look.** Color palettes, fonts, sizes, the spacing scale, breakpoints, and brand assets belong to that app. Do not copy them from another app. This document says how and where to define them. It does not set the values.
+- **Where.** The app chooses one central folder. `lib/core/tokens/`, `lib/theme/`, and the section 2 paths `lib/app/theme/` and `lib/app/constants/` are all valid. Record the chosen folder in the app's README or DESIGN doc.
+
+System text scale is section 4.6. Mix, Remix, and a local Widgetbook are section 4.7. Neither section adds a shared visual theme.
+
+Prefer the standalone `material_ui` package over `package:flutter/material.dart` where the app's dependencies support it. `material_ui` exposes the same `ThemeData`, `ColorScheme`, and `ThemeExtension` API and is released independently of the Flutter SDK. Prefer `cupertino_ui` over `package:flutter/cupertino.dart` on the same terms.
 
 ```dart
 import 'package:material_ui/material_ui.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 ```
 
-Flutter 3.47 publishes `material_ui` and `cupertino_ui` so design libraries can ship without an SDK release. `package:flutter/material.dart` and `package:flutter/cupertino.dart` still run, and formal deprecation is scheduled for a later stable. Contributions to the in-framework copies were frozen in Flutter 3.44. Migrate with `dart fix --apply --code=migrate_design_widgets`. When a dependency still reads `Theme.of(context)` from the in-framework library, wrap the tree in `MaterialUiCompatibilityBridge`. The bridge does not fix public APIs that take or return in-framework types such as `ColorScheme` or `TextTheme`; those packages have to move to `material_ui` first. Material and Cupertino localization delegates now live in those packages. `GlobalMaterialLocalizations.delegates` includes the Cupertino and Widgets delegates.
+Flutter 3.47 publishes `material_ui` and `cupertino_ui` so design libraries can ship without an SDK release. `package:flutter/material.dart` and `package:flutter/cupertino.dart` still run, and formal deprecation is scheduled for a later stable. Contributions to the in-framework copies were frozen in Flutter 3.44. Migrate with `dart fix --apply --code=migrate_design_widgets`. When a dependency still reads `Theme.of(context)` from the in-framework library, wrap the tree in `MaterialUiCompatibilityBridge`. The bridge does not fix public APIs that take or return in-framework types such as `ColorScheme`, `TextTheme`, or `ThemeExtension`; those packages have to move to `material_ui` first. Material and Cupertino localization delegates now live in those packages. `GlobalMaterialLocalizations.delegates` includes the Cupertino and Widgets delegates.
 
-### 4.1 Global Design Tokens
-All styling primitives must be centralized under `lib/app/constants/` or `lib/app/theme/`:
+### 4.1 Central design tokens
+Define each color, size, space, radius, duration, breakpoint, and asset path once, in the central files from the rule above. Widget code uses those names.
+
+Example layout. The folder name follows the app's choice in the rule above:
 
 ```
-lib/app/constants/
-├── app_colors.dart        # Semantic color tokens (Light & Dark)
+lib/theme/
+├── app_colors.dart        # Semantic color tokens (light and dark)
 ├── app_dimensions.dart    # Spacing, padding, radius, elevation
 ├── app_typography.dart    # TextStyle hierarchies
 ├── app_durations.dart     # Animation and transition durations
 └── app_assets.dart        # SVG, image, and Lottie asset paths
 ```
 
-#### Example Token Definition:
+Example token definition. The names show the structure. The numbers are this example's scale. Another app picks its own:
+
 ```dart
+// Example scale for one app. Do not copy these numbers into another app.
 abstract final class AppDimensions {
   static const double space2 = 2.0;
   static const double space4 = 4.0;
@@ -190,11 +205,10 @@ abstract final class AppDimensions {
 }
 ```
 
+Color literals live in the color tokens or in `ColorScheme` and `ThemeExtension` values, with a light scheme and a dark scheme when the app has both. Widgets read `Theme.of(context).colorScheme`, a `ThemeExtension`, or the app's color tokens. Font family, size, and weight live in the typography tokens. Section 4.3 keeps those out of the color theme. Those sizes are the unscaled sizes. Section 4.6 is the OS text scaler on top of them.
+
 ### 4.2 Responsive, Adaptive & Foldable Layout Rules
-- **Breakpoints:**
-  - **Phone / Folded State:** `< 600dp`
-  - **Tablet / Unfolded Foldable:** `600dp - 1024dp`
-  - **Desktop / Large Screen:** `> 1024dp`
+- **Breakpoints:** Define the app's widths in the central tokens. Widgets compare against those constants. Example only. One app's scale is phone / folded below `600dp`, tablet / unfolded foldable from `600dp` to `1024dp`, and desktop above `1024dp`. Another app uses a different scale.
 - **Dynamic Hinge & Display Feature Awareness:**
   - Avoid rendering interactive elements or primary content directly across physical seams or hinges.
   - Query `MediaQuery.displayFeaturesOf(context)` to detect physical display splits (`DisplayFeatureType.hinge` or `DisplayFeatureType.folding`).
@@ -204,6 +218,93 @@ abstract final class AppDimensions {
   - Wrap scrollable views in `SingleChildScrollView` or `CustomScrollView` to prevent layout overflow errors during live folding state changes.
 - **State Preservation on Posture Shift:**
   - Ensure controller state, form inputs, and scroll positions persist across live fold/unfold display reconfigurations.
+- **System text scale:** Large OS text is a layout input, in the same way a narrow width is. Section 4.6 is the rule. Locking `textScaler` to 1.0 does not satisfy it.
+
+### 4.3 Color themes
+A color theme contains colors only. Switching variants does not change layout, which widgets are built, font family, font size, font weight, spacing, or radii. Text and icon colors are part of the theme and may differ by variant. Font size in that rule is the token size. A light or dark switch does not change it. The OS text scaler in section 4.6 still multiplies it.
+
+If the app offers a dark variant, it also offers a light variant. Both are color schemes in the central theme files. An app may offer light only.
+
+### 4.4 Catching hard-coded values
+- **Analyzer.** The Dart linter and `flutter_lints` do not ship a rule that forbids literal colors, spacing, radii, durations, or breakpoints in widgets. `use_full_hex_values_for_flutter_colors` only requires an eight-digit hex when a `Color` is constructed from an integer. Where a maintained analyzer plugin flags hard-coded colors or strings, enable it after the package check in section 12.1.
+- **Review.** UI review includes this checklist item: every color, user-facing string, dimension, duration, and breakpoint in a widget comes from theme, a token, or l10n. Literals stay in the central token and theme files.
+- **Text scale.** The same review checks section 4.6. The change does not force a text scaler of 1.0, and a box that holds text does not take a fixed height.
+- **CI (optional).** A grep, or a small script, over `lib/` may fail the job on `Color(0x`, `Colors.`, `EdgeInsets`, `BorderRadius.circular(`, and `Duration(` outside the central token and theme files. Exclude those central files, tests, and generated code. The check is optional. `TextScaler.noScaling` and `withNoTextScaling` outside a documented exception are worth the same kind of grep.
+
+### 4.5 Dutch copy: informal address
+
+Dutch text shown to users uses the informal form. This covers UI strings, emails, notifications, and documentation shown to users. Write `je`, `jij`, `jou`, and `jouw`, and the verb forms that go with them. Do not write `u` or `uw`. Keep the tone friendly, clear, and concise.
+
+The rule applies to every app. Each app still has its own look and feel. Color, type, spacing, and brand stay with that app, as in the rule at the top of this section.
+
+| Before | After |
+| :--- | :--- |
+| U kunt uw wachtwoord wijzigen | Je kunt je wachtwoord wijzigen |
+| Controleer uw e-mail | Controleer je e-mail |
+| Wilt u doorgaan? | Wil je doorgaan? |
+
+- **Check (recommended).** Add an automated check or test that fails when Dutch (`nl`) strings contain a formal pronoun. Match `u` and `uw` on a word boundary, case-insensitive. Run it over the Dutch l10n files (gen-l10n ARB, for example `app_nl.arb`) and over other Dutch copy the app shows to users, such as email and notification templates.
+
+### 4.6 System text scale
+
+People using svgr-reserveringen and zwitsers_veldschieten set a larger system font, and the layout breaks. Android calls the setting Font size (Settings > Font size). iOS calls it Larger Text, under Settings > Accessibility > Display & Text Size, and that setting is Dynamic Type. The same settings apply to every current store app and to every future store app.
+
+Flutter applies that choice through `MediaQuery.textScaler`. `Text` and other widgets that read the ambient scaler scale their font size with it. On a linear scaler that is a multiply. Apps must honour the scaler. Typography tokens stay the sizes at scale 1.0. They are not a reason to ignore the OS setting.
+
+Sources, checked 2026-11-12: [Large fonts](https://docs.flutter.dev/ui/accessibility/ui-design-and-styling), [TextScaler migration](https://docs.flutter.dev/release/breaking-changes/deprecate-textscalefactor), [Android 14 nonlinear font scaling](https://docs.flutter.dev/release/breaking-changes/android-14-nonlinear-text-scaling-migration), [`MediaQuery.textScalerOf`](https://api.flutter.dev/flutter/widgets/MediaQuery/textScalerOf.html).
+
+- Do not set `TextScaler.noScaling`, `MediaQuery.withNoTextScaling`, or a `textScaler` of `TextScaler.linear(1.0)` so that a layout stays put. [`TextScaler.noScaling`](https://api.flutter.dev/flutter/painting/TextScaler/noScaling-constant.html) is `TextScaler.linear(1.0)`. `MediaQuery.withClampedTextScaling` with a max of 1.0 is the same refusal. Do not install the Android 14 "temporarily opting out" snippet from the nonlinear-scaling guide. It replaces the platform scaler with a linear one and reads the deprecated `textScaleFactor` getter.
+- Do not pass the deprecated `textScaleFactor` argument on `Text`, `RichText`, `EditableText`, or `MediaQueryData`. When code must compute a size, use `MediaQuery.textScalerOf(context).scale(fontSize)`.
+- On Android 14 and later the platform scaler can be nonlinear: larger fonts grow by less than smaller ones. Production code keeps the scaler the platform provided. Tests in section 10.2 still pump linear 1.5 and linear 2.0, which is the 200% stress case Android documents.
+- **Exception.** A control that cannot reflow, such as a data-dense chart, or an icon font that is not itself a label, may opt out. Flutter's own icon-font example is [`MediaQuery.withNoTextScaling`](https://api.flutter.dev/flutter/widgets/MediaQuery/withNoTextScaling.html). The opt-out is written next to the widget, in a short comment or in the app's `GUIDELINES_EXCEPTIONS.md`. The same information has an accessible alternative that does scale, such as a table, a list, or a text label.
+
+Layout, so scale 1.5 and 2.0 do not break the screen:
+
+- No fixed height on a container that holds text. That includes a tight `SizedBox`, `Container`, or `ConstrainedBox`, and a fixed button height or `toolbarHeight`, when the child is text. Height comes from the child, or the region scrolls.
+- A `Row` of labels gives each label a bounded width with `Flexible` or `Expanded`, and the label wraps inside that width. When the labels do not belong on one line, use `Wrap` instead of `Row`.
+- `TextOverflow.ellipsis` is not the fix for a string the user has to read. Wrap it, or put it in a scroll view.
+- Buttons and app bars grow with their labels, or the labels scroll. They do not clip.
+- Touch targets are at least 48dp on the shortest side at text scale 1.0. That meets Android's 48dp minimum and iOS's 44pt minimum ([tap target size](https://docs.flutter.dev/ui/accessibility/ui-design-and-styling)). At a larger scale the target stays usable: the hit area grows with the label, rather than clipping the label inside a fixed 48dp box.
+- Before a store build, check a small phone width, about 375 logical pixels (iPhone SE class, 375×667 points), at text scale 1.0, 1.5, and 2.0, in NL and EN, in light and in dark. Dark applies when the app has a dark scheme (section 4.3). Dutch copy is often longer than English. Both locales are part of the check.
+
+Widget tests that lock this in are in section 10.2. A local Widgetbook catalogue of the same three axes is in section 4.7. The catalogue does not replace the tests.
+
+### 4.7 Mix, Remix, and Widgetbook
+
+This section follows the Flutter channel video [The new way to build custom design libraries with Flutter](https://www.youtube.com/watch?v=b-u0t5QF3XY) (Craig, Mix, and Widgetbook, published 2026-11-11).
+
+Mix and Remix are for a new app, and for a new primitive in that app's own design system. They are not a rewrite of an existing app. Apps that already depend on `package:material_ui` keep it. Section 4 still prefers `material_ui` and `cupertino_ui` over `package:flutter/material.dart` and `package:flutter/cupertino.dart` where dependencies allow. Adopting Mix does not mean leaving `material_ui`.
+
+**Mix** is the styling layer. A style is a value, separate from the widget tree, and it resolves with context: padding, color, radius, dark mode, hover. Stylers compose. A later call overrides the fields it sets and leaves the rest. Variants such as `onDark` and `onHovered` carry the states that would otherwise be conditionals in `build`. The app's tokens and stylers live in the central folder from section 4. A styler written beside a widget is still a hard-coded design value when it contains color, font, or dimension literals. Those literals stay in the token files.
+
+Checked on pub.dev 2026-11-12: `mix` 2.4.0 is stable. Its pubspec requires Dart `>=3.12.0 <4.0.0` and Flutter `>=3.44.0`. The Flutter 3.47 / Dart 3.13 baseline in this document satisfies that. The [getting-started](https://fluttermix.com/mix/docs/overview/getting-started/) page on that date listed the same SDK floor and showed a sample pin of `mix: ^2.3.1`, which is behind 2.4.0. The pubspec of the version you add is the constraint. Verify current versions before locking a new app. Docs: [Styling](https://fluttermix.com/mix/docs/guides/styling/), [dynamic styling](https://fluttermix.com/mix/docs/guides/dynamic-styling/), [design tokens](https://fluttermix.com/mix/docs/guides/design-token/). Package: [mix](https://pub.dev/packages/mix). The video's short link [g.dev/flutter/mix](https://g.dev/flutter/mix) resolved to that pub.dev page. Source: [btwld/mix](https://github.com/btwld/mix).
+
+**Remix** is the component layer on Mix. The component supplies interaction, focus, and accessibility. The look is a Mix styler the app owns. Remix is built on Naked UI's unstyled primitives, which sit on Flutter raw widgets. [`RawMenuAnchor`](https://api.flutter.dev/flutter/widgets/RawMenuAnchor-class.html) is one of those widgets: it anchors a menu overlay, and the API docs say it does not manage semantics or focus. The component on top of it does. Remix does not require `MaterialApp`. Flutter has moved Material and Cupertino out of the framework into `material_ui` and `cupertino_ui` ([migration](https://docs.flutter.dev/release/breaking-changes/material-ui-and-cupertino-ui), and section 4). For a custom look, prefer raw widgets plus the app's own styles. Restyling Material widgets to fight the brand is the path this section avoids. An existing Material screen can stay on `material_ui` until that screen is actually rebuilt.
+
+Checked on pub.dev 2026-11-12: `remix` 1.0.0-rc.2 (published 2026-11-11) is a release candidate, not a stable. It requires Dart `>=3.12.0 <4.0.0` and Flutter `>=3.44.0`, and it depends on `mix` ^2.3.1 and `naked_ui` ^2.0.0-rc.1. `flutter pub add remix` resolves the latest stable, which is still `remix` 0.2.0 (2026-04-15), an older publish of the same package. Do not treat 0.2.0 as the 1.0 line from the video. Verify current versions before adding the package. A new app takes the current stable 1.x when one exists. Until then it may use the current 1.0 pre-release, and it names that version in the app README so the next upgrade is visible. The app depends on `remix`. It does not add a direct `naked_ui` dependency for ordinary screens. Docs: [Remix](https://docs.page/btwld/remix). Package: [remix](https://pub.dev/packages/remix). Source: [btwld/remix](https://github.com/btwld/remix).
+
+**Own look.** Each app owns its Mix tokens and stylers. There is no shared Mix theme and no shared Remix skin across apps. This document does not prescribe Fluent UI. Remix's published presets (`vanilla`, `fortal`, `heroui`) are starter files one app may copy into its own tree. They are not a house style, and this document does not require them. Copied preset files become that app's tokens and follow section 4.
+
+Adding `mix`, `remix`, or `widgetbook` for the uses in this section is already approved under section 12.1. A different major, or a different package with a similar name, still needs a package card.
+
+**Widgetbook** is a local catalogue of the app's shared components and screens. It is a dev dependency and a separate target. It is not a route in the production app. The catalogue must switch three axes:
+
+- Locale: NL and EN, through the app's gen-l10n delegates.
+- Brightness: light and dark. Dark applies when the app has a dark scheme.
+- Text scale: 1.0, 1.5, and 2.0.
+
+Checked on pub.dev 2026-11-12. Stable `widgetbook` is 3.25.0 (published 2026-06-25). It requires Dart `>=3.10.0 <4.0.0` and Flutter `>=3.44.0`. On that line the three axes are addons: [`LocalizationAddon`](https://docs.widgetbook.io/addons/localization-addon), [`MaterialThemeAddon`](https://docs.widgetbook.io/addons/theme-addon) (or `ThemeAddon` when the app does not use `ThemeData`), and [`TextScaleAddon`](https://docs.widgetbook.io/addons/text-scale-addon). In 3.25.0, `TextScaleAddon` defaults to a slider from 0.5 to 2.0, which includes 1.0, 1.5, and 2.0. The `scales` list on that constructor is deprecated. Keep the default max at 2.0 or higher so 2.0 stays selectable.
+
+Widgetbook 4 (Story, Args, Modes, and `build_runner`) is still beta. Checked 2026-11-12: the newest publish is `widgetbook` 4.0.0-beta.15 (2026-11-02). There is no stable 4.0.0. The v4 docs say the beta may be unstable and that API-defining changes can still land in minor releases ([What's new in Widgetbook 4?](https://docs.widgetbook.io/~v4/whats-new-in-v4)). On that beta the same three axes are `LocaleMode`, `MaterialThemeMode`, and `TextScaleMode`. Those names are the beta API, not a pin. The beta package registers its own `build_runner` builders (`story_builder` in its `build.yaml`). It does not use the separate `widgetbook_generator` package. The newest `widgetbook_generator` 4 publish checked was 4.0.0-alpha.4 (2025-11-21), which is older than 4.0.0-beta.15 and is not the generator to add beside it. Prefer the current stable 3.x line until 4.0.0 is stable. On 2026-11-12 that stable was `widgetbook` 3.25.0 with `widgetbook_generator` 3.24.0 and `widgetbook_annotation` 3.11.0. When 4.0.0 is stable, move the catalogue onto Modes and keep the three axes. Verify current versions on [pub.dev](https://pub.dev/packages/widgetbook) before locking. Do not copy the numbers in this section into a pubspec without that check.
+
+Widgetbook Cloud is a hosted review. It is optional, and it is not required to meet this section. Docs: [Widgetbook Cloud](https://docs.widgetbook.io/cloud). The video's short link [g.dev/flutter/widgetbook-cloud](https://g.dev/flutter/widgetbook-cloud) resolved to the product site, [widgetbook.io/cloud](https://www.widgetbook.io/cloud).
+
+**Adoption**
+
+1. **Every app, now.** Honour section 4.6 and add the section 10.2 tests. This includes svgr-reserveringen, zwitsers_veldschieten, and every future store app.
+2. **Existing store apps.** Fix the screens that overflow at large text first. Mix is optional on those apps.
+3. **New store apps.** Start with per-app Mix and Remix styles and a local Widgetbook. The same start applies to any other new app.
+4. **Fleet migration.** A move of existing apps onto Mix starts as a pilot on one app. It does not land in every repo in one change.
 
 ---
 
@@ -411,6 +512,40 @@ final class UnauthorizedFailure extends Failure {
 ### 10.2 Widget Tests
 - Test atomic components and feature screens for state rendering (`AsyncData`, `AsyncLoading`, `AsyncError`).
 - Test user interactions (tapping buttons, entering text, validating form triggers).
+- Pump feature screens and text-bearing shared widgets at `TextScaler.linear(1.5)` and `TextScaler.linear(2.0)`, at about 375 logical pixels wide, in NL and EN. When the app has a dark scheme, pump light and dark as well. Section 4.6 is the layout rule. These tests lock it in.
+- Assert no `RenderFlex` overflow. `tester.takeException()` returns the `FlutterError` an overflow reports during the pump. `expect(tester.takeException(), isNull)` fails the test when that error was reported.
+- Where the screen puts labels inside an `InteractiveViewer`, the test finds those labels and checks they are not clipped away. A label under a clip, with no scroll or pan that can bring it on screen, fails the test. `takeException()` does not catch that clip.
+- At text scale 1.0, `meetsGuideline(androidTapTargetGuideline)` and `meetsGuideline(iOSTapTargetGuideline)` from [accessibility testing](https://docs.flutter.dev/ui/accessibility/accessibility-testing) cover the 48dp and 44pt floors. They do not replace the overflow pumps at 1.5 and 2.0.
+
+`MaterialApp` builds its own `MediaQuery` from the view, so a `MediaQuery` placed above `MaterialApp` does not win. Put the scaler on the `builder`, under the app's media query. The root widget in the sample is the app's. On `material_ui` that is `MaterialApp` or `MaterialApp.router` from `package:material_ui`. `physicalSize` is in physical pixels. With `devicePixelRatio` 1.0, 375×667 is the iPhone SE-class logical size from section 4.6. Repeat the pump with `TextScaler.linear(1.5)` and with `Locale('en')`.
+
+```dart
+testWidgets('screen does not overflow at text scale 2', (tester) async {
+  tester.view.devicePixelRatio = 1.0;
+  tester.view.physicalSize = const Size(375, 667);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.view.resetPhysicalSize);
+
+  await tester.pumpWidget(
+    MaterialApp(
+      locale: const Locale('nl'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: const TextScaler.linear(2.0),
+          ),
+          child: child!,
+        );
+      },
+      home: const ReservationScreen(),
+    ),
+  );
+
+  expect(tester.takeException(), isNull);
+});
+```
 
 ### 10.3 Integration Tests
 - End-to-end user journeys tested in the `integration_test/` directory, with the SDK package `integration_test` (not the older `flutter_driver` flow).
@@ -461,10 +596,12 @@ Flag on the Android toolchain line in that card: Flutter 3.47 still builds many 
 
 ### 12.2 Operational AI Coding Rules
 1. **Consult PRD & Guidelines First:** Never invent unapproved business logic or substitute architecture without confirmation.
-2. **Strict File Size Budget:** Keep every generated file strictly under **200–250 LOC**. Modularize screens into sub-widgets proactively.
+2. **File Size Guideline:** Smaller files are better, and **200–250 lines is the target**, but there can be exceptions. Good maintainability is the key goal. A generated file over the target is fine when splitting it would hurt maintainability, and such an exception should be noted briefly in a code comment or in the project's `GUIDELINES_EXCEPTIONS.md`. This is a guideline with justified exceptions, not a hard cap. Modularize screens into sub-widgets when that split improves maintainability.
 3. **No Truncated Placeholders:** Never emit lazy comments like `// ... rest of code unchanged ...`. Always provide valid, compilable code or targeted diffs.
-4. **Automated Code Generation:** Whenever modifying Freezed, Riverpod, or JSON Serializable models, trigger or instruct running `dart run build_runner build --delete-conflicting-outputs`.
-5. **Zero Hardcoded Assets & Strings:** When creating new screens, populate `AppStrings`, `AppColors`, and `AppDimensions`. Flag, kept: official Flutter i18n is gen-l10n ARB files with `flutter: generate: true`, not an `AppStrings` class. This bullet stays as the general convention. An app repo may override it in its local copy of this file or in `GUIDELINES_EXCEPTIONS.md`.
+4. **Automated Code Generation:** Whenever modifying Freezed, Riverpod, JSON Serializable models, or Widgetbook use-cases and stories, trigger or instruct running `dart run build_runner build --delete-conflicting-outputs`. Widgetbook's generators are in section 4.7.
+5. **Zero hard-coded design values:** Keep colors, user-facing strings, dimensions, spacing, radii, durations, breakpoints, and other magic values out of widgets. Read them from the app's theme, tokens, or l10n. User-facing strings go in gen-l10n ARB files (`flutter: generate: true`). Do not copy another app's palette, type scale, spacing, or breakpoints. See section 4.
+6. **System text scale:** Honour `MediaQuery.textScaler`. Do not set `TextScaler.noScaling`, `MediaQuery.withNoTextScaling`, or a scaler of 1.0 except the documented exception in section 4.6. Layout and the widget tests are sections 4.6 and 10.2.
+7. **Mix, Remix, Widgetbook:** Do not add them to an existing app unless the task says so. Do not invent a shared Mix theme, a shared Remix skin, or a Fluent UI house style. New apps follow section 4.7. Do not rewrite an app off `package:material_ui` in order to adopt Mix.
 
 ---
 
@@ -601,6 +738,8 @@ Modern AI-assisted development leverages the **Model Context Protocol (MCP)** to
 
 Pins below were checked against pub.dev and the Flutter 3.47.7 SDK on 2026-10-16. They are a starting baseline, not a freeze. Use the current stable versions, still subject to the package-vetting rules in section 12.1. Re-check pub.dev before locking a new app. An app repo may record a different pin in its local exceptions.
 
+`mix`, `remix`, and `widgetbook` are not in this baseline. Existing apps are not required to add them. Section 4.7 says when a new app adds them, and which versions were current on 2026-11-12. Verify current versions before locking. Do not copy those numbers here.
+
 `riverpod_annotation` and `riverpod_generator` are major 4 beside `flutter_riverpod` 3.4.3. `freezed` 4.0.2 uses `freezed_annotation` 3.1.0. `dual_screen` is omitted because 1.0.4 does not resolve on Dart 3. `gap` 3.0.1 is the latest release and still resolves; it was last published 2023-06-24, so treat it as unmaintained and replace it when a vetted alternative is chosen. `hooks_riverpod` is not in this baseline: its `flutter_hooks` 0.21.3+1 constraint is `sdk: >=2.17.0 <3.0.0`, which does not resolve on Dart 3.13.
 
 ```yaml
@@ -620,7 +759,8 @@ dependencies:
     sdk: flutter
 
   # Standalone design libraries (Flutter 3.47+). Prefer these over
-  # package:flutter/material.dart. See section 4.
+  # package:flutter/material.dart where dependencies support it.
+  # Same ThemeData, ColorScheme, and ThemeExtension API. See section 4.
   material_ui: ^1.7.0
   # cupertino_ui: ^1.1.3
 
