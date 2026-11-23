@@ -9,11 +9,31 @@ on:
     branches: [main]
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || (github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop') }}
 
 jobs:
+  changes:
+    name: Detect code changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            code:
+              - '**'
+              - '!**/*.md'
+              - '!docs/**'
+              - '!LICENSE'
+              - '!.github/ISSUE_TEMPLATE/**'
+
   analyze-and-test:
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,3 +53,32 @@ jobs:
 
       - name: Unit and widget tests
         run: flutter test
+
+  ci-result:
+    name: CI result
+    needs: [changes, analyze-and-test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require test jobs when code changed
+        env:
+          EVENT: ${{ github.event_name }}
+          CHANGES: ${{ needs.changes.result }}
+          CODE: ${{ needs.changes.outputs.code }}
+          TEST_RESULT: ${{ needs.analyze-and-test.result }}
+        run: |
+          set -euo pipefail
+          if [ "$CHANGES" = "failure" ] || [ "$CHANGES" = "cancelled" ]; then
+            echo "Changes detection job result: $CHANGES"
+            exit 1
+          fi
+          if [ "$TEST_RESULT" = "failure" ] || [ "$TEST_RESULT" = "cancelled" ]; then
+            echo "Analyze and test job result: $TEST_RESULT"
+            exit 1
+          fi
+          if [ "$EVENT" = "workflow_dispatch" ] || [ "$CODE" = "true" ]; then
+            if [ "$TEST_RESULT" != "success" ]; then
+              echo "Analyze and test job was required but result is: $TEST_RESULT"
+              exit 1
+            fi
+          fi
